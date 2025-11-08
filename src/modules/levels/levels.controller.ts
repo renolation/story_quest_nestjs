@@ -11,10 +11,15 @@ import {
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { LevelsService } from './levels.service';
 import { CreateLevelDto } from './dto/create-level.dto';
 import { UpdateLevelDto } from './dto/update-level.dto';
+import { LevelResponseDto } from './dto/level-response.dto';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
+@ApiTags('Levels')
+@ApiBearerAuth()
 @Controller('levels')
 export class LevelsController {
   constructor(private readonly levelsService: LevelsService) {}
@@ -26,19 +31,58 @@ export class LevelsController {
   }
 
   @Get()
+  @ApiOperation({
+    summary: 'Get all levels with user progress',
+    description: 'Retrieves levels with the authenticated user\'s progress data. Optionally filter by unitId',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Levels retrieved successfully with progress',
+    type: [LevelResponseDto],
+  })
+  @ApiQuery({
+    name: 'unitId',
+    required: false,
+    type: String,
+    description: 'Filter levels by unit ID',
+  })
+  @ApiQuery({
+    name: 'includeQuestions',
+    required: false,
+    type: String,
+    description: 'Set to "true" to include nested questions',
+  })
   findAll(
+    @CurrentUser() user: any,
     @Query('unitId') unitId?: string,
     @Query('includeQuestions') includeQuestions?: string,
-  ) {
-    return this.levelsService.findAll(unitId, includeQuestions === 'true');
+  ): Promise<LevelResponseDto[]> {
+    return this.levelsService.findAll(user.id, unitId, includeQuestions === 'true');
   }
 
   @Get(':id')
+  @ApiOperation({
+    summary: 'Get a level by ID with user progress',
+    description: 'Retrieves a specific level with the authenticated user\'s progress data',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Level retrieved successfully with progress',
+    type: LevelResponseDto,
+  })
+  @ApiResponse({ status: 404, description: 'Level not found' })
+  @ApiQuery({
+    name: 'includeQuestions',
+    required: false,
+    type: String,
+    description: 'Set to "true" to include nested questions',
+  })
   findOne(
+    @CurrentUser() user: any,
     @Param('id', ParseUUIDPipe) id: string,
     @Query('includeQuestions') includeQuestions?: string,
-  ) {
-    return this.levelsService.findOne(id, includeQuestions === 'true');
+  ): Promise<LevelResponseDto> {
+    return this.levelsService.findOne(id, user.id, includeQuestions === 'true');
   }
 
   @Patch(':id')

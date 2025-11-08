@@ -4,12 +4,15 @@ import { Repository } from 'typeorm';
 import { Level } from './entities/level.entity';
 import { CreateLevelDto } from './dto/create-level.dto';
 import { UpdateLevelDto } from './dto/update-level.dto';
+import { LevelResponseDto } from './dto/level-response.dto';
+import { ProgressService } from '../progress/progress.service';
 
 @Injectable()
 export class LevelsService {
   constructor(
     @InjectRepository(Level)
     private readonly levelRepository: Repository<Level>,
+    private readonly progressService: ProgressService,
   ) {}
 
   async create(createLevelDto: CreateLevelDto): Promise<Level> {
@@ -17,7 +20,7 @@ export class LevelsService {
     return await this.levelRepository.save(level);
   }
 
-  async findAll(unitId?: string, includeQuestions = false): Promise<Level[]> {
+  async findAll(userId: string, unitId?: string, includeQuestions = false): Promise<LevelResponseDto[]> {
     const query: any = {
       where: unitId ? { unitId, isActive: true } : { isActive: true },
       order: { orderIndex: 'ASC' },
@@ -27,10 +30,30 @@ export class LevelsService {
       query.relations = ['questions', 'questions.answerOptions'];
     }
 
-    return await this.levelRepository.find(query);
+    const levels = await this.levelRepository.find(query);
+
+    // Fetch all level progresses for this user efficiently
+    const levelsData = levels.map(l => ({ id: l.id, passingScore: l.passingScore }));
+    const progressMap = await this.progressService.mapLevelsProgressToDto(userId, levelsData);
+
+    // Map to response DTOs with progress
+    return levels.map(level => ({
+      id: level.id,
+      title: level.title,
+      description: level.description,
+      unitId: level.unitId,
+      orderIndex: level.orderIndex,
+      timeLimitSeconds: level.timeLimitSeconds,
+      passingScore: level.passingScore,
+      isActive: level.isActive,
+      createdAt: level.createdAt,
+      updatedAt: level.updatedAt,
+      questions: includeQuestions ? level.questions : undefined,
+      progress: progressMap.get(level.id) || null,
+    }));
   }
 
-  async findOne(id: string, includeQuestions = false): Promise<Level> {
+  async findOne(id: string, userId: string, includeQuestions = false): Promise<LevelResponseDto> {
     const query: any = { where: { id } };
 
     if (includeQuestions) {
@@ -43,17 +66,46 @@ export class LevelsService {
       throw new NotFoundException(`Level with ID ${id} not found`);
     }
 
+    // Fetch level progress for this user
+    const progress = await this.progressService.mapLevelProgressToDto(
+      userId,
+      id,
+      level.passingScore,
+    );
+
+    return {
+      id: level.id,
+      title: level.title,
+      description: level.description,
+      unitId: level.unitId,
+      orderIndex: level.orderIndex,
+      timeLimitSeconds: level.timeLimitSeconds,
+      passingScore: level.passingScore,
+      isActive: level.isActive,
+      createdAt: level.createdAt,
+      updatedAt: level.updatedAt,
+      questions: includeQuestions ? level.questions : undefined,
+      progress,
+    };
+  }
+
+  // Helper method for internal use without progress
+  async findOneById(id: string): Promise<Level> {
+    const level = await this.levelRepository.findOne({ where: { id } });
+    if (!level) {
+      throw new NotFoundException(`Level with ID ${id} not found`);
+    }
     return level;
   }
 
   async update(id: string, updateLevelDto: UpdateLevelDto): Promise<Level> {
-    const level = await this.findOne(id);
+    const level = await this.findOneById(id);
     Object.assign(level, updateLevelDto);
     return await this.levelRepository.save(level);
   }
 
   async remove(id: string): Promise<void> {
-    const level = await this.findOne(id);
+    const level = await this.findOneById(id);
     await this.levelRepository.remove(level);
   }
 }

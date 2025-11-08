@@ -32,11 +32,22 @@ async function bootstrap() {
       'Provides endpoints for managing chapters, units, levels, questions, and student progress.',
     )
     .setVersion('1.0')
+    .addTag('Authentication', 'User authentication and authorization endpoints')
     .addTag('Chapters', 'Chapter management endpoints')
     .addTag('Units', 'Unit management endpoints')
     .addTag('Levels', 'Level management endpoints')
     .addTag('Questions', 'Question and answer management endpoints')
-    .addBearerAuth()
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'JWT-auth',
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
