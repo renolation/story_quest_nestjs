@@ -7,6 +7,7 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Patch,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -16,7 +17,13 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
-import { LoginDto, RegisterDto, AuthResponseDto, UserResponseDto } from './dto';
+import {
+  LoginDto,
+  RegisterDto,
+  AuthResponseDto,
+  UserResponseDto,
+  ChangePasswordDto,
+} from './dto';
 import { LocalAuthGuard } from '../../common/guards';
 import { Public, CurrentUser } from '../../common/decorators';
 
@@ -123,6 +130,77 @@ export class AuthController {
   })
   async getCurrentUser(@CurrentUser() user: any): Promise<UserResponseDto> {
     return this.authService.getCurrentUser(user.id);
+  }
+
+  @Patch('change-password')
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Change user password',
+    description:
+      'Allows authenticated users to change their password by providing current password and new password',
+  })
+  @ApiBody({ type: ChangePasswordDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Password changed successfully',
+    schema: {
+      example: {
+        success: true,
+        message: 'Password changed successfully',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 401,
+    description: 'Current password is incorrect or unauthorized',
+    schema: {
+      example: {
+        statusCode: 401,
+        message: 'Current password is incorrect',
+        error: 'Unauthorized',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Validation error',
+    schema: {
+      example: {
+        statusCode: 400,
+        message: [
+          'New password must be at least 6 characters long',
+          'Passwords do not match',
+        ],
+        error: 'Bad Request',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found',
+    schema: {
+      example: {
+        statusCode: 404,
+        message: 'User not found',
+        error: 'Not Found',
+      },
+    },
+  })
+  async changePassword(
+    @CurrentUser() user: any,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ): Promise<{ success: boolean; message: string }> {
+    await this.authService.changePassword(
+      user.id,
+      changePasswordDto.currentPassword,
+      changePasswordDto.newPassword,
+    );
+
+    return {
+      success: true,
+      message: 'Password changed successfully',
+    };
   }
 
   @Public()

@@ -10,6 +10,7 @@ import { UsersService } from '../users/users.service';
 import { JwtPayload } from '../../common/interfaces';
 import { RegisterDto, AuthResponseDto, UserResponseDto } from './dto';
 import { User } from '../users/entities/user.entity';
+import { UserRole } from '../../common/enums';
 
 @Injectable()
 export class AuthService {
@@ -93,40 +94,21 @@ export class AuthService {
   async register(registerDto: RegisterDto): Promise<AuthResponseDto> {
     this.logger.log(`Registering new user: ${registerDto.email}`);
 
-    // Check if email already exists
-    const existingEmail = await this.usersService.findByEmail(
-      registerDto.email,
-    );
-    if (existingEmail) {
-      throw new BadRequestException('Email already registered');
-    }
+    // Create user via UsersService
+    const user = await this.usersService.create({
+      email: registerDto.email,
+      username: registerDto.username,
+      password: registerDto.password,
+      fullName: registerDto.fullName,
+      role: registerDto.role || UserRole.STUDENT, // Default to student if not provided
+      avatarUrl: registerDto.avatarUrl,
+    });
 
-    // Check if username already exists
-    const existingUsername = await this.usersService.findByUsername(
-      registerDto.username,
-    );
-    if (existingUsername) {
-      throw new BadRequestException('Username already taken');
-    }
+    this.logger.log(`User registered successfully: ${user.email}`);
 
-    // Hash password
-    const passwordHash = await this.usersService.hashPassword(
-      registerDto.password,
-    );
-
-    // Create user (Note: In a real implementation, you would have a create method in UsersService)
-    // For now, this is a placeholder that shows the intended flow
-    // You'll need to implement the actual user creation in UsersService
-
-    this.logger.log(`User registered successfully: ${registerDto.email}`);
-
-    // Return login response
-    // const user = ... (created user);
-    // return this.login(user);
-
-    throw new BadRequestException(
-      'User registration not fully implemented. Please implement user creation in UsersService first.',
-    );
+    // Generate JWT token and return auth response
+    const userWithoutPassword = this.usersService.excludePasswordHash(user);
+    return this.login(userWithoutPassword);
   }
 
   /**
@@ -175,6 +157,28 @@ export class AuthService {
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
     };
+  }
+
+  /**
+   * Change user password
+   * @param userId - User ID
+   * @param currentPassword - Current password for verification
+   * @param newPassword - New password to set
+   */
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ): Promise<void> {
+    this.logger.log(`Processing password change request for user: ${userId}`);
+
+    await this.usersService.changePassword(
+      userId,
+      currentPassword,
+      newPassword,
+    );
+
+    this.logger.log(`Password changed successfully for user: ${userId}`);
   }
 
   /**
