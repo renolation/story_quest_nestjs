@@ -339,7 +339,7 @@ interface JwtPayload {
 }
 
 // Token expiration
-ACCESS_TOKEN_EXPIRY = '15m';    // 15 minutes
+ACCESS_TOKEN_EXPIRY = '90d';    // 90 days (3 months)
 REFRESH_TOKEN_EXPIRY = '7d';    // 7 days
 ```
 
@@ -1016,7 +1016,7 @@ REDIS_PASSWORD=
 
 # JWT
 JWT_SECRET=super_secret_key_change_in_production
-JWT_EXPIRES_IN=15m
+JWT_EXPIRES_IN=90d
 JWT_REFRESH_SECRET=refresh_secret_key
 JWT_REFRESH_EXPIRES_IN=7d
 

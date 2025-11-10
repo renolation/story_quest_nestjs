@@ -82,7 +82,7 @@ Add these to your `.env` file:
 ```bash
 # JWT Authentication
 JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-JWT_EXPIRES_IN=15m
+JWT_EXPIRES_IN=90d
 ```
 
 **IMPORTANT**: Change the `JWT_SECRET` to a strong, random secret in production!
@@ -281,7 +281,7 @@ export class ProfileController {
 
 ### 2. Token Security
 - JWT tokens are signed with a secret key
-- Tokens expire after 15 minutes (configurable)
+- Tokens expire after 90 days (configurable)
 - Token validation checks user existence and active status
 - Tokens are transmitted via Authorization header (Bearer scheme)
 
@@ -382,7 +382,7 @@ To complete the authentication system:
 
 **1. "JWT must be provided"**
 - Ensure you're sending the Authorization header: `Bearer YOUR_TOKEN`
-- Check token hasn't expired (default: 15 minutes)
+- Check token hasn't expired (default: 90 days)
 
 **2. "User not found or inactive"**
 - User may have been deleted or deactivated
