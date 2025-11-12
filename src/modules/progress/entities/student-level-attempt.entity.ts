@@ -11,14 +11,14 @@ import { Level } from '../../levels/entities/level.entity';
 
 @Entity('student_level_attempts')
 export class StudentLevelAttempt {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column({ name: 'student_id' })
-  studentId: string;
+  studentId: number;
 
   @Column({ name: 'level_id' })
-  levelId: string;
+  levelId: number;
 
   @Column()
   score: number;

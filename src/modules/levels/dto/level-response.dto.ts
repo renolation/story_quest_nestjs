@@ -2,8 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { LevelProgressDto } from '../../progress/dto/level-progress.dto';
 
 export class LevelResponseDto {
-  @ApiProperty({ description: 'Level unique identifier', example: 'uuid' })
-  id: string;
+  @ApiProperty({ description: 'Level unique identifier', example: 1 })
+  id: number;
 
   @ApiProperty({ description: 'Level title', example: 'Practice Hello' })
   title: string;
@@ -11,8 +11,8 @@ export class LevelResponseDto {
   @ApiProperty({ description: 'Level description', example: 'Practice saying hello' })
   description: string;
 
-  @ApiProperty({ description: 'Parent unit ID', example: 'uuid' })
-  unitId: string;
+  @ApiProperty({ description: 'Parent unit ID', example: 1 })
+  unitId: number;
 
   @ApiProperty({ description: 'Level order index within unit', example: 1 })
   orderIndex: number;

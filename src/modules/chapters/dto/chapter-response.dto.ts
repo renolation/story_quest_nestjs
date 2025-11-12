@@ -2,8 +2,8 @@ import { ApiProperty } from '@nestjs/swagger';
 import { ChapterProgressDto } from '../../progress/dto/chapter-progress.dto';
 
 export class ChapterResponseDto {
-  @ApiProperty({ description: 'Chapter unique identifier', example: 'uuid' })
-  id: string;
+  @ApiProperty({ description: 'Chapter unique identifier', example: 1 })
+  id: number;
 
   @ApiProperty({ description: 'Chapter title', example: 'Basic Greetings' })
   title: string;

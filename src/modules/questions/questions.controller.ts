@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
   Query,
-  ParseUUIDPipe,
+  ParseIntPipe,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
@@ -26,18 +26,18 @@ export class QuestionsController {
   }
 
   @Get()
-  findAll(@Query('levelId') levelId?: string) {
+  findAll(@Query('levelId', new ParseIntPipe({ optional: true })) levelId?: number) {
     return this.questionsService.findAll(levelId);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe) id: string) {
+  findOne(@Param('id', ParseIntPipe) id: number) {
     return this.questionsService.findOne(id);
   }
 
   @Patch(':id')
   update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateQuestionDto: UpdateQuestionDto,
   ) {
     return this.questionsService.update(id, updateQuestionDto);
@@ -45,7 +45,7 @@ export class QuestionsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseUUIDPipe) id: string) {
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.questionsService.remove(id);
   }
 }

@@ -20,7 +20,7 @@ export class UnitsService {
     return await this.unitRepository.save(unit);
   }
 
-  async findAll(userId: string, chapterId?: string, includeLevels = false): Promise<UnitResponseDto[]> {
+  async findAll(userId: number, chapterId?: number, includeLevels = false): Promise<UnitResponseDto[]> {
     const query: any = {
       where: chapterId ? { chapterId, isActive: true } : { isActive: true },
       order: { orderIndex: 'ASC' },
@@ -54,7 +54,7 @@ export class UnitsService {
     }));
   }
 
-  async findOne(id: string, userId: string, includeLevels = false): Promise<UnitResponseDto> {
+  async findOne(id: number, userId: number, includeLevels = false): Promise<UnitResponseDto> {
     const query: any = { where: { id } };
 
     if (includeLevels) {
@@ -85,7 +85,7 @@ export class UnitsService {
   }
 
   // Helper method for internal use without progress
-  async findOneById(id: string): Promise<Unit> {
+  async findOneById(id: number): Promise<Unit> {
     const unit = await this.unitRepository.findOne({ where: { id } });
     if (!unit) {
       throw new NotFoundException(`Unit with ID ${id} not found`);
@@ -93,13 +93,13 @@ export class UnitsService {
     return unit;
   }
 
-  async update(id: string, updateUnitDto: UpdateUnitDto): Promise<Unit> {
+  async update(id: number, updateUnitDto: UpdateUnitDto): Promise<Unit> {
     const unit = await this.findOneById(id);
     Object.assign(unit, updateUnitDto);
     return await this.unitRepository.save(unit);
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: number): Promise<void> {
     const unit = await this.findOneById(id);
     await this.unitRepository.remove(unit);
   }

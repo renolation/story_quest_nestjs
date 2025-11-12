@@ -10,8 +10,8 @@ import { Unit } from '../../units/entities/unit.entity';
 
 @Entity('chapters')
 export class Chapter {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column({ length: 255 })
   title: string;

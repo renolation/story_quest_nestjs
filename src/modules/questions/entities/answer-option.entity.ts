@@ -10,11 +10,11 @@ import { Question } from './question.entity';
 
 @Entity('answer_options')
 export class AnswerOption {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column({ name: 'question_id' })
-  questionId: string;
+  questionId: number;
 
   @Column({ name: 'option_text', type: 'text' })
   optionText: string;

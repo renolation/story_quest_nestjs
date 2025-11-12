@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
   Query,
-  ParseUUIDPipe,
+  ParseIntPipe,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
@@ -54,7 +54,7 @@ export class UnitsController {
   })
   findAll(
     @CurrentUser() user: any,
-    @Query('chapterId') chapterId?: string,
+    @Query('chapterId', new ParseIntPipe({ optional: true })) chapterId?: number,
     @Query('includeLevels') includeLevels?: string,
   ): Promise<UnitResponseDto[]> {
     return this.unitsService.findAll(user.id, chapterId, includeLevels === 'true');
@@ -79,7 +79,7 @@ export class UnitsController {
   })
   findOne(
     @CurrentUser() user: any,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Query('includeLevels') includeLevels?: string,
   ): Promise<UnitResponseDto> {
     return this.unitsService.findOne(id, user.id, includeLevels === 'true');
@@ -87,7 +87,7 @@ export class UnitsController {
 
   @Patch(':id')
   update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateUnitDto: UpdateUnitDto,
   ) {
     return this.unitsService.update(id, updateUnitDto);
@@ -95,7 +95,7 @@ export class UnitsController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseUUIDPipe) id: string) {
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.unitsService.remove(id);
   }
 }

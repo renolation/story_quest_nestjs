@@ -1,9 +1,9 @@
-import { IsNotEmpty, IsString, IsOptional, IsInt, IsBoolean, MaxLength, IsUUID } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsInt, IsBoolean, MaxLength } from 'class-validator';
 
 export class CreateUnitDto {
   @IsNotEmpty()
-  @IsUUID()
-  chapterId: string;
+  @IsInt()
+  chapterId: number;
 
   @IsNotEmpty()
   @IsString()

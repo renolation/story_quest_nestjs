@@ -13,11 +13,11 @@ import { Level } from '../../levels/entities/level.entity';
 
 @Entity('units')
 export class Unit {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column({ name: 'chapter_id' })
-  chapterId: string;
+  chapterId: number;
 
   @Column({ length: 255 })
   title: string;

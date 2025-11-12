@@ -13,11 +13,11 @@ import { Question } from '../../questions/entities/question.entity';
 
 @Entity('levels')
 export class Level {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column({ name: 'unit_id' })
-  unitId: string;
+  unitId: number;
 
   @Column({ length: 255 })
   title: string;

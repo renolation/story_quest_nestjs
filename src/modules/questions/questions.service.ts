@@ -34,7 +34,7 @@ export class QuestionsService {
     return this.findOne(savedQuestion.id);
   }
 
-  async findAll(levelId?: string): Promise<Question[]> {
+  async findAll(levelId?: number): Promise<Question[]> {
     const query: any = {
       where: levelId ? { levelId, isActive: true } : { isActive: true },
       order: { orderIndex: 'ASC' },
@@ -44,7 +44,7 @@ export class QuestionsService {
     return await this.questionRepository.find(query);
   }
 
-  async findOne(id: string): Promise<Question> {
+  async findOne(id: number): Promise<Question> {
     const question = await this.questionRepository.findOne({
       where: { id },
       relations: ['answerOptions'],
@@ -57,7 +57,7 @@ export class QuestionsService {
     return question;
   }
 
-  async update(id: string, updateQuestionDto: UpdateQuestionDto): Promise<Question> {
+  async update(id: number, updateQuestionDto: UpdateQuestionDto): Promise<Question> {
     const { answerOptions, ...questionData } = updateQuestionDto;
     const question = await this.findOne(id);
 
@@ -83,7 +83,7 @@ export class QuestionsService {
     return this.findOne(id);
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: number): Promise<void> {
     const question = await this.findOne(id);
     await this.questionRepository.remove(question);
   }

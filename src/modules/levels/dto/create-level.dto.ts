@@ -1,9 +1,9 @@
-import { IsNotEmpty, IsString, IsOptional, IsInt, IsBoolean, MaxLength, IsUUID, Min, Max } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsInt, IsBoolean, MaxLength, Min, Max } from 'class-validator';
 
 export class CreateLevelDto {
   @IsNotEmpty()
-  @IsUUID()
-  unitId: string;
+  @IsInt()
+  unitId: number;
 
   @IsNotEmpty()
   @IsString()

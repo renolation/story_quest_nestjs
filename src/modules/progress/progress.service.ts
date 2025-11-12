@@ -23,8 +23,8 @@ export class ProgressService {
    * Get chapter progress for a specific student
    */
   async getChapterProgress(
-    studentId: string,
-    chapterId: string,
+    studentId: number,
+    chapterId: number,
   ): Promise<StudentChapterProgress | null> {
     return await this.chapterProgressRepository.findOne({
       where: { studentId, chapterId },
@@ -35,8 +35,8 @@ export class ProgressService {
    * Get multiple chapter progresses for a student
    */
   async getChaptersProgress(
-    studentId: string,
-    chapterIds: string[],
+    studentId: number,
+    chapterIds: number[],
   ): Promise<StudentChapterProgress[]> {
     if (chapterIds.length === 0) {
       return [];
@@ -54,8 +54,8 @@ export class ProgressService {
    * Get unit progress for a specific student
    */
   async getUnitProgress(
-    studentId: string,
-    unitId: string,
+    studentId: number,
+    unitId: number,
   ): Promise<StudentUnitProgress | null> {
     return await this.unitProgressRepository.findOne({
       where: { studentId, unitId },
@@ -66,8 +66,8 @@ export class ProgressService {
    * Get multiple unit progresses for a student
    */
   async getUnitsProgress(
-    studentId: string,
-    unitIds: string[],
+    studentId: number,
+    unitIds: number[],
   ): Promise<StudentUnitProgress[]> {
     if (unitIds.length === 0) {
       return [];
@@ -85,8 +85,8 @@ export class ProgressService {
    * Get all level attempts for a specific student and level
    */
   async getLevelAttempts(
-    studentId: string,
-    levelId: string,
+    studentId: number,
+    levelId: number,
   ): Promise<StudentLevelAttempt[]> {
     return await this.levelAttemptRepository.find({
       where: { studentId, levelId },
@@ -98,8 +98,8 @@ export class ProgressService {
    * Get best level attempt (highest score) for a specific student and level
    */
   async getBestLevelAttempt(
-    studentId: string,
-    levelId: string,
+    studentId: number,
+    levelId: number,
   ): Promise<StudentLevelAttempt | null> {
     const attempts = await this.levelAttemptRepository.find({
       where: { studentId, levelId },
@@ -115,9 +115,9 @@ export class ProgressService {
    * Returns a Map with levelId as key and best attempt as value
    */
   async getLevelsProgress(
-    studentId: string,
-    levelIds: string[],
-  ): Promise<Map<string, StudentLevelAttempt>> {
+    studentId: number,
+    levelIds: number[],
+  ): Promise<Map<number, StudentLevelAttempt>> {
     if (levelIds.length === 0) {
       return new Map();
     }
@@ -132,7 +132,7 @@ export class ProgressService {
     });
 
     // Group by levelId and keep only the best attempt for each level
-    const progressMap = new Map<string, StudentLevelAttempt>();
+    const progressMap = new Map<number, StudentLevelAttempt>();
 
     for (const attempt of attempts) {
       if (!progressMap.has(attempt.levelId)) {
@@ -193,8 +193,8 @@ export class ProgressService {
    * Map StudentLevelAttempt to progress DTO
    */
   async mapLevelProgressToDto(
-    studentId: string,
-    levelId: string,
+    studentId: number,
+    levelId: number,
     passingScore: number,
   ): Promise<LevelProgressDto | null> {
     // Get all attempts to count them
@@ -223,9 +223,9 @@ export class ProgressService {
    * Efficiently map multiple level attempts to progress DTOs
    */
   async mapLevelsProgressToDto(
-    studentId: string,
-    levels: Array<{ id: string; passingScore: number }>,
-  ): Promise<Map<string, LevelProgressDto>> {
+    studentId: number,
+    levels: Array<{ id: number; passingScore: number }>,
+  ): Promise<Map<number, LevelProgressDto>> {
     const levelIds = levels.map(l => l.id);
     const progressMap = await this.getLevelsProgress(studentId, levelIds);
 
@@ -239,7 +239,7 @@ export class ProgressService {
     });
 
     // Group attempts by levelId
-    const attemptsByLevel = new Map<string, StudentLevelAttempt[]>();
+    const attemptsByLevel = new Map<number, StudentLevelAttempt[]>();
     for (const attempt of allAttempts) {
       if (!attemptsByLevel.has(attempt.levelId)) {
         attemptsByLevel.set(attempt.levelId, []);
@@ -251,7 +251,7 @@ export class ProgressService {
     }
 
     // Create progress DTOs
-    const result = new Map<string, LevelProgressDto>();
+    const result = new Map<number, LevelProgressDto>();
 
     for (const level of levels) {
       const bestAttempt = progressMap.get(level.id);

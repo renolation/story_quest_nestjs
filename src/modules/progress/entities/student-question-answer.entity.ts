@@ -13,20 +13,20 @@ import { AnswerOption } from '../../questions/entities/answer-option.entity';
 
 @Entity('student_question_answers')
 export class StudentQuestionAnswer {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column({ name: 'attempt_id' })
-  attemptId: string;
+  attemptId: number;
 
   @Column({ name: 'question_id' })
-  questionId: string;
+  questionId: number;
 
   @Column({ name: 'student_id' })
-  studentId: string;
+  studentId: number;
 
   @Column({ name: 'selected_option_id', nullable: true })
-  selectedOptionId: string;
+  selectedOptionId: number;
 
   @Column({ name: 'answer_text', type: 'text', nullable: true })
   answerText: string;
