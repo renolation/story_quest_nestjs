@@ -3,11 +3,12 @@ version: '3.8'
 services:
   # NestJS API (Production)
   api:
+    image: renolation/english_nestjs:latest
     build:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: story_quest_api
+    container_name: english_nestjs
     restart: unless-stopped
     ports:
       - "3000:3000"

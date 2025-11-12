@@ -65,5 +65,3 @@ temp
 .editorconfig
 .prettierrc
 .eslintrc.js
-tsconfig.json
-tsconfig.build.json
