@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  # NestJS API (Production)
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: story_quest_api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      # Database Configuration
+      DB_HOST: 103.188.82.191
+      DB_PORT: 5432
+      DB_USERNAME: renolation
+      DB_PASSWORD: renolation
+      DB_DATABASE: main_db
+      DB_SSL: false
+      # Redis Configuration (if needed)
+      REDIS_HOST: localhost
+      REDIS_PORT: 6379
+      # JWT Configuration
+      JWT_SECRET: your-super-secret-jwt-key-change-this-in-production-12345
+      JWT_EXPIRES_IN: 90d
+    network_mode: host
