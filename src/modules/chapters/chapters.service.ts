@@ -20,7 +20,7 @@ export class ChaptersService {
     return await this.chapterRepository.save(chapter);
   }
 
-  async findAll(userId: string, includeUnits = false): Promise<ChapterResponseDto[]> {
+  async findAll(userId: number, includeUnits = false): Promise<ChapterResponseDto[]> {
     const query: any = {
       where: { isActive: true },
       order: { orderIndex: 'ASC' },
@@ -54,7 +54,7 @@ export class ChaptersService {
     }));
   }
 
-  async findOne(id: string, userId: string, includeUnits = false): Promise<ChapterResponseDto> {
+  async findOne(id: number, userId: number, includeUnits = false): Promise<ChapterResponseDto> {
     const query: any = { where: { id } };
 
     if (includeUnits) {
@@ -85,7 +85,7 @@ export class ChaptersService {
   }
 
   // Helper method for internal use without progress
-  async findOneById(id: string): Promise<Chapter> {
+  async findOneById(id: number): Promise<Chapter> {
     const chapter = await this.chapterRepository.findOne({ where: { id } });
     if (!chapter) {
       throw new NotFoundException(`Chapter with ID ${id} not found`);
@@ -93,13 +93,13 @@ export class ChaptersService {
     return chapter;
   }
 
-  async update(id: string, updateChapterDto: UpdateChapterDto): Promise<Chapter> {
+  async update(id: number, updateChapterDto: UpdateChapterDto): Promise<Chapter> {
     const chapter = await this.findOneById(id);
     Object.assign(chapter, updateChapterDto);
     return await this.chapterRepository.save(chapter);
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: number): Promise<void> {
     const chapter = await this.findOneById(id);
     await this.chapterRepository.remove(chapter);
   }

@@ -11,14 +11,14 @@ import { Unit } from '../../units/entities/unit.entity';
 
 @Entity('student_unit_progress')
 export class StudentUnitProgress {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column({ name: 'student_id' })
-  studentId: string;
+  studentId: number;
 
   @Column({ name: 'unit_id' })
-  unitId: string;
+  unitId: number;
 
   @Column({ name: 'total_levels', default: 0 })
   totalLevels: number;

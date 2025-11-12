@@ -7,7 +7,7 @@ import {
   Param,
   Delete,
   Query,
-  ParseUUIDPipe,
+  ParseIntPipe,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
@@ -72,7 +72,7 @@ export class ChaptersController {
   })
   findOne(
     @CurrentUser() user: any,
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Query('includeUnits') includeUnits?: string,
   ): Promise<ChapterResponseDto> {
     return this.chaptersService.findOne(id, user.id, includeUnits === 'true');
@@ -80,7 +80,7 @@ export class ChaptersController {
 
   @Patch(':id')
   update(
-    @Param('id', ParseUUIDPipe) id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateChapterDto: UpdateChapterDto,
   ) {
     return this.chaptersService.update(id, updateChapterDto);
@@ -88,7 +88,7 @@ export class ChaptersController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseUUIDPipe) id: string) {
+  remove(@Param('id', ParseIntPipe) id: number) {
     return this.chaptersService.remove(id);
   }
 }

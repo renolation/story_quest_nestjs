@@ -131,7 +131,7 @@ export class AuthService {
    * @param userId - User ID from JWT payload
    * @returns User response DTO
    */
-  async getCurrentUser(userId: string): Promise<UserResponseDto> {
+  async getCurrentUser(userId: number): Promise<UserResponseDto> {
     const user = await this.usersService.findById(userId);
     return this.mapUserToResponseDto(
       this.usersService.excludePasswordHash(user),
@@ -166,7 +166,7 @@ export class AuthService {
    * @param newPassword - New password to set
    */
   async changePassword(
-    userId: string,
+    userId: number,
     currentPassword: string,
     newPassword: string,
   ): Promise<void> {

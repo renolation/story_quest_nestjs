@@ -14,11 +14,11 @@ import { QuestionType, PlacementPosition } from '../../../common/enums';
 
 @Entity('questions')
 export class Question {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column({ name: 'level_id' })
-  levelId: string;
+  levelId: number;
 
   @Column({
     name: 'question_type',

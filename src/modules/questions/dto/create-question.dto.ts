@@ -1,12 +1,12 @@
-import { IsNotEmpty, IsString, IsOptional, IsInt, IsBoolean, IsEnum, MaxLength, IsUUID, IsArray, ValidateNested, Min } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsInt, IsBoolean, IsEnum, MaxLength, IsArray, ValidateNested, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 import { QuestionType, PlacementPosition } from '../../../common/enums';
 import { CreateAnswerOptionDto } from './create-answer-option.dto';
 
 export class CreateQuestionDto {
   @IsNotEmpty()
-  @IsUUID()
-  levelId: string;
+  @IsInt()
+  levelId: number;
 
   @IsNotEmpty()
   @IsEnum(QuestionType)

@@ -20,7 +20,7 @@ export class LevelsService {
     return await this.levelRepository.save(level);
   }
 
-  async findAll(userId: string, unitId?: string, includeQuestions = false): Promise<LevelResponseDto[]> {
+  async findAll(userId: number, unitId?: number, includeQuestions = false): Promise<LevelResponseDto[]> {
     const query: any = {
       where: unitId ? { unitId, isActive: true } : { isActive: true },
       order: { orderIndex: 'ASC' },
@@ -53,7 +53,7 @@ export class LevelsService {
     }));
   }
 
-  async findOne(id: string, userId: string, includeQuestions = false): Promise<LevelResponseDto> {
+  async findOne(id: number, userId: number, includeQuestions = false): Promise<LevelResponseDto> {
     const query: any = { where: { id } };
 
     if (includeQuestions) {
@@ -90,7 +90,7 @@ export class LevelsService {
   }
 
   // Helper method for internal use without progress
-  async findOneById(id: string): Promise<Level> {
+  async findOneById(id: number): Promise<Level> {
     const level = await this.levelRepository.findOne({ where: { id } });
     if (!level) {
       throw new NotFoundException(`Level with ID ${id} not found`);
@@ -98,13 +98,13 @@ export class LevelsService {
     return level;
   }
 
-  async update(id: string, updateLevelDto: UpdateLevelDto): Promise<Level> {
+  async update(id: number, updateLevelDto: UpdateLevelDto): Promise<Level> {
     const level = await this.findOneById(id);
     Object.assign(level, updateLevelDto);
     return await this.levelRepository.save(level);
   }
 
-  async remove(id: string): Promise<void> {
+  async remove(id: number): Promise<void> {
     const level = await this.findOneById(id);
     await this.levelRepository.remove(level);
   }

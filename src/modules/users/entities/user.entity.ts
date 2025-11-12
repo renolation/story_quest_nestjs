@@ -9,8 +9,8 @@ import { UserRole } from '../../../common/enums';
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn('uuid')
-  id: string;
+  @PrimaryGeneratedColumn()
+  id: number;
 
   @Column({ unique: true, length: 255 })
   email: string;

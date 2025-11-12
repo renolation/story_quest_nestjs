@@ -134,7 +134,7 @@ export class UsersService {
    * @returns User entity
    * @throws NotFoundException if user not found
    */
-  async findById(id: string): Promise<User> {
+  async findById(id: number): Promise<User> {
     const user = await this.usersRepository.findOne({
       where: { id },
     });
@@ -188,7 +188,7 @@ export class UsersService {
    * @throws NotFoundException if user not found
    */
   async changePassword(
-    userId: string,
+    userId: number,
     currentPassword: string,
     newPassword: string,
   ): Promise<void> {
