@@ -1,16 +1,68 @@
 # NestJS Backend API Expert Guidelines
 
 ## 🎯 App Overview
-Story Quest is an English learning app designed for students in grades 3–5 (ages 8–11), especially those living in rural areas of Vietnam. The backend provides secure API endpoints, manages user data, tracks learning progress, handles AI story generation, and ensures safe content delivery for children.
+Story Quest is an English learning app designed for students in grades 3–5 (ages 8–11), especially those living in rural areas of Vietnam. The backend serves **TWO client types** with a unified API:
 
-The backend's primary responsibilities include:
-- **Authentication & Authorization**: JWT-based authentication with role-based access control
-- **Content Management**: Chapters, Units, Levels, and Questions CRUD operations
-- **Progress Tracking**: Real-time monitoring of student learning progress and achievements
+### 📱 **Multi-Client Architecture**
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    NestJS Backend API                         │
+│                   (Single Source of Truth)                    │
+└────────────────┬─────────────────────┬──────────────────────┘
+                 │                     │
+    ┌────────────▼────────────┐   ┌────▼──────────────────┐
+    │   React Web Dashboard    │   │  Flutter Mobile App    │
+    │   (TypeScript + Vite)    │   │  (Dart + Flutter)      │
+    ├──────────────────────────┤   ├────────────────────────┤
+    │ 4 Web Roles:             │   │ 1 Mobile Role:         │
+    │  • AGENCY (Super Admin)  │   │  • STUDENT             │
+    │  • CENTER (Org Admin)    │   │                        │
+    │  • TEACHER (Instructor)  │   │ Features:              │
+    │  • REVIEWER (Moderator)  │   │  - Learning content    │
+    │                          │   │  - Progress tracking   │
+    │ Features:                │   │  - Interactive levels  │
+    │  - Admin dashboards      │   │  - Speech practice     │
+    │  - Content management    │   │  - Gamification        │
+    │  - Analytics & reports   │   │  - Offline mode        │
+    │  - Center/branch mgmt    │   │                        │
+    │  - Student monitoring    │   └────────────────────────┘
+    │  - Content review        │
+    │  - Study abroad portal   │
+    └──────────────────────────┘
+```
+
+### 🔑 **Key Architecture Principle**
+⚠️ **CRITICAL**: Students use **MOBILE APP ONLY** (Flutter). Web dashboard is for administrative/teaching roles only.
+
+### 🎯 Backend Responsibilities
+
+The backend provides secure API endpoints and manages:
+
+#### **For Web Dashboard (React)**
+- **Multi-Role Authentication**: JWT with 4 web roles (Agency, Center, Teacher, Reviewer)
+- **Center & Branch Management**: Organization hierarchy and administration
+- **Teacher & Class Management**: Teacher assignments, class scheduling
+- **Student Monitoring**: Read-only analytics, notes, progress tracking (no direct student creation)
+- **Content Management & Review**: Curriculum creation, approval workflows
+- **Giftcode System**: Trial codes, discounts, access management
+- **Analytics & Reporting**: Dashboards for centers, teachers, system-wide metrics
+- **Study Abroad Portal**: AI-powered recommendations and application management
+
+#### **For Mobile App (Flutter)**
+- **Student Authentication**: Secure JWT login for students only
+- **Content Delivery**: Chapters, Units, Levels, Questions with progress syncing
+- **Progress Tracking**: Real-time monitoring of learning achievements
 - **AI Integration**: Story generation using OpenAI/Gemini APIs with content moderation
 - **Speech Services**: Text-to-Speech and pronunciation validation
-- **Analytics & Reporting**: Learning metrics for students, teachers, and parents
-- **COPPA Compliance**: Child-safe data handling and privacy protection
+- **Gamification**: Points, badges, streaks, leaderboards
+- **Offline Support**: Cached content for low-connectivity areas
+
+#### **Shared Across All Clients**
+- **JWT Authentication**: Single token system for all roles
+- **Role-Based Access Control (RBAC)**: 5 roles with granular permissions
+- **Data Security**: COPPA compliance, child-safe data handling
+- **API Consistency**: RESTful conventions, unified response formats
+- **Performance**: Redis caching, query optimization, rate limiting
 
 ---
 
@@ -255,11 +307,13 @@ student_chapter_progress (student_id, chapter_id, completed_units, average_score
 
 ### Key Enums
 ```typescript
-// User roles
+// User roles (5 roles total: 4 web + 1 mobile)
 enum UserRole {
-  ADMIN = 'admin',
-  TEACHER = 'teacher',
-  STUDENT = 'student'
+  AGENCY = 'agency',      // Super admin - manages entire system (web only)
+  CENTER = 'center',      // Organization admin - manages center/branches (web only)
+  TEACHER = 'teacher',    // Instructor - manages students and content (web only)
+  REVIEWER = 'reviewer',  // Content moderator - reviews/approves content (web only)
+  STUDENT = 'student'     // End user - uses mobile app ONLY (not web dashboard)
 }
 
 // Question types
@@ -310,17 +364,84 @@ REFRESH_TOKEN_EXPIRY = '7d';    // 7 days
 
 ### Role-Based Access Control (RBAC)
 ```typescript
-// Role hierarchy
-ADMIN    > TEACHER > STUDENT
-  ↓          ↓         ↓
-All     Assigned   Own data
-access   students    only
+// Role hierarchy (5 roles serving 2 client types)
+AGENCY (Super Admin)
+  ↓
+CENTER (Organization Admin)
+  ↓
+TEACHER (Instructor)
 
-// Guards implementation
+REVIEWER (Content Moderator) - Parallel role for content approval
+
+STUDENT (Mobile Only) - Separate hierarchy, uses Flutter app
+
+/**
+ * Role Access Matrix:
+ *
+ * AGENCY:
+ *   - Full system access
+ *   - Manage all centers, teachers, reviewers
+ *   - Content review oversight
+ *   - Study abroad management
+ *   - System-wide analytics
+ *
+ * CENTER:
+ *   - Manage own center and branches
+ *   - Manage teachers and classes
+ *   - View student analytics (read-only)
+ *   - Create and manage giftcodes
+ *   - Center-specific reports
+ *
+ * TEACHER:
+ *   - View assigned students (read-only + notes)
+ *   - Create and edit curriculum content
+ *   - Manage homework assignments
+ *   - Add student notes and observations
+ *   - View class reports
+ *
+ * REVIEWER:
+ *   - Review content submission queue
+ *   - Approve/reject curriculum content
+ *   - View review history
+ *   - Chat support with content creators
+ *
+ * STUDENT:
+ *   - Mobile app access ONLY (Flutter)
+ *   - Cannot access web dashboard
+ *   - Own learning progress and content
+ *   - Self-service profile management
+ */
+
+// Guards implementation examples
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(UserRole.TEACHER, UserRole.ADMIN)
+@Roles(UserRole.AGENCY)
+export class AgencyController {
+  // Only super admins can access
+}
+
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.CENTER, UserRole.AGENCY)
+export class CenterController {
+  // Centers can manage their own data, Agency can manage all
+}
+
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.TEACHER, UserRole.CENTER, UserRole.AGENCY)
 export class TeachersController {
-  // Only teachers and admins can access
+  // Teachers, Centers, and Agency can access
+}
+
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.REVIEWER, UserRole.AGENCY)
+export class ReviewerController {
+  // Reviewers and Agency can access content review
+}
+
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles(UserRole.STUDENT)
+export class StudentProgressController {
+  // Students access their own data via mobile app
+  // Web dashboard users CANNOT use student endpoints
 }
 ```
 
@@ -350,31 +471,132 @@ export class TeachersController {
 
 ### RESTful Conventions
 ```typescript
-// Resource naming (plural, kebab-case)
+// ============================================
+// AUTH ENDPOINTS (All Roles)
+// ============================================
+POST   /api/v1/auth/register               // Student registration (mobile only)
+POST   /api/v1/auth/login                  // Login (all roles)
+POST   /api/v1/auth/refresh                // Refresh token
+POST   /api/v1/auth/logout                 // Logout
+GET    /api/v1/auth/me                     // Get current user
+PATCH  /api/v1/auth/change-password        // Change password
+
+// ============================================
+// AGENCY ENDPOINTS (Super Admin - Web Only)
+// ============================================
+// Centers Management
+GET    /api/v1/agency/centers              // List all centers
+POST   /api/v1/agency/centers              // Create center
+PATCH  /api/v1/agency/centers/:id          // Update center
+DELETE /api/v1/agency/centers/:id          // Delete/suspend center
+
+// Content Review Oversight
+GET    /api/v1/agency/content-reviews      // View all reviews
+GET    /api/v1/agency/reviewers            // Manage reviewers
+
+// Study Abroad Management
+GET    /api/v1/agency/study-abroad         // Study abroad applications
+POST   /api/v1/agency/study-abroad         // Create study abroad program
+
+// System Analytics
+GET    /api/v1/agency/analytics/system     // System-wide metrics
+
+// ============================================
+// CENTER ENDPOINTS (Organization Admin - Web Only)
+// ============================================
+// Branch Management
+GET    /api/v1/center/branches             // List own branches
+POST   /api/v1/center/branches             // Create branch
+PATCH  /api/v1/center/branches/:id         // Update branch
+DELETE /api/v1/center/branches/:id         // Delete branch
+
+// Teacher Management
+GET    /api/v1/center/teachers             // List teachers in center
+POST   /api/v1/center/teachers             // Add teacher
+PATCH  /api/v1/center/teachers/:id         // Update teacher
+
+// Class Management
+GET    /api/v1/center/classes              // List classes
+POST   /api/v1/center/classes              // Create class
+PATCH  /api/v1/center/classes/:id          // Update class
+
+// Student Monitoring (Read-Only)
+GET    /api/v1/center/students             // View students (no create/edit)
+GET    /api/v1/center/students/:id/progress // View student progress
+
+// Giftcode Management
+GET    /api/v1/center/giftcodes            // List giftcodes
+POST   /api/v1/center/giftcodes            // Create giftcode
+PATCH  /api/v1/center/giftcodes/:id        // Update giftcode
+
+// Analytics
+GET    /api/v1/center/analytics            // Center-specific reports
+
+// ============================================
+// TEACHER ENDPOINTS (Instructor - Web Only)
+// ============================================
+// Student Management (Read-Only + Notes)
+GET    /api/v1/teacher/students            // View assigned students
+GET    /api/v1/teacher/students/:id        // View student details
+POST   /api/v1/teacher/students/:id/notes  // Add student note
+GET    /api/v1/teacher/students/:id/notes  // View student notes
+
+// Curriculum Content Creation
+GET    /api/v1/teacher/curriculum          // List own curriculum
+POST   /api/v1/teacher/curriculum          // Create curriculum content
+PATCH  /api/v1/teacher/curriculum/:id      // Edit curriculum
+DELETE /api/v1/teacher/curriculum/:id      // Delete curriculum
+
+// Homework Management
+GET    /api/v1/teacher/homework            // List homework
+POST   /api/v1/teacher/homework            // Create homework
+PATCH  /api/v1/teacher/homework/:id        // Update homework
+
+// Reports
+GET    /api/v1/teacher/reports/class       // Class performance reports
+
+// ============================================
+// REVIEWER ENDPOINTS (Content Moderator - Web Only)
+// ============================================
+// Content Review Queue
+GET    /api/v1/reviewer/queue              // Pending content reviews
+GET    /api/v1/reviewer/queue/:id          // View content details
+POST   /api/v1/reviewer/queue/:id/approve  // Approve content
+POST   /api/v1/reviewer/queue/:id/reject   // Reject content
+
+// Review History
+GET    /api/v1/reviewer/history            // View review history
+
+// Chat Support
+GET    /api/v1/reviewer/chat               // Chat with content creators
+POST   /api/v1/reviewer/chat/:id/message   // Send message
+
+// ============================================
+// STUDENT ENDPOINTS (Mobile App Only - Flutter)
+// ============================================
+// Content Access (Learning Material)
 GET    /api/v1/chapters                    // List all chapters
 GET    /api/v1/chapters/:id                // Get chapter by ID (ID is INTEGER)
-POST   /api/v1/chapters                    // Create chapter
-PATCH  /api/v1/chapters/:id                // Update chapter
-DELETE /api/v1/chapters/:id                // Delete chapter
-
-// Nested resources
 GET    /api/v1/chapters/:id/units          // Get units in chapter
 GET    /api/v1/units/:id/levels            // Get levels in unit
 GET    /api/v1/levels/:id/questions        // Get questions in level
 
-// Progress tracking
+// Progress Tracking
 POST   /api/v1/progress/levels/:id/start   // Start level attempt
 POST   /api/v1/progress/questions/:id/answer // Submit answer
 POST   /api/v1/progress/levels/:id/complete // Complete level
 GET    /api/v1/progress/me                 // Get my progress
 
-// Auth endpoints
-POST   /api/v1/auth/register               // Student registration
-POST   /api/v1/auth/login                  // Login
-POST   /api/v1/auth/refresh                // Refresh token
-POST   /api/v1/auth/logout                 // Logout
-GET    /api/v1/auth/me                     // Get current user
-PATCH  /api/v1/auth/change-password        // Change password
+// Gamification
+GET    /api/v1/students/me/achievements    // Get achievements
+GET    /api/v1/students/leaderboard        // Get leaderboard
+
+// ============================================
+// SHARED ENDPOINTS (Multiple Roles)
+// ============================================
+// These endpoints are accessible by multiple roles with different permissions
+GET    /api/v1/users/:id                   // Get user profile
+PATCH  /api/v1/users/:id                   // Update profile
 ```
 
 ### ID Format Examples
@@ -815,6 +1037,8 @@ aws s3 cp backup_*.sql s3://backups/database/
 - **Production**: https://api.storyquest.com/api/docs
 
 ### Related Documentation
+
+#### Backend Documentation (This Project)
 - [Project Structure](./docs/PROJECT_STRUCTURE.md) - Complete folder structure
 - [API Design Guidelines](./docs/API_DESIGN_GUIDELINES.md) - API standards
 - [Authentication](./docs/AUTH_README.md) - Auth system details
@@ -824,6 +1048,12 @@ aws s3 cp backup_*.sql s3://backups/database/
 - [Password Management](./docs/CHANGE_PASSWORD_IMPLEMENTATION.md) - Password changes
 - [Database Migration](./docs/UUID_TO_INT_MIGRATION_SUMMARY.md) - INT migration
 - [Docker Setup](./docs/DOCKER.md) - Deployment guide
+- [Web Dashboard Requirements](./docs/WEB_DASHBOARD_REQUIREMENTS.md) - Complete feature specs for 4 web roles
+- [Web Dashboard Implementation Guide](./docs/WEB_DASHBOARD_IMPLEMENTATION_GUIDE.md) - Step-by-step implementation
+
+#### Client-Specific Documentation
+- **React Web Dashboard** (`claude-react.md`): Frontend guidelines for AGENCY, CENTER, TEACHER, REVIEWER roles
+- **Flutter Mobile App**: Student-facing mobile application documentation (separate repository)
 
 ### External Links
 - [NestJS Documentation](https://docs.nestjs.com/)
@@ -832,14 +1062,42 @@ aws s3 cp backup_*.sql s3://backups/database/
 
 ---
 
-**Remember**: This backend serves children's education. Prioritize **security**, **privacy**, **reliability**, and **performance**. Every API should be designed with child safety and COPPA compliance in mind.
+## 🎯 Final Reminders
 
-**IMPORTANT DATABASE NOTE**: All primary keys and foreign keys are **INTEGERS (auto-increment)**, not UUIDs. Always use `ParseIntPipe` in controllers and `@IsInt()` in DTOs.
+### Multi-Client Architecture
+**This backend serves TWO client types:**
+1. **React Web Dashboard** (4 roles: AGENCY, CENTER, TEACHER, REVIEWER) - Administrative/teaching interface
+2. **Flutter Mobile App** (1 role: STUDENT) - Learning interface for children
+
+⚠️ **CRITICAL**: Students use mobile app ONLY. Web dashboard is for administrative roles.
+
+### Core Principles
+- **Security First**: Children's education platform - prioritize **security**, **privacy**, **reliability**, **performance**
+- **COPPA Compliance**: Every API must be designed with child safety in mind
+- **Role Separation**: Strict RBAC enforcement - 5 roles with granular permissions
+- **Integer IDs**: All primary/foreign keys use **auto-increment integers** (NOT UUIDs)
+- **Consistent APIs**: RESTful conventions, unified response formats across all clients
+- **Performance**: Redis caching, query optimization, rate limiting for scalability
+
+### Database Standards
+**IMPORTANT**: All primary keys and foreign keys are **INTEGERS (auto-increment)**, not UUIDs.
+- Always use `ParseIntPipe` in controllers
+- Always use `@IsInt()` in DTOs for ID fields
+- Never use `ParseUUIDPipe` or `@IsUUID()`
+
+### Documentation Flow
+```
+Backend API (CLAUDE.md - this file)
+    ├── React Web Dashboard (claude-react.md)
+    │   └── Serves: AGENCY, CENTER, TEACHER, REVIEWER
+    └── Flutter Mobile App (separate repo)
+        └── Serves: STUDENT
+```
 
 Happy coding! 🚀🔒🎓
 
 ---
 
-**Last Updated:** 2025-01-13
-**Version:** 2.0
-**Status:** ✅ Production Ready
+**Last Updated:** 2025-01-14
+**Version:** 3.0 (Multi-Client Update)
+**Status:** ✅ Production Ready - Serving React Web + Flutter Mobile
