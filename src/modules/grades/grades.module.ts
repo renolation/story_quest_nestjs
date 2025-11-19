@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Grade } from './entities/grade.entity';
+import { GradesController } from './grades.controller';
+import { GradesService } from './grades.service';
 
 /**
  * PHASE 7 - GRADES MODULE - TODO
@@ -15,8 +17,8 @@ import { Grade } from './entities/grade.entity';
  */
 @Module({
   imports: [TypeOrmModule.forFeature([Grade])],
-  controllers: [],
-  providers: [],
-  exports: [],
+  controllers: [GradesController],
+  providers: [GradesService],
+  exports: [GradesService],
 })
 export class GradesModule {}

@@ -14,12 +14,6 @@ export class StudentUnitProgress {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'student_id' })
-  studentId: number;
-
-  @Column({ name: 'unit_id' })
-  unitId: number;
-
   @Column({ name: 'total_levels', default: 0 })
   totalLevels: number;
 
@@ -32,7 +26,13 @@ export class StudentUnitProgress {
   @Column({ name: 'total_points_earned', default: 0 })
   totalPointsEarned: number;
 
-  @Column({ name: 'average_score', type: 'decimal', precision: 5, scale: 2, default: 0 })
+  @Column({
+    name: 'average_score',
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+    default: 0,
+  })
   averageScore: number;
 
   @Column({ name: 'last_accessed_at', nullable: true, type: 'timestamp' })
@@ -41,11 +41,21 @@ export class StudentUnitProgress {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  // Relationships
+  @ManyToOne(() => User, { onDelete: 'CASCADE', nullable: false })
   @JoinColumn({ name: 'student_id' })
   student: User;
 
-  @ManyToOne(() => Unit, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Unit, { onDelete: 'CASCADE', nullable: false })
   @JoinColumn({ name: 'unit_id' })
   unit: Unit;
+
+  // Getters for foreign key IDs
+  get studentId(): number {
+    return this.student?.id;
+  }
+
+  get unitId(): number {
+    return this.unit?.id;
+  }
 }

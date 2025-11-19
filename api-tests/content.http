@@ -1,0 +1,271 @@
+### Story Quest API - Content Tests (Chapters, Units, Levels, Questions)
+### Prerequisites: Run auth.http first to get tokens
+
+@baseUrl = http://localhost:3000/api/v1
+@contentType = application/json
+
+# Use tokens from auth.http
+@studentToken = YOUR_STUDENT_TOKEN_HERE
+@teacherToken = YOUR_TEACHER_TOKEN_HERE
+
+###############################################
+# CHAPTERS API
+###############################################
+
+### Get All Chapters
+GET {{baseUrl}}/chapters
+Authorization: Bearer {{studentToken}}
+
+### Get Chapter by ID
+GET {{baseUrl}}/chapters/1
+Authorization: Bearer {{studentToken}}
+
+### Get Chapter - Invalid ID (should fail 404)
+GET {{baseUrl}}/chapters/99999
+Authorization: Bearer {{studentToken}}
+
+### Get Chapter - No Token (should fail 401)
+GET {{baseUrl}}/chapters/1
+
+### Create Chapter (Teacher)
+POST {{baseUrl}}/chapters
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Test Chapter",
+  "description": "This is a test chapter created via API",
+  "orderIndex": 99
+}
+
+### Create Chapter - No Auth (should fail 401)
+POST {{baseUrl}}/chapters
+Content-Type: {{contentType}}
+
+{
+  "title": "Unauthorized Chapter",
+  "description": "This should fail",
+  "orderIndex": 100
+}
+
+### Update Chapter
+# @name createdChapter
+PATCH {{baseUrl}}/chapters/1
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Updated Chapter Title"
+}
+
+### Delete Chapter (use test chapter, not seeded data)
+# DELETE {{baseUrl}}/chapters/11
+# Authorization: Bearer {{teacherToken}}
+
+###############################################
+# UNITS API
+###############################################
+
+### Get All Units
+GET {{baseUrl}}/units
+Authorization: Bearer {{studentToken}}
+
+### Get Unit by ID
+GET {{baseUrl}}/units/1
+Authorization: Bearer {{studentToken}}
+
+### Create Unit (Teacher)
+POST {{baseUrl}}/units
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "chapterId": 1,
+  "title": "Test Unit",
+  "description": "Test unit description",
+  "orderIndex": 99
+}
+
+### Update Unit
+PATCH {{baseUrl}}/units/1
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "description": "Updated description"
+}
+
+###############################################
+# LEVELS API
+###############################################
+
+### Get All Levels
+GET {{baseUrl}}/levels
+Authorization: Bearer {{studentToken}}
+
+### Get Level by ID
+GET {{baseUrl}}/levels/1
+Authorization: Bearer {{studentToken}}
+
+### Create Level (Teacher)
+POST {{baseUrl}}/levels
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "unitId": 1,
+  "title": "Test Level - Easy",
+  "description": "Test level description",
+  "orderIndex": 99,
+  "timeLimitSeconds": 60,
+  "passingScore": 70,
+  "totalPoints": 100
+}
+
+### Update Level
+PATCH {{baseUrl}}/levels/1
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "timeLimitSeconds": 90
+}
+
+###############################################
+# QUESTIONS API
+###############################################
+
+### Get All Questions
+GET {{baseUrl}}/questions
+Authorization: Bearer {{studentToken}}
+
+### Get Question by ID (with answer options)
+GET {{baseUrl}}/questions/1
+Authorization: Bearer {{studentToken}}
+
+### Create Question (Teacher)
+POST {{baseUrl}}/questions
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "levelId": 1,
+  "questionType": "select_right_answer",
+  "questionText": "What is the correct answer?",
+  "questionAudioUrl": "https://storage.example.com/audio/test.mp3",
+  "points": 10,
+  "orderIndex": 99,
+  "answerOptions": [
+    {
+      "optionText": "Correct Answer",
+      "isCorrect": true,
+      "orderIndex": 1
+    },
+    {
+      "optionText": "Wrong Answer 1",
+      "isCorrect": false,
+      "orderIndex": 2
+    },
+    {
+      "optionText": "Wrong Answer 2",
+      "isCorrect": false,
+      "orderIndex": 3
+    },
+    {
+      "optionText": "Wrong Answer 3",
+      "isCorrect": false,
+      "orderIndex": 4
+    }
+  ]
+}
+
+### Update Question
+PATCH {{baseUrl}}/questions/1
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "points": 15
+}
+
+###############################################
+# VALIDATION TESTS
+###############################################
+
+### Create Chapter - Missing Required Fields (should fail 400)
+POST {{baseUrl}}/chapters
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Only Title"
+}
+
+### Create Unit - Invalid Chapter ID (should fail 404)
+POST {{baseUrl}}/units
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "chapterId": 99999,
+  "title": "Invalid Unit",
+  "description": "This chapter doesn't exist",
+  "orderIndex": 1
+}
+
+### Create Level - Invalid Passing Score (should fail 400)
+POST {{baseUrl}}/levels
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "unitId": 1,
+  "title": "Invalid Level",
+  "description": "Invalid passing score",
+  "orderIndex": 1,
+  "timeLimitSeconds": 60,
+  "passingScore": 150,
+  "totalPoints": 100
+}
+
+###############################################
+# QUERY PARAMETERS (if implemented)
+###############################################
+
+### Get Chapters with Pagination
+# GET {{baseUrl}}/chapters?page=1&limit=5
+# Authorization: Bearer {{studentToken}}
+
+### Get Units by Chapter
+# GET {{baseUrl}}/units?chapterId=1
+# Authorization: Bearer {{studentToken}}
+
+### Get Levels by Unit
+# GET {{baseUrl}}/levels?unitId=1
+# Authorization: Bearer {{studentToken}}
+
+### Get Questions by Level
+# GET {{baseUrl}}/questions?levelId=1
+# Authorization: Bearer {{studentToken}}
+
+###############################################
+# NOTES
+###############################################
+
+# Content Hierarchy:
+# - Chapters (10 seeded)
+#   └─ Units (45 seeded, 3-5 per chapter)
+#      └─ Levels (135 seeded, 3 per unit)
+#         └─ Questions (999 seeded, 5-10 per level)
+#            └─ Answer Options (4 per question)
+
+# Seeded Chapter IDs: 1-10
+# Seeded Unit IDs: 1-45
+# Seeded Level IDs: 1-135
+# Seeded Question IDs: 1-999
+
+# Question Types:
+# - select_right_answer
+# - fill_in_blank
+# - sort_words
+# - talk_to_speech_compare

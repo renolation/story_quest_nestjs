@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Center } from './entities/center.entity';
+import { CentersController } from './centers.controller';
+import { CentersService } from './centers.service';
 
 /**
  * PHASE 7 - CENTERS MODULE - TODO
@@ -21,8 +23,8 @@ import { Center } from './entities/center.entity';
  */
 @Module({
   imports: [TypeOrmModule.forFeature([Center])],
-  controllers: [],
-  providers: [],
-  exports: [],
+  controllers: [CentersController],
+  providers: [CentersService],
+  exports: [CentersService],
 })
 export class CentersModule {}

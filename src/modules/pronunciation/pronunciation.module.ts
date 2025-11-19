@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PronunciationAttempt } from './entities/pronunciation-attempt.entity';
+import { PronunciationController } from './pronunciation.controller';
+import { PronunciationService } from './pronunciation.service';
 
 /**
  * PHASE 3 - PRONUNCIATION MODULE - TODO
@@ -19,8 +21,8 @@ import { PronunciationAttempt } from './entities/pronunciation-attempt.entity';
  */
 @Module({
   imports: [TypeOrmModule.forFeature([PronunciationAttempt])],
-  controllers: [],
-  providers: [],
-  exports: [],
+  controllers: [PronunciationController],
+  providers: [PronunciationService],
+  exports: [PronunciationService],
 })
 export class PronunciationModule {}

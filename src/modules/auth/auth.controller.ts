@@ -20,12 +20,14 @@ import { AuthService } from './auth.service';
 import {
   LoginDto,
   RegisterDto,
+  CreateUserDto,
   AuthResponseDto,
   UserResponseDto,
   ChangePasswordDto,
 } from './dto';
-import { LocalAuthGuard } from '../../common/guards';
-import { Public, CurrentUser } from '../../common/decorators';
+import { LocalAuthGuard, RolesGuard } from '../../common/guards';
+import { Public, CurrentUser, Roles } from '../../common/decorators';
+import { UserRole } from '../../common/enums';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -77,19 +79,25 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 
-  @Public()
-  @Post('register')
+  @Post('users')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.AGENCY, UserRole.CENTER, UserRole.TEACHER, UserRole.PARENT)
+  @ApiBearerAuth()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
-    summary: 'Register new user',
-    description:
-      'Create a new user account. This endpoint is for future implementation.',
+    summary: 'Create new user (Hierarchical permissions)',
+    description: `Create a new user account with role-based hierarchy:
+    - AGENCY can create: CENTER, TEACHER, REVIEWER, PARENT
+    - CENTER can create: TEACHER, PARENT
+    - TEACHER can create: PARENT
+    - PARENT can create: STUDENT
+    - REVIEWER and STUDENT cannot create users`,
   })
-  @ApiBody({ type: RegisterDto })
+  @ApiBody({ type: CreateUserDto })
   @ApiResponse({
     status: 201,
-    description: 'User registered successfully',
-    type: AuthResponseDto,
+    description: 'User created successfully',
+    type: UserResponseDto,
   })
   @ApiResponse({
     status: 400,
@@ -102,8 +110,34 @@ export class AuthController {
       },
     },
   })
-  async register(@Body() registerDto: RegisterDto): Promise<AuthResponseDto> {
-    return this.authService.register(registerDto);
+  @ApiResponse({
+    status: 401,
+    description: 'Unauthorized - Not authenticated',
+    schema: {
+      example: {
+        statusCode: 401,
+        message: 'Unauthorized',
+        error: 'Unauthorized',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Insufficient permissions for this role',
+    schema: {
+      example: {
+        statusCode: 403,
+        message:
+          'teacher role cannot create student users. Allowed roles: parent',
+        error: 'Forbidden',
+      },
+    },
+  })
+  async createUser(
+    @CurrentUser() currentUser: any,
+    @Body() createUserDto: CreateUserDto,
+  ): Promise<UserResponseDto> {
+    return this.authService.createUser(currentUser, createUserDto);
   }
 
   @Get('me')

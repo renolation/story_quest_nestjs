@@ -2,13 +2,19 @@ import {
   Injectable,
   UnauthorizedException,
   BadRequestException,
+  ForbiddenException,
   Logger,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
 import { JwtPayload } from '../../common/interfaces';
-import { RegisterDto, AuthResponseDto, UserResponseDto } from './dto';
+import {
+  RegisterDto,
+  CreateUserDto,
+  AuthResponseDto,
+  UserResponseDto,
+} from './dto';
 import { User } from '../users/entities/user.entity';
 import { UserRole } from '../../common/enums';
 
@@ -179,6 +185,91 @@ export class AuthService {
     );
 
     this.logger.log(`Password changed successfully for user: ${userId}`);
+  }
+
+  /**
+   * Create a new user (admin-only with role hierarchy)
+   * Role hierarchy:
+   * - AGENCY can create: CENTER, TEACHER, REVIEWER, PARENT
+   * - CENTER can create: TEACHER, PARENT
+   * - TEACHER can create: PARENT
+   * - PARENT can create: STUDENT
+   * - REVIEWER cannot create users
+   * - STUDENT cannot create users
+   *
+   * @param currentUser - The authenticated user creating the new user
+   * @param createUserDto - User creation data
+   * @returns Created user response DTO
+   */
+  async createUser(
+    currentUser: any,
+    createUserDto: CreateUserDto,
+  ): Promise<UserResponseDto> {
+    this.logger.log(
+      `User ${currentUser.email} (${currentUser.role}) attempting to create user with role: ${createUserDto.role}`,
+    );
+
+    // Validate if current user can create the requested role
+    this.validateUserCreationPermission(currentUser.role, createUserDto.role);
+
+    // Prevent creating AGENCY role via this endpoint for security
+    if (createUserDto.role === UserRole.AGENCY) {
+      throw new ForbiddenException(
+        'AGENCY role cannot be created via this endpoint for security reasons',
+      );
+    }
+
+    // Create user via UsersService
+    const user = await this.usersService.create({
+      email: createUserDto.email,
+      username: createUserDto.username,
+      password: createUserDto.password,
+      fullName: createUserDto.fullName,
+      role: createUserDto.role,
+      avatarUrl: createUserDto.avatarUrl,
+    });
+
+    this.logger.log(
+      `User created successfully: ${user.email} with role: ${user.role}`,
+    );
+
+    // Return user response (no token for admin-created users)
+    return this.mapUserToResponseDto(
+      this.usersService.excludePasswordHash(user),
+    );
+  }
+
+  /**
+   * Validate if a user role can create another user role
+   * @param creatorRole - Role of the user creating the account
+   * @param targetRole - Role being assigned to the new user
+   * @throws ForbiddenException if permission denied
+   */
+  private validateUserCreationPermission(
+    creatorRole: UserRole,
+    targetRole: UserRole,
+  ): void {
+    const permissions: Record<UserRole, UserRole[]> = {
+      [UserRole.AGENCY]: [
+        UserRole.CENTER,
+        UserRole.TEACHER,
+        UserRole.REVIEWER,
+        UserRole.PARENT,
+      ],
+      [UserRole.CENTER]: [UserRole.TEACHER, UserRole.PARENT],
+      [UserRole.TEACHER]: [UserRole.PARENT],
+      [UserRole.PARENT]: [UserRole.STUDENT],
+      [UserRole.REVIEWER]: [], // Cannot create users
+      [UserRole.STUDENT]: [], // Cannot create users
+    };
+
+    const allowedRoles = permissions[creatorRole] || [];
+
+    if (!allowedRoles.includes(targetRole)) {
+      throw new ForbiddenException(
+        `${creatorRole} role cannot create ${targetRole} users. Allowed roles: ${allowedRoles.join(', ') || 'none'}`,
+      );
+    }
   }
 
   /**

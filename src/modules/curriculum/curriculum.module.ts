@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CurriculumContent } from './entities/curriculum-content.entity';
+import { CurriculumController } from './curriculum.controller';
+import { CurriculumService } from './curriculum.service';
 
 /**
  * PHASE 7 - CURRICULUM MODULE - TODO
@@ -29,8 +31,8 @@ import { CurriculumContent } from './entities/curriculum-content.entity';
  */
 @Module({
   imports: [TypeOrmModule.forFeature([CurriculumContent])],
-  controllers: [],
-  providers: [],
-  exports: [],
+  controllers: [CurriculumController],
+  providers: [CurriculumService],
+  exports: [CurriculumService],
 })
 export class CurriculumModule {}

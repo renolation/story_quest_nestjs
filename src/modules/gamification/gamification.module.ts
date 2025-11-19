@@ -4,6 +4,8 @@ import { Achievement } from './entities/achievement.entity';
 import { StudentAchievement } from './entities/student-achievement.entity';
 import { StudentPoints } from './entities/student-points.entity';
 import { DailyGoal } from './entities/daily-goal.entity';
+import { GamificationController } from './gamification.controller';
+import { GamificationService } from './gamification.service';
 
 /**
  * PHASE 4 - GAMIFICATION MODULE - TODO
@@ -33,8 +35,8 @@ import { DailyGoal } from './entities/daily-goal.entity';
       DailyGoal,
     ]),
   ],
-  controllers: [],
-  providers: [],
-  exports: [],
+  controllers: [GamificationController],
+  providers: [GamificationService],
+  exports: [GamificationService],
 })
 export class GamificationModule {}

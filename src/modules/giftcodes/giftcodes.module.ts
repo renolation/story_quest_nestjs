@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Giftcode } from './entities/giftcode.entity';
 import { GiftcodeUsage } from './entities/giftcode-usage.entity';
+import { GiftcodesController } from './giftcodes.controller';
+import { GiftcodesService } from './giftcodes.service';
 
 /**
  * PHASE 7 - GIFTCODES MODULE - TODO
@@ -28,8 +30,8 @@ import { GiftcodeUsage } from './entities/giftcode-usage.entity';
  */
 @Module({
   imports: [TypeOrmModule.forFeature([Giftcode, GiftcodeUsage])],
-  controllers: [],
-  providers: [],
-  exports: [],
+  controllers: [GiftcodesController],
+  providers: [GiftcodesService],
+  exports: [GiftcodesService],
 })
 export class GiftcodesModule {}

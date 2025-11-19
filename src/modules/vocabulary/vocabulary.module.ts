@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { VocabularyWord } from './entities/vocabulary-word.entity';
+import { VocabularyController } from './vocabulary.controller';
+import { VocabularyService } from './vocabulary.service';
 
 /**
  * PHASE 3 - VOCABULARY MODULE - TODO
@@ -20,8 +22,8 @@ import { VocabularyWord } from './entities/vocabulary-word.entity';
  */
 @Module({
   imports: [TypeOrmModule.forFeature([VocabularyWord])],
-  controllers: [],
-  providers: [],
-  exports: [],
+  controllers: [VocabularyController],
+  providers: [VocabularyService],
+  exports: [VocabularyService],
 })
 export class VocabularyModule {}

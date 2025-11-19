@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TeacherNote } from './entities/teacher-note.entity';
+import { TeacherNotesController } from './teacher-notes.controller';
+import { TeacherNotesService } from './teacher-notes.service';
 
 /**
  * PHASE 7 - TEACHER NOTES MODULE - TODO
@@ -22,8 +24,8 @@ import { TeacherNote } from './entities/teacher-note.entity';
  */
 @Module({
   imports: [TypeOrmModule.forFeature([TeacherNote])],
-  controllers: [],
-  providers: [],
-  exports: [],
+  controllers: [TeacherNotesController],
+  providers: [TeacherNotesService],
+  exports: [TeacherNotesService],
 })
 export class TeacherNotesModule {}

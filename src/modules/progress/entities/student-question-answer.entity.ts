@@ -16,18 +16,6 @@ export class StudentQuestionAnswer {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'attempt_id' })
-  attemptId: number;
-
-  @Column({ name: 'question_id' })
-  questionId: number;
-
-  @Column({ name: 'student_id' })
-  studentId: number;
-
-  @Column({ name: 'selected_option_id', nullable: true })
-  selectedOptionId: number;
-
   @Column({ name: 'answer_text', type: 'text', nullable: true })
   answerText: string;
 
@@ -46,19 +34,40 @@ export class StudentQuestionAnswer {
   @CreateDateColumn({ name: 'answered_at' })
   answeredAt: Date;
 
-  @ManyToOne(() => StudentLevelAttempt, { onDelete: 'CASCADE' })
+  // Relationships
+  @ManyToOne(() => StudentLevelAttempt, (attempt) => attempt.answers, {
+    onDelete: 'CASCADE',
+    nullable: false,
+  })
   @JoinColumn({ name: 'attempt_id' })
   attempt: StudentLevelAttempt;
 
-  @ManyToOne(() => Question, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Question, { onDelete: 'CASCADE', nullable: false })
   @JoinColumn({ name: 'question_id' })
   question: Question;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, { onDelete: 'CASCADE', nullable: false })
   @JoinColumn({ name: 'student_id' })
   student: User;
 
   @ManyToOne(() => AnswerOption, { onDelete: 'SET NULL', nullable: true })
   @JoinColumn({ name: 'selected_option_id' })
   selectedOption: AnswerOption;
+
+  // Getters for foreign key IDs
+  get attemptId(): number {
+    return this.attempt?.id;
+  }
+
+  get questionId(): number {
+    return this.question?.id;
+  }
+
+  get studentId(): number {
+    return this.student?.id;
+  }
+
+  get selectedOptionId(): number | null {
+    return this.selectedOption?.id || null;
+  }
 }

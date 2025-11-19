@@ -1,12 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { StudentChapterProgress } from './entities/student-chapter-progress.entity';
 import { StudentUnitProgress } from './entities/student-unit-progress.entity';
 import { StudentLevelAttempt } from './entities/student-level-attempt.entity';
+import { StudentQuestionAnswer } from './entities/student-question-answer.entity';
+import { Level } from '../levels/entities/level.entity';
+import { Question } from '../questions/entities/question.entity';
+import { AnswerOption } from '../questions/entities/answer-option.entity';
+import { User } from '../users/entities/user.entity';
 import { ChapterProgressDto } from './dto/chapter-progress.dto';
 import { UnitProgressDto } from './dto/unit-progress.dto';
 import { LevelProgressDto } from './dto/level-progress.dto';
+import { SubmitAnswerDto } from './dto/submit-answer.dto';
+import { CompleteLevelDto } from './dto/complete-level.dto';
 
 @Injectable()
 export class ProgressService {
@@ -17,6 +24,16 @@ export class ProgressService {
     private readonly unitProgressRepository: Repository<StudentUnitProgress>,
     @InjectRepository(StudentLevelAttempt)
     private readonly levelAttemptRepository: Repository<StudentLevelAttempt>,
+    @InjectRepository(StudentQuestionAnswer)
+    private readonly questionAnswerRepository: Repository<StudentQuestionAnswer>,
+    @InjectRepository(Level)
+    private readonly levelRepository: Repository<Level>,
+    @InjectRepository(Question)
+    private readonly questionRepository: Repository<Question>,
+    @InjectRepository(AnswerOption)
+    private readonly answerOptionRepository: Repository<AnswerOption>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
   ) {}
 
   /**
@@ -27,7 +44,10 @@ export class ProgressService {
     chapterId: number,
   ): Promise<StudentChapterProgress | null> {
     return await this.chapterProgressRepository.findOne({
-      where: { studentId, chapterId },
+      where: {
+        student: { id: studentId },
+        chapter: { id: chapterId }
+      },
     });
   }
 
@@ -44,8 +64,8 @@ export class ProgressService {
 
     return await this.chapterProgressRepository.find({
       where: {
-        studentId,
-        chapterId: In(chapterIds),
+        student: { id: studentId },
+        chapter: { id: In(chapterIds) },
       },
     });
   }
@@ -58,7 +78,10 @@ export class ProgressService {
     unitId: number,
   ): Promise<StudentUnitProgress | null> {
     return await this.unitProgressRepository.findOne({
-      where: { studentId, unitId },
+      where: {
+        student: { id: studentId },
+        unit: { id: unitId }
+      },
     });
   }
 
@@ -75,8 +98,8 @@ export class ProgressService {
 
     return await this.unitProgressRepository.find({
       where: {
-        studentId,
-        unitId: In(unitIds),
+        student: { id: studentId },
+        unit: { id: In(unitIds) },
       },
     });
   }
@@ -89,7 +112,10 @@ export class ProgressService {
     levelId: number,
   ): Promise<StudentLevelAttempt[]> {
     return await this.levelAttemptRepository.find({
-      where: { studentId, levelId },
+      where: {
+        student: { id: studentId },
+        level: { id: levelId }
+      },
       order: { startedAt: 'DESC' },
     });
   }
@@ -102,7 +128,10 @@ export class ProgressService {
     levelId: number,
   ): Promise<StudentLevelAttempt | null> {
     const attempts = await this.levelAttemptRepository.find({
-      where: { studentId, levelId },
+      where: {
+        student: { id: studentId },
+        level: { id: levelId }
+      },
       order: { score: 'DESC', startedAt: 'DESC' },
       take: 1,
     });
@@ -125,23 +154,25 @@ export class ProgressService {
     // Get all attempts for the specified levels
     const attempts = await this.levelAttemptRepository.find({
       where: {
-        studentId,
-        levelId: In(levelIds),
+        student: { id: studentId },
+        level: { id: In(levelIds) },
       },
       order: { score: 'DESC', startedAt: 'DESC' },
+      relations: ['level'],
     });
 
     // Group by levelId and keep only the best attempt for each level
     const progressMap = new Map<number, StudentLevelAttempt>();
 
     for (const attempt of attempts) {
-      if (!progressMap.has(attempt.levelId)) {
-        progressMap.set(attempt.levelId, attempt);
+      const levelId = attempt.level.id;
+      if (!progressMap.has(levelId)) {
+        progressMap.set(levelId, attempt);
       } else {
         // Compare scores to ensure we have the best one
-        const existing = progressMap.get(attempt.levelId);
+        const existing = progressMap.get(levelId);
         if (existing && attempt.score > existing.score) {
-          progressMap.set(attempt.levelId, attempt);
+          progressMap.set(levelId, attempt);
         }
       }
     }
@@ -232,19 +263,21 @@ export class ProgressService {
     // Get all attempts to count them and find last attempt date
     const allAttempts = await this.levelAttemptRepository.find({
       where: {
-        studentId,
-        levelId: In(levelIds),
+        student: { id: studentId },
+        level: { id: In(levelIds) },
       },
       order: { startedAt: 'DESC' },
+      relations: ['level'],
     });
 
     // Group attempts by levelId
     const attemptsByLevel = new Map<number, StudentLevelAttempt[]>();
     for (const attempt of allAttempts) {
-      if (!attemptsByLevel.has(attempt.levelId)) {
-        attemptsByLevel.set(attempt.levelId, []);
+      const levelId = attempt.level.id;
+      if (!attemptsByLevel.has(levelId)) {
+        attemptsByLevel.set(levelId, []);
       }
-      const levelAttempts = attemptsByLevel.get(attempt.levelId);
+      const levelAttempts = attemptsByLevel.get(levelId);
       if (levelAttempts) {
         levelAttempts.push(attempt);
       }
@@ -270,5 +303,228 @@ export class ProgressService {
     }
 
     return result;
+  }
+
+  /**
+   * Start a new level attempt for a student
+   */
+  async startLevel(studentId: number, levelId: number) {
+    // Verify level exists
+    const level = await this.levelRepository.findOne({
+      where: { id: levelId },
+    });
+
+    if (!level) {
+      throw new NotFoundException(`Level with ID ${levelId} not found`);
+    }
+
+    // Verify student exists
+    const student = await this.userRepository.findOne({
+      where: { id: studentId },
+    });
+
+    if (!student) {
+      throw new NotFoundException(`Student with ID ${studentId} not found`);
+    }
+
+    // Create new attempt
+    const attempt = this.levelAttemptRepository.create({
+      student,
+      level,
+      score: 0,
+      pointsEarned: 0,
+      timeSpentSeconds: 0,
+      isCompleted: false,
+      isPassed: false,
+      startedAt: new Date(),
+    });
+
+    return await this.levelAttemptRepository.save(attempt);
+  }
+
+  /**
+   * Submit an answer to a question
+   */
+  async submitAnswer(
+    studentId: number,
+    questionId: number,
+    submitAnswerDto: SubmitAnswerDto,
+  ) {
+    // Verify question exists
+    const question = await this.questionRepository.findOne({
+      where: { id: questionId },
+    });
+
+    if (!question) {
+      throw new NotFoundException(`Question with ID ${questionId} not found`);
+    }
+
+    // Verify attempt exists and belongs to student
+    const attempt = await this.levelAttemptRepository.findOne({
+      where: { id: submitAnswerDto.attemptId },
+      relations: ['student'],
+    });
+
+    if (!attempt) {
+      throw new NotFoundException(
+        `Level attempt with ID ${submitAnswerDto.attemptId} not found`,
+      );
+    }
+
+    if (attempt.student.id !== studentId) {
+      throw new NotFoundException('Level attempt does not belong to this student');
+    }
+
+    // Verify student exists
+    const student = await this.userRepository.findOne({
+      where: { id: studentId },
+    });
+
+    if (!student) {
+      throw new NotFoundException(`Student with ID ${studentId} not found`);
+    }
+
+    // Get selected option if provided
+    let selectedOption: AnswerOption | undefined = undefined;
+    if (submitAnswerDto.selectedOptionId) {
+      const option = await this.answerOptionRepository.findOne({
+        where: { id: submitAnswerDto.selectedOptionId },
+      });
+      if (option) {
+        selectedOption = option;
+      }
+    }
+
+    // Create answer record
+    const answer = this.questionAnswerRepository.create({
+      attempt,
+      question,
+      student,
+      selectedOption,
+      answerText: submitAnswerDto.answerText,
+      answerAudioUrl: submitAnswerDto.answerAudioUrl,
+      isCorrect: submitAnswerDto.isCorrect,
+      pointsEarned: submitAnswerDto.pointsEarned,
+      timeSpentSeconds: submitAnswerDto.timeSpentSeconds || 0,
+      answeredAt: new Date(),
+    });
+
+    return await this.questionAnswerRepository.save(answer);
+  }
+
+  /**
+   * Complete a level attempt
+   */
+  async completeLevel(
+    studentId: number,
+    levelId: number,
+    completeLevelDto: CompleteLevelDto,
+  ) {
+    // Verify attempt exists and belongs to student
+    const attempt = await this.levelAttemptRepository.findOne({
+      where: { id: completeLevelDto.attemptId },
+      relations: ['student', 'level'],
+    });
+
+    if (!attempt) {
+      throw new NotFoundException(
+        `Level attempt with ID ${completeLevelDto.attemptId} not found`,
+      );
+    }
+
+    if (attempt.student.id !== studentId) {
+      throw new NotFoundException('Level attempt does not belong to this student');
+    }
+
+    if (attempt.level.id !== levelId) {
+      throw new NotFoundException('Level attempt does not belong to this level');
+    }
+
+    // Update attempt with completion data
+    attempt.score = completeLevelDto.score;
+    attempt.pointsEarned = completeLevelDto.pointsEarned;
+    attempt.isPassed = completeLevelDto.isPassed;
+    attempt.isCompleted = true;
+    attempt.timeSpentSeconds = completeLevelDto.timeSpentSeconds;
+    attempt.completedAt = new Date();
+
+    return await this.levelAttemptRepository.save(attempt);
+  }
+
+  /**
+   * Get overall progress summary for a student
+   */
+  async getStudentProgress(studentId: number) {
+    // Verify student exists
+    const student = await this.userRepository.findOne({
+      where: { id: studentId },
+    });
+
+    if (!student) {
+      throw new NotFoundException(`Student with ID ${studentId} not found`);
+    }
+
+    // Get all chapter progress
+    const chapterProgress = await this.chapterProgressRepository.find({
+      where: { student: { id: studentId } },
+    });
+
+    // Get all unit progress
+    const unitProgress = await this.unitProgressRepository.find({
+      where: { student: { id: studentId } },
+    });
+
+    // Get all level attempts
+    const levelAttempts = await this.levelAttemptRepository.find({
+      where: { student: { id: studentId } },
+      order: { startedAt: 'DESC' },
+    });
+
+    // Calculate summary statistics
+    const totalChapters = chapterProgress.length;
+    const completedChapters = chapterProgress.filter(
+      (cp) => cp.completedUnits === cp.totalUnits,
+    ).length;
+
+    const totalUnits = unitProgress.length;
+    const completedUnits = unitProgress.filter(
+      (up) => up.completedLevels === up.totalLevels,
+    ).length;
+
+    const totalAttempts = levelAttempts.length;
+    const completedAttempts = levelAttempts.filter(
+      (attempt) => attempt.isCompleted,
+    ).length;
+    const passedAttempts = levelAttempts.filter(
+      (attempt) => attempt.isPassed,
+    ).length;
+
+    const averageScore =
+      levelAttempts.length > 0
+        ? levelAttempts.reduce((sum, attempt) => sum + attempt.score, 0) /
+          levelAttempts.length
+        : 0;
+
+    const totalPointsEarned = levelAttempts.reduce(
+      (sum, attempt) => sum + attempt.pointsEarned,
+      0,
+    );
+
+    return {
+      studentId,
+      totalChapters,
+      completedChapters,
+      totalUnits,
+      completedUnits,
+      totalLevelAttempts: totalAttempts,
+      completedLevelAttempts: completedAttempts,
+      passedLevelAttempts: passedAttempts,
+      averageScore: Math.round(averageScore * 100) / 100,
+      totalPointsEarned,
+      chapterProgress: chapterProgress.map((cp) =>
+        this.mapChapterProgressToDto(cp),
+      ),
+      unitProgress: unitProgress.map((up) => this.mapUnitProgressToDto(up)),
+    };
   }
 }

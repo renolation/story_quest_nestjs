@@ -13,9 +13,6 @@ export class AnswerOption {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'question_id' })
-  questionId: number;
-
   @Column({ name: 'option_text', type: 'text' })
   optionText: string;
 
@@ -36,7 +33,13 @@ export class AnswerOption {
 
   @ManyToOne(() => Question, (question) => question.answerOptions, {
     onDelete: 'CASCADE',
+    nullable: false,
   })
   @JoinColumn({ name: 'question_id' })
   question: Question;
+
+  // Getter for foreign key ID
+  get questionId(): number {
+    return this.question?.id;
+  }
 }

@@ -1,0 +1,201 @@
+### Story Quest API - Authentication Tests
+### Base URL
+@baseUrl = http://localhost:3000/api/v1
+@contentType = application/json
+
+###############################################
+# 1. HEALTH CHECK
+###############################################
+
+### Health Check
+GET {{baseUrl}}/auth/health
+
+###############################################
+# 2. REGISTER NEW USERS
+###############################################
+
+### Register Student
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "teststudent@example.com",
+  "username": "teststudent123",
+  "password": "Password123",
+  "fullName": "Test Student",
+  "role": "student"
+}
+
+### Register Teacher
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "testteacher@example.com",
+  "username": "testteacher123",
+  "password": "Password123",
+  "fullName": "Test Teacher",
+  "role": "teacher"
+}
+
+### Register with Invalid Email (should fail)
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "invalid-email",
+  "username": "testuser",
+  "password": "Password123",
+  "fullName": "Test User",
+  "role": "student"
+}
+
+### Register with Weak Password (should fail)
+POST {{baseUrl}}/auth/register
+Content-Type: {{contentType}}
+
+{
+  "email": "test@example.com",
+  "username": "testuser",
+  "password": "123",
+  "fullName": "Test User",
+  "role": "student"
+}
+
+###############################################
+# 3. LOGIN
+###############################################
+
+### Login as Student (save token)
+# @name studentLogin
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "identifier": "student1@test.com",
+  "password": "Password123"
+}
+
+### Extract Student Token
+@studentToken = {{studentLogin.response.body.accessToken}}
+
+### Login as Teacher
+# @name teacherLogin
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "identifier": "teacher1@storyquest.com",
+  "password": "Password123"
+}
+
+### Extract Teacher Token
+@teacherToken = {{teacherLogin.response.body.accessToken}}
+
+### Login as Center
+# @name centerLogin
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "identifier": "center1@storyquest.com",
+  "password": "Password123"
+}
+
+### Extract Center Token
+@centerToken = {{centerLogin.response.body.accessToken}}
+
+### Login as Agency
+# @name agencyLogin
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "identifier": "agency@storyquest.com",
+  "password": "Password123"
+}
+
+### Extract Agency Token
+@agencyToken = {{agencyLogin.response.body.accessToken}}
+
+### Login with Invalid Credentials (should fail)
+POST {{baseUrl}}/auth/login
+Content-Type: {{contentType}}
+
+{
+  "identifier": "student1@test.com",
+  "password": "WrongPassword"
+}
+
+###############################################
+# 4. GET CURRENT USER
+###############################################
+
+### Get Current User (Student)
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{studentToken}}
+
+### Get Current User (Teacher)
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{teacherToken}}
+
+### Get Current User - No Token (should fail)
+GET {{baseUrl}}/auth/me
+
+### Get Current User - Invalid Token (should fail)
+GET {{baseUrl}}/auth/me
+Authorization: Bearer invalid_token_here
+
+###############################################
+# 5. CHANGE PASSWORD
+###############################################
+
+### Change Password (Student)
+PATCH {{baseUrl}}/auth/change-password
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "currentPassword": "Password123",
+  "newPassword": "NewPassword456"
+}
+
+### Change Password - Wrong Current Password (should fail)
+PATCH {{baseUrl}}/auth/change-password
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "currentPassword": "WrongPassword",
+  "newPassword": "NewPassword456"
+}
+
+### Change Password Back (so we can reuse credentials)
+PATCH {{baseUrl}}/auth/change-password
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "currentPassword": "NewPassword456",
+  "newPassword": "Password123"
+}
+
+###############################################
+# NOTES
+###############################################
+
+# Test Credentials (all use Password123):
+# - Agency: agency@storyquest.com
+# - Center: center1@storyquest.com
+# - Teacher: teacher1@storyquest.com
+# - Reviewer: reviewer1@storyquest.com
+# - Student: student1@test.com
+
+# Expected Response Codes:
+# - 200 OK: Successful GET, PATCH
+# - 201 Created: Successful POST
+# - 400 Bad Request: Validation error
+# - 401 Unauthorized: No token or invalid token
+# - 403 Forbidden: Insufficient permissions
+# - 404 Not Found: Resource doesn't exist
+# - 409 Conflict: Duplicate resource (email/username exists)

@@ -1,0 +1,298 @@
+### Story Quest API - Progress Tracking Tests
+### Prerequisites: Run auth.http first to get student token
+
+@baseUrl = http://localhost:3000/api/v1
+@contentType = application/json
+
+# Use student token from auth.http
+@studentToken = YOUR_STUDENT_TOKEN_HERE
+
+###############################################
+# PROGRESS OVERVIEW
+###############################################
+
+### Get Student Progress Summary
+GET {{baseUrl}}/progress/me
+Authorization: Bearer {{studentToken}}
+
+### Get Chapter Progress
+GET {{baseUrl}}/progress/chapters/1
+Authorization: Bearer {{studentToken}}
+
+### Get Unit Progress
+GET {{baseUrl}}/progress/units/1
+Authorization: Bearer {{studentToken}}
+
+###############################################
+# START LEVEL
+###############################################
+
+### Start Level Attempt
+# @name startLevel
+POST {{baseUrl}}/progress/levels/1/start
+Authorization: Bearer {{studentToken}}
+
+### Extract Attempt ID
+@attemptId = {{startLevel.response.body.id}}
+
+### Start Already Started Level (should create new attempt)
+POST {{baseUrl}}/progress/levels/1/start
+Authorization: Bearer {{studentToken}}
+
+### Start Invalid Level (should fail 404)
+POST {{baseUrl}}/progress/levels/99999/start
+Authorization: Bearer {{studentToken}}
+
+###############################################
+# SUBMIT ANSWERS
+###############################################
+
+### Submit Answer to Question 1
+POST {{baseUrl}}/progress/questions/1/answer
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "attemptId": 1,
+  "selectedOptionId": 1,
+  "timeSpent": 15
+}
+
+### Submit Answer to Question 2
+POST {{baseUrl}}/progress/questions/2/answer
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "attemptId": 1,
+  "selectedOptionId": 5,
+  "timeSpent": 20
+}
+
+### Submit Answer - Invalid Attempt ID (should fail)
+POST {{baseUrl}}/progress/questions/1/answer
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "attemptId": 99999,
+  "selectedOptionId": 1,
+  "timeSpent": 15
+}
+
+### Submit Answer - Invalid Question ID (should fail 404)
+POST {{baseUrl}}/progress/questions/99999/answer
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "attemptId": 1,
+  "selectedOptionId": 1,
+  "timeSpent": 15
+}
+
+### Submit Answer - Invalid Option ID (should fail)
+POST {{baseUrl}}/progress/questions/1/answer
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "attemptId": 1,
+  "selectedOptionId": 99999,
+  "timeSpent": 15
+}
+
+###############################################
+# COMPLETE LEVEL
+###############################################
+
+### Complete Level Attempt
+POST {{baseUrl}}/progress/levels/1/complete
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "attemptId": 1,
+  "finalScore": 85,
+  "totalTimeSpent": 120
+}
+
+### Complete Already Completed Level (should fail or update)
+POST {{baseUrl}}/progress/levels/1/complete
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "attemptId": 1,
+  "finalScore": 90,
+  "totalTimeSpent": 100
+}
+
+### Complete Level - Invalid Attempt ID (should fail)
+POST {{baseUrl}}/progress/levels/1/complete
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "attemptId": 99999,
+  "finalScore": 85,
+  "totalTimeSpent": 120
+}
+
+### Complete Level - Score Too High (should fail 400)
+POST {{baseUrl}}/progress/levels/2/complete
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "attemptId": 2,
+  "finalScore": 150,
+  "totalTimeSpent": 120
+}
+
+###############################################
+# COMPLETE WORKFLOW TEST
+###############################################
+
+### WORKFLOW: Complete Level 2 from Start to Finish
+
+# Step 1: Start Level 2
+# @name startLevel2
+POST {{baseUrl}}/progress/levels/2/start
+Authorization: Bearer {{studentToken}}
+
+### Extract Attempt ID for Level 2
+@attemptId2 = {{startLevel2.response.body.id}}
+
+# Step 2: Get questions for Level 2
+GET {{baseUrl}}/questions?levelId=2
+Authorization: Bearer {{studentToken}}
+
+# Step 3: Submit answers for all questions (example with Question 6-10)
+POST {{baseUrl}}/progress/questions/6/answer
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "attemptId": {{attemptId2}},
+  "selectedOptionId": 21,
+  "timeSpent": 12
+}
+
+###
+
+POST {{baseUrl}}/progress/questions/7/answer
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "attemptId": {{attemptId2}},
+  "selectedOptionId": 25,
+  "timeSpent": 18
+}
+
+###
+
+POST {{baseUrl}}/progress/questions/8/answer
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "attemptId": {{attemptId2}},
+  "selectedOptionId": 29,
+  "timeSpent": 15
+}
+
+# Step 4: Complete Level 2
+POST {{baseUrl}}/progress/levels/2/complete
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "attemptId": {{attemptId2}},
+  "finalScore": 80,
+  "totalTimeSpent": 95
+}
+
+# Step 5: Check updated progress
+GET {{baseUrl}}/progress/me
+Authorization: Bearer {{studentToken}}
+
+###############################################
+# AUTHORIZATION TESTS
+###############################################
+
+### Try to Access Another Student's Progress (should fail if implemented)
+# This would require knowing another student's ID
+# GET {{baseUrl}}/progress/students/2
+# Authorization: Bearer {{studentToken}}
+
+### Try Progress Endpoints Without Token (should fail 401)
+GET {{baseUrl}}/progress/me
+
+### Try to Start Level Without Token (should fail 401)
+POST {{baseUrl}}/progress/levels/1/start
+
+###############################################
+# EDGE CASES
+###############################################
+
+### Submit Answer Before Starting Level (should fail)
+POST {{baseUrl}}/progress/questions/1/answer
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "attemptId": 99999,
+  "selectedOptionId": 1,
+  "timeSpent": 15
+}
+
+### Complete Level with Score = 0
+POST {{baseUrl}}/progress/levels/3/complete
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "attemptId": 3,
+  "finalScore": 0,
+  "totalTimeSpent": 60
+}
+
+### Complete Level with Score Below Passing Score
+POST {{baseUrl}}/progress/levels/4/complete
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "attemptId": 4,
+  "finalScore": 50,
+  "totalTimeSpent": 90
+}
+
+###############################################
+# NOTES
+###############################################
+
+# Progress Tracking Flow:
+# 1. Start Level → Get attempt ID
+# 2. Submit Answers → One by one with attempt ID
+# 3. Complete Level → Provide final score and time
+# 4. Check Progress → View updated progress
+
+# Seeded Data:
+# - 20 students with varying progress
+# - Some levels already completed
+# - Mix of passed/failed attempts
+# - Various scores (50-100)
+
+# Level Requirements:
+# - Level 1 (Easy): Passing Score = 70, Time Limit = 60s
+# - Level 2 (Medium): Passing Score = 75, Time Limit = 90s
+# - Level 3 (Hard): Passing Score = 80, Time Limit = 120s
+
+# Response Structure:
+# - Start Level: { id, levelId, studentId, score, startedAt }
+# - Submit Answer: { isCorrect, pointsEarned, correctOptionId }
+# - Complete Level: { passed, score, timeSpent, isPassed }
+# - Progress Summary: { chapters, units, levels, overallProgress }

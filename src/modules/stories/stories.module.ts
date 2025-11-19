@@ -5,6 +5,8 @@ import { StoryScene } from './entities/story-scene.entity';
 import { StoryVocabulary } from './entities/story-vocabulary.entity';
 import { StoryComprehensionQuestion } from './entities/story-comprehension-question.entity';
 import { StudentStoryProgress } from './entities/student-story-progress.entity';
+import { StoriesController } from './stories.controller';
+import { StoriesService } from './stories.service';
 
 /**
  * PHASE 5 - STORIES MODULE - TODO
@@ -41,8 +43,8 @@ import { StudentStoryProgress } from './entities/student-story-progress.entity';
       StudentStoryProgress,
     ]),
   ],
-  controllers: [],
-  providers: [],
-  exports: [],
+  controllers: [StoriesController],
+  providers: [StoriesService],
+  exports: [StoriesService],
 })
 export class StoriesModule {}
