@@ -74,6 +74,13 @@ src/database/
 | REVIEWER | 2 | Content moderators |
 | STUDENT | 20 | Test students for progress tracking |
 
+**Content Structure**:
+- 4 chapters
+- 4 units per chapter (16 total)
+- 4 levels per unit (64 total)
+- 10 questions per level (640 total)
+- 4 answer options per question (2560 total)
+
 **User Schema**:
 ```typescript
 {
@@ -101,35 +108,35 @@ src/database/
 
 **Goal**: Create learning content hierarchy
 
-#### Chapters (10 chapters)
+#### Chapters (4 chapters)
 ```typescript
 [
   { title: 'Greetings & Introductions', description: 'Learn basic greetings', orderIndex: 1 },
   { title: 'Numbers & Counting', description: 'Count from 1 to 100', orderIndex: 2 },
   { title: 'Colors & Shapes', description: 'Identify colors and shapes', orderIndex: 3 },
-  { title: 'Family & Friends', description: 'Talk about family members', orderIndex: 4 },
-  { title: 'Animals & Pets', description: 'Learn animal names', orderIndex: 5 },
-  // ... 5 more chapters
+  { title: 'Family & Friends', description: 'Talk about family members', orderIndex: 4 }
 ]
 ```
 
-#### Units (3-5 units per chapter = ~40 units)
+#### Units (4 units per chapter = 16 units)
 ```typescript
 Chapter 1 → Units:
-  - Unit 1: "Hello & Goodbye" (3 levels)
-  - Unit 2: "My Name Is..." (3 levels)
-  - Unit 3: "How Are You?" (3 levels)
+  - Unit 1: "Hello & Goodbye" (4 levels)
+  - Unit 2: "My Name Is..." (4 levels)
+  - Unit 3: "How Are You?" (4 levels)
+  - Unit 4: "Nice to Meet You" (4 levels)
 ```
 
-#### Levels (3-5 levels per unit = ~150 levels)
+#### Levels (4 levels per unit = 64 levels)
 ```typescript
 Unit 1 → Levels:
-  - Level 1: "Easy - Basic Hello" (timeLimit: 60, passingScore: 70)
-  - Level 2: "Medium - Greeting Friends" (timeLimit: 90, passingScore: 75)
-  - Level 3: "Hard - Formal Greetings" (timeLimit: 120, passingScore: 80)
+  - Level 1: "Beginner - Basic Hello" (timeLimit: 60, passingScore: 70)
+  - Level 2: "Easy - Greeting Friends" (timeLimit: 90, passingScore: 75)
+  - Level 3: "Medium - Formal Greetings" (timeLimit: 120, passingScore: 80)
+  - Level 4: "Hard - Advanced Conversations" (timeLimit: 150, passingScore: 85)
 ```
 
-#### Questions (5-10 questions per level = ~1000 questions)
+#### Questions (10 questions per level = 640 questions)
 ```typescript
 {
   levelId: 1,

@@ -36,14 +36,14 @@
 - ✅ Implemented proper query builders for counting
 - ✅ Added student relationship to StudentQuestionAnswer
 
-### 4. Seeding Progress (In Progress)
+### 4. Seeding Progress (Complete)
 - ✅ Successfully seeded:
   - **31 users** (1 agency, 3 centers, 5 teachers, 2 reviewers, 20 students)
-  - **10 chapters** (Greetings, Numbers, Colors, Family, Animals, Food, School, Weather, Body, Routines)
-  - **45 units** (3-5 units per chapter)
-  - **135 levels** (3 levels per unit: Easy, Medium, Hard)
-  - **999 questions** with 4 answer options each (~3996 answer options)
-- ⏳ Currently generating: Progress data (attempts, answers, unit/chapter progress)
+  - **4 chapters** (Greetings, Numbers, Colors, Family)
+  - **16 units** (4 units per chapter)
+  - **64 levels** (4 levels per unit)
+  - **640 questions** with 4 answer options each (2560 answer options)
+  - **Progress data** (attempts, answers, unit/chapter progress)
 
 ---
 
@@ -87,25 +87,19 @@ All users have password: **Password123**
 
 ## 🎯 Learning Content Structure
 
-### Chapters Created (10)
+### Chapters Created (4)
 1. Greetings & Introductions
 2. Numbers & Counting
 3. Colors & Shapes
 4. Family & Friends
-5. Animals & Pets
-6. Food & Drinks
-7. School & Classroom
-8. Weather & Seasons
-9. Body Parts & Actions
-10. Daily Routines
 
 ### Content Hierarchy
 ```
-10 Chapters
-  └→ 45 Units (3-5 per chapter)
-      └→ 135 Levels (3 per unit: Easy, Medium, Hard)
-          └→ 999 Questions (5-10 per level)
-              └→ ~3996 Answer Options (4 per question)
+4 Chapters
+  └→ 16 Units (4 per chapter)
+      └→ 64 Levels (4 per unit)
+          └→ 640 Questions (10 per level)
+              └→ 2560 Answer Options (4 per question)
 ```
 
 ### Question Type Distribution

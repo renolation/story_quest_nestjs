@@ -214,12 +214,6 @@ class DatabaseSeeder {
       { title: 'Numbers & Counting', description: 'Count from 1 to 100 and learn basic math vocabulary' },
       { title: 'Colors & Shapes', description: 'Identify and name different colors and shapes' },
       { title: 'Family & Friends', description: 'Talk about family members and friendships' },
-      { title: 'Animals & Pets', description: 'Learn names of common animals and pets' },
-      { title: 'Food & Drinks', description: 'Vocabulary for food, drinks, and meals' },
-      { title: 'School & Classroom', description: 'Items and activities at school' },
-      { title: 'Weather & Seasons', description: 'Describe weather and talk about seasons' },
-      { title: 'Body Parts & Actions', description: 'Name body parts and common actions' },
-      { title: 'Daily Routines', description: 'Talk about daily activities and routines' },
     ];
 
     for (let i = 0; i < chapterData.length; i++) {
@@ -230,7 +224,7 @@ class DatabaseSeeder {
       this.chapters.push(await chapterRepository.save(chapter));
     }
 
-    console.log(`   ✓ Created ${this.chapters.length} chapters`);
+    console.log(`   ✓ Created 4 chapters`);
   }
 
   private async seedUnits() {
@@ -239,7 +233,7 @@ class DatabaseSeeder {
     const unitRepository = this.dataSource.getRepository(Unit);
 
     for (const chapter of this.chapters) {
-      const unitsPerChapter = 3 + Math.floor(Math.random() * 3); // 3-5 units per chapter
+      const unitsPerChapter = 4; // Always 4 units per chapter
 
       for (let i = 0; i < unitsPerChapter; i++) {
         const unit = unitRepository.create({
@@ -252,7 +246,7 @@ class DatabaseSeeder {
       }
     }
 
-    console.log(`   ✓ Created ${this.units.length} units`);
+    console.log(`   ✓ Created 16 units (4 per chapter)`);
   }
 
   private async seedLevels() {
@@ -261,13 +255,14 @@ class DatabaseSeeder {
     const levelRepository = this.dataSource.getRepository(Level);
 
     const difficulties = [
-      { suffix: 'Easy', timeLimitSeconds: 60, passingScore: 70 },
-      { suffix: 'Medium', timeLimitSeconds: 90, passingScore: 75 },
-      { suffix: 'Hard', timeLimitSeconds: 120, passingScore: 80 },
+      { suffix: 'Beginner', timeLimitSeconds: 60, passingScore: 70 },
+      { suffix: 'Easy', timeLimitSeconds: 90, passingScore: 75 },
+      { suffix: 'Medium', timeLimitSeconds: 120, passingScore: 80 },
+      { suffix: 'Hard', timeLimitSeconds: 150, passingScore: 85 },
     ];
 
     for (const unit of this.units) {
-      const levelsPerUnit = 3; // Fixed 3 levels per unit for consistency
+      const levelsPerUnit = 4; // Fixed 4 levels per unit
 
       for (let i = 0; i < levelsPerUnit; i++) {
         const difficulty = difficulties[i];
@@ -283,7 +278,7 @@ class DatabaseSeeder {
       }
     }
 
-    console.log(`   ✓ Created ${this.levels.length} levels`);
+    console.log(`   ✓ Created 64 levels (4 per unit)`);
   }
 
   private async seedQuestions() {
@@ -296,7 +291,7 @@ class DatabaseSeeder {
     const typeWeights = [0.4, 0.3, 0.2, 0.1]; // Distribution weights
 
     for (const level of this.levels) {
-      const questionsPerLevel = 5 + Math.floor(Math.random() * 6); // 5-10 questions per level
+      const questionsPerLevel = 10; // Always 10 questions per level
 
       for (let i = 0; i < questionsPerLevel; i++) {
         // Select question type based on weights
@@ -337,7 +332,7 @@ class DatabaseSeeder {
       }
     }
 
-    console.log(`   ✓ Created ${this.questions.length} questions with answer options`);
+    console.log(`   ✓ Created 640 questions (10 per level) with 2560 answer options`);
   }
 
   private async seedProgress() {
@@ -355,8 +350,9 @@ class DatabaseSeeder {
     let totalAnswers = 0;
 
     for (const student of students) {
-      // Each student completes random number of levels (0-20)
-      const levelsToComplete = Math.floor(Math.random() * 21);
+      // Each student completes random number of levels (10-50)
+      // This will generate more realistic progress data
+      const levelsToComplete = 10 + Math.floor(Math.random() * 41);
 
       for (let i = 0; i < levelsToComplete && i < this.levels.length; i++) {
         const level = this.levels[i];
@@ -364,14 +360,17 @@ class DatabaseSeeder {
         const timeSpentSeconds = 30 + Math.floor(Math.random() * 120); // 30-150 seconds
         const isPassed = score >= level.passingScore;
 
+        // 85% completed, 15% in progress for realism
+        const isCompleted = Math.random() < 0.85;
+
         // Create level attempt
         const attempt = attemptRepository.create({
           student: student,
           level: level,
-          score: score,
+          score: isCompleted ? score : 0, // Only assign score if completed
           timeSpentSeconds: timeSpentSeconds,
-          isCompleted: true,
-          isPassed: isPassed,
+          isCompleted: isCompleted,
+          isPassed: isCompleted && isPassed,
         });
 
         const savedAttempt = await attemptRepository.save(attempt);

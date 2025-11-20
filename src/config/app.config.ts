@@ -16,7 +16,7 @@ export default registerAs('app', () => ({
   isProduction: process.env.NODE_ENV === 'production',
 
   // Server
-  port: parseInt(process.env.PORT, 10) || 4000,
+  port: parseInt(process.env.PORT || '4000', 10),
   apiPrefix: process.env.API_PREFIX || 'api/v1',
 
   // CORS
@@ -29,8 +29,8 @@ export default registerAs('app', () => ({
 
   // Rate Limiting
   throttle: {
-    ttl: parseInt(process.env.THROTTLE_TTL, 10) || 60,
-    limit: parseInt(process.env.THROTTLE_LIMIT, 10) || 100,
+    ttl: parseInt(process.env.THROTTLE_TTL || '60', 10),
+    limit: parseInt(process.env.THROTTLE_LIMIT || '100', 10),
   },
 
   // Logging
@@ -53,7 +53,7 @@ export default registerAs('app', () => ({
 
   // File Upload (for Phase 3 - Audio files)
   upload: {
-    maxFileSize: parseInt(process.env.MAX_FILE_SIZE, 10) || 5 * 1024 * 1024, // 5MB
+    maxFileSize: parseInt(process.env.MAX_FILE_SIZE || '5242880', 10), // 5MB default
     allowedMimeTypes: [
       'image/jpeg',
       'image/png',

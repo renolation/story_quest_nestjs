@@ -254,13 +254,12 @@ export class AuthService {
         UserRole.CENTER,
         UserRole.TEACHER,
         UserRole.REVIEWER,
-        UserRole.PARENT,
+        UserRole.STUDENT,
       ],
-      [UserRole.CENTER]: [UserRole.TEACHER, UserRole.PARENT],
-      [UserRole.TEACHER]: [UserRole.PARENT],
-      [UserRole.PARENT]: [UserRole.STUDENT],
+      [UserRole.CENTER]: [UserRole.TEACHER, UserRole.STUDENT],
+      [UserRole.TEACHER]: [UserRole.STUDENT],
       [UserRole.REVIEWER]: [], // Cannot create users
-      [UserRole.STUDENT]: [], // Cannot create users
+      [UserRole.STUDENT]: [], // Cannot create users (students self-register)
     };
 
     const allowedRoles = permissions[creatorRole] || [];

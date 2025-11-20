@@ -1,0 +1,124 @@
+### Story Quest API - Chapters Tests
+### Use this file with REST Client extension in VS Code
+
+@baseUrl = http://localhost:3000/api/v1
+@contentType = application/json
+
+### Set token after login
+@accessToken = your_token_here
+@studentToken = your_student_token_here
+@teacherToken = your_teacher_token_here
+
+###############################################################################
+### 1. Get All Chapters
+###############################################################################
+
+### Get All Chapters (Student)
+GET {{baseUrl}}/chapters
+Authorization: Bearer {{studentToken}}
+
+###
+
+### Get All Chapters with Progress
+GET {{baseUrl}}/chapters?includeProgress=true
+Authorization: Bearer {{studentToken}}
+
+###############################################################################
+### 2. Get Chapter by ID
+###############################################################################
+
+### Get Chapter 1
+GET {{baseUrl}}/chapters/1
+Authorization: Bearer {{studentToken}}
+
+###
+
+### Get Chapter 2
+GET {{baseUrl}}/chapters/2
+Authorization: Bearer {{studentToken}}
+
+###
+
+### Get Non-Existent Chapter (Should Return 404)
+GET {{baseUrl}}/chapters/999
+Authorization: Bearer {{studentToken}}
+
+###############################################################################
+### 3. Create Chapter (Teacher/Admin Only)
+###############################################################################
+
+### Create New Chapter (Teacher)
+POST {{baseUrl}}/chapters
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Test Chapter via API",
+  "description": "This chapter was created via REST Client",
+  "thumbnailUrl": "https://example.com/test-chapter.jpg",
+  "orderIndex": 99
+}
+
+###
+
+### Create Chapter - Student Should Fail
+POST {{baseUrl}}/chapters
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Should Fail",
+  "description": "Students cannot create chapters",
+  "orderIndex": 100
+}
+
+###############################################################################
+### 4. Update Chapter (Teacher/Admin Only)
+###############################################################################
+
+### Update Chapter 1
+PATCH {{baseUrl}}/chapters/1
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Greetings & Introductions (Updated)",
+  "description": "Updated description via API"
+}
+
+###############################################################################
+### 5. Delete Chapter (Admin Only)
+###############################################################################
+
+### Delete Chapter 99 (Test Chapter)
+DELETE {{baseUrl}}/chapters/99
+Authorization: Bearer {{teacherToken}}
+
+###############################################################################
+### 6. Error Cases
+###############################################################################
+
+### Get Chapter Without Token
+GET {{baseUrl}}/chapters/1
+
+###
+
+### Create Chapter with Missing Fields
+POST {{baseUrl}}/chapters
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Only Title"
+}
+
+###
+
+### Update Non-Existent Chapter
+PATCH {{baseUrl}}/chapters/9999
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Should Fail"
+}

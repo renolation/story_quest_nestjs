@@ -81,17 +81,16 @@ export class AuthController {
 
   @Post('users')
   @UseGuards(RolesGuard)
-  @Roles(UserRole.AGENCY, UserRole.CENTER, UserRole.TEACHER, UserRole.PARENT)
+  @Roles(UserRole.AGENCY, UserRole.CENTER, UserRole.TEACHER)
   @ApiBearerAuth()
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Create new user (Hierarchical permissions)',
     description: `Create a new user account with role-based hierarchy:
-    - AGENCY can create: CENTER, TEACHER, REVIEWER, PARENT
-    - CENTER can create: TEACHER, PARENT
-    - TEACHER can create: PARENT
-    - PARENT can create: STUDENT
-    - REVIEWER and STUDENT cannot create users`,
+    - AGENCY can create: CENTER, TEACHER, REVIEWER, STUDENT
+    - CENTER can create: TEACHER, STUDENT
+    - TEACHER can create: STUDENT
+    - REVIEWER and STUDENT cannot create users (students self-register)`,
   })
   @ApiBody({ type: CreateUserDto })
   @ApiResponse({
