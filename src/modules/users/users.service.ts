@@ -180,6 +180,104 @@ export class UsersService {
   }
 
   /**
+   * Update user profile
+   * @param userId - User ID
+   * @param updateData - Data to update
+   * @returns Updated user entity
+   * @throws NotFoundException if user not found
+   * @throws ConflictException if email or username already taken
+   */
+  async update(
+    userId: number,
+    updateData: Partial<{
+      email: string;
+      username: string;
+      fullName: string;
+      avatarUrl: string;
+    }>,
+  ): Promise<User> {
+    this.logger.log(`Updating user profile: ${userId}`);
+
+    // Find user
+    const user = await this.findById(userId);
+
+    // Check if new email is already taken by another user
+    if (updateData.email && updateData.email !== user.email) {
+      const existingEmail = await this.findByEmail(updateData.email);
+      if (existingEmail && existingEmail.id !== userId) {
+        throw new ConflictException('Email already taken');
+      }
+    }
+
+    // Check if new username is already taken by another user
+    if (updateData.username && updateData.username !== user.username) {
+      const existingUsername = await this.findByUsername(updateData.username);
+      if (existingUsername && existingUsername.id !== userId) {
+        throw new ConflictException('Username already taken');
+      }
+    }
+
+    // Update user
+    await this.usersRepository.update(userId, updateData);
+
+    // Return updated user
+    const updatedUser = await this.findById(userId);
+    this.logger.log(`User profile updated successfully: ${userId}`);
+
+    return updatedUser;
+  }
+
+  /**
+   * Find all users with filtering and pagination
+   * @param filters - Filter criteria
+   * @returns Paginated list of users
+   */
+  async findAll(filters: {
+    role?: string;
+    isActive?: boolean;
+    page?: number;
+    limit?: number;
+  }): Promise<{
+    data: User[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const { role, isActive, page = 1, limit = 10 } = filters;
+
+    const queryBuilder = this.usersRepository.createQueryBuilder('user');
+
+    // Apply filters
+    if (role) {
+      queryBuilder.andWhere('user.role = :role', { role });
+    }
+
+    if (isActive !== undefined) {
+      queryBuilder.andWhere('user.isActive = :isActive', { isActive });
+    }
+
+    // Get total count
+    const total = await queryBuilder.getCount();
+
+    // Apply pagination
+    const skip = (page - 1) * limit;
+    queryBuilder.skip(skip).take(limit);
+
+    // Order by created date (newest first)
+    queryBuilder.orderBy('user.createdAt', 'DESC');
+
+    // Execute query
+    const data = await queryBuilder.getMany();
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+    };
+  }
+
+  /**
    * Change user password
    * @param userId - User ID
    * @param currentPassword - Current password for verification

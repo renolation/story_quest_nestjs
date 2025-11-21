@@ -1,201 +1,202 @@
 ### Story Quest API - Authentication Tests
 ### Base URL
 @baseUrl = http://localhost:3000/api/v1
-@contentType = application/json
+@studentToken =
+@teacherToken =
+@agencyToken =
 
 ###############################################
-# 1. HEALTH CHECK
+### HEALTH CHECK
 ###############################################
 
 ### Health Check
 GET {{baseUrl}}/auth/health
 
 ###############################################
-# 2. REGISTER NEW USERS
+### STUDENT REGISTRATION & LOGIN
 ###############################################
 
-### Register Student
+### Register New Student
+# @name registerStudent
 POST {{baseUrl}}/auth/register
-Content-Type: {{contentType}}
+Content-Type: application/json
 
 {
-  "email": "teststudent@example.com",
-  "username": "teststudent123",
+  "email": "newstudent@test.com",
+  "username": "newstudent123",
   "password": "Password123",
-  "fullName": "Test Student",
+  "fullName": "New Test Student",
   "role": "student"
 }
 
-### Register Teacher
-POST {{baseUrl}}/auth/register
-Content-Type: {{contentType}}
-
-{
-  "email": "testteacher@example.com",
-  "username": "testteacher123",
-  "password": "Password123",
-  "fullName": "Test Teacher",
-  "role": "teacher"
-}
-
-### Register with Invalid Email (should fail)
-POST {{baseUrl}}/auth/register
-Content-Type: {{contentType}}
-
-{
-  "email": "invalid-email",
-  "username": "testuser",
-  "password": "Password123",
-  "fullName": "Test User",
-  "role": "student"
-}
-
-### Register with Weak Password (should fail)
-POST {{baseUrl}}/auth/register
-Content-Type: {{contentType}}
-
-{
-  "email": "test@example.com",
-  "username": "testuser",
-  "password": "123",
-  "fullName": "Test User",
-  "role": "student"
-}
-
-###############################################
-# 3. LOGIN
-###############################################
-
-### Login as Student (save token)
-# @name studentLogin
+### Login as Student (from seeded data)
+# @name loginStudent
 POST {{baseUrl}}/auth/login
-Content-Type: {{contentType}}
+Content-Type: application/json
 
 {
   "identifier": "student1@test.com",
   "password": "Password123"
 }
 
-### Extract Student Token
-@studentToken = {{studentLogin.response.body.accessToken}}
+###############################################
+### AUTHENTICATED USER ENDPOINTS
+###############################################
+
+### Get Current User Profile
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{studentToken}}
+
+### Get My Profile (Users endpoint)
+GET {{baseUrl}}/users/me
+Authorization: Bearer {{studentToken}}
+
+### Update My Profile
+PATCH {{baseUrl}}/users/me
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{
+  "fullName": "Updated Student Name",
+  "avatarUrl": "https://example.com/new-avatar.jpg"
+}
+
+### Change Password
+PATCH {{baseUrl}}/auth/change-password
+Authorization: Bearer {{studentToken}}
+Content-Type: application/json
+
+{
+  "currentPassword": "Password123",
+  "newPassword": "NewPassword456",
+  "confirmPassword": "NewPassword456"
+}
+
+###############################################
+### TEACHER LOGIN & ENDPOINTS
+###############################################
 
 ### Login as Teacher
-# @name teacherLogin
+# @name loginTeacher
 POST {{baseUrl}}/auth/login
-Content-Type: {{contentType}}
+Content-Type: application/json
 
 {
   "identifier": "teacher1@storyquest.com",
   "password": "Password123"
 }
 
-### Extract Teacher Token
-@teacherToken = {{teacherLogin.response.body.accessToken}}
+### Create New Student (Teacher role)
+POST {{baseUrl}}/auth/users
+Authorization: Bearer {{teacherToken}}
+Content-Type: application/json
 
-### Login as Center
-# @name centerLogin
+{
+  "email": "teacher-created-student@test.com",
+  "username": "teacherstudent1",
+  "password": "Password123",
+  "fullName": "Teacher Created Student",
+  "role": "student"
+}
+
+### Get User by ID (Teacher can view student details)
+GET {{baseUrl}}/users/21
+Authorization: Bearer {{teacherToken}}
+
+###############################################
+### CENTER ADMIN ENDPOINTS
+###############################################
+
+### Login as Center Admin
+# @name loginCenter
 POST {{baseUrl}}/auth/login
-Content-Type: {{contentType}}
+Content-Type: application/json
 
 {
   "identifier": "center1@storyquest.com",
   "password": "Password123"
 }
 
-### Extract Center Token
-@centerToken = {{centerLogin.response.body.accessToken}}
+### List All Users (Center admin)
+GET {{baseUrl}}/users?page=1&limit=10
+Authorization: Bearer {{agencyToken}}
+
+### Filter Users by Role
+GET {{baseUrl}}/users?role=student&page=1&limit=10
+Authorization: Bearer {{agencyToken}}
+
+### Create Teacher (Center can create teachers)
+POST {{baseUrl}}/auth/users
+Authorization: Bearer {{agencyToken}}
+Content-Type: application/json
+
+{
+  "email": "newteacher@storyquest.com",
+  "username": "newteacher1",
+  "password": "Password123",
+  "fullName": "New Teacher Created by Center",
+  "role": "teacher"
+}
+
+###############################################
+### AGENCY (SUPER ADMIN) ENDPOINTS
+###############################################
 
 ### Login as Agency
-# @name agencyLogin
+# @name loginAgency
 POST {{baseUrl}}/auth/login
-Content-Type: {{contentType}}
+Content-Type: application/json
 
 {
   "identifier": "agency@storyquest.com",
   "password": "Password123"
 }
 
-### Extract Agency Token
-@agencyToken = {{agencyLogin.response.body.accessToken}}
+### List All Users (Agency)
+GET {{baseUrl}}/users
+Authorization: Bearer {{agencyToken}}
 
-### Login with Invalid Credentials (should fail)
+### Create Center Admin (Agency can create centers)
+POST {{baseUrl}}/auth/users
+Authorization: Bearer {{agencyToken}}
+Content-Type: application/json
+
+{
+  "email": "newcenter@storyquest.com",
+  "username": "newcenter1",
+  "password": "Password123",
+  "fullName": "New Center Admin",
+  "role": "center"
+}
+
+###############################################
+### ERROR HANDLING TESTS
+###############################################
+
+### Test - Invalid Credentials
 POST {{baseUrl}}/auth/login
-Content-Type: {{contentType}}
+Content-Type: application/json
 
 {
   "identifier": "student1@test.com",
   "password": "WrongPassword"
 }
 
-###############################################
-# 4. GET CURRENT USER
-###############################################
+### Test - Duplicate Email
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
 
-### Get Current User (Student)
+{
+  "email": "student1@test.com",
+  "username": "duplicate123",
+  "password": "Password123",
+  "fullName": "Duplicate Email Test",
+  "role": "student"
+}
+
+### Test - No Token (Unauthorized)
 GET {{baseUrl}}/auth/me
-Authorization: Bearer {{studentToken}}
 
-### Get Current User (Teacher)
-GET {{baseUrl}}/auth/me
-Authorization: Bearer {{teacherToken}}
-
-### Get Current User - No Token (should fail)
-GET {{baseUrl}}/auth/me
-
-### Get Current User - Invalid Token (should fail)
+### Test - Invalid Token
 GET {{baseUrl}}/auth/me
 Authorization: Bearer invalid_token_here
-
-###############################################
-# 5. CHANGE PASSWORD
-###############################################
-
-### Change Password (Student)
-PATCH {{baseUrl}}/auth/change-password
-Authorization: Bearer {{studentToken}}
-Content-Type: {{contentType}}
-
-{
-  "currentPassword": "Password123",
-  "newPassword": "NewPassword456"
-}
-
-### Change Password - Wrong Current Password (should fail)
-PATCH {{baseUrl}}/auth/change-password
-Authorization: Bearer {{studentToken}}
-Content-Type: {{contentType}}
-
-{
-  "currentPassword": "WrongPassword",
-  "newPassword": "NewPassword456"
-}
-
-### Change Password Back (so we can reuse credentials)
-PATCH {{baseUrl}}/auth/change-password
-Authorization: Bearer {{studentToken}}
-Content-Type: {{contentType}}
-
-{
-  "currentPassword": "NewPassword456",
-  "newPassword": "Password123"
-}
-
-###############################################
-# NOTES
-###############################################
-
-# Test Credentials (all use Password123):
-# - Agency: agency@storyquest.com
-# - Center: center1@storyquest.com
-# - Teacher: teacher1@storyquest.com
-# - Reviewer: reviewer1@storyquest.com
-# - Student: student1@test.com
-
-# Expected Response Codes:
-# - 200 OK: Successful GET, PATCH
-# - 201 Created: Successful POST
-# - 400 Bad Request: Validation error
-# - 401 Unauthorized: No token or invalid token
-# - 403 Forbidden: Insufficient permissions
-# - 404 Not Found: Resource doesn't exist
-# - 409 Conflict: Duplicate resource (email/username exists)

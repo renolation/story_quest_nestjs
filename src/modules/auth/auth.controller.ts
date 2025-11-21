@@ -35,6 +35,48 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Public()
+  @Post('register')
+  @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Register new student account',
+    description:
+      'Public endpoint for student self-registration. Creates a new student account and returns JWT access token.',
+  })
+  @ApiBody({ type: RegisterDto })
+  @ApiResponse({
+    status: 201,
+    description: 'User registered successfully',
+    type: AuthResponseDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: 'Validation error',
+    schema: {
+      example: {
+        statusCode: 400,
+        message: ['Email must be a valid email address'],
+        error: 'Bad Request',
+      },
+    },
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Email or username already exists',
+    schema: {
+      example: {
+        statusCode: 409,
+        message: 'Email already registered',
+        error: 'Conflict',
+      },
+    },
+  })
+  async register(
+    @Body() registerDto: RegisterDto,
+  ): Promise<AuthResponseDto> {
+    return this.authService.register(registerDto);
+  }
+
+  @Public()
   @Post('login')
   @UseGuards(LocalAuthGuard)
   @HttpCode(HttpStatus.OK)
