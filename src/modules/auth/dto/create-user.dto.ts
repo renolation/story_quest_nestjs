@@ -60,7 +60,8 @@ export class CreateUserDto {
   fullName: string;
 
   @ApiProperty({
-    description: 'User role (AGENCY role cannot be created via this endpoint for security)',
+    description:
+      'User role (AGENCY role cannot be created via this endpoint for security)',
     enum: UserRole,
     example: UserRole.STUDENT,
   })

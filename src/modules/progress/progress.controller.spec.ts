@@ -133,7 +133,11 @@ describe('ProgressController', () => {
     });
 
     it('should use current user ID from decorator', async () => {
-      const customUser = { id: 123, email: 'test@example.com', role: 'student' };
+      const customUser = {
+        id: 123,
+        email: 'test@example.com',
+        role: 'student',
+      };
       const levelId = 1;
       mockProgressService.startLevel.mockResolvedValue(mockLevelAttempt);
 
@@ -180,16 +184,28 @@ describe('ProgressController', () => {
 
       mockProgressService.submitAnswer.mockResolvedValue(mockQuestionAnswer);
 
-      const result = await controller.submitAnswer(mockUser, questionId, submitDto);
+      const result = await controller.submitAnswer(
+        mockUser,
+        questionId,
+        submitDto,
+      );
 
-      expect(service.submitAnswer).toHaveBeenCalledWith(mockUser.id, questionId, submitDto);
+      expect(service.submitAnswer).toHaveBeenCalledWith(
+        mockUser.id,
+        questionId,
+        submitDto,
+      );
       expect(result).toEqual(mockQuestionAnswer);
       expect(result.isCorrect).toBe(true);
       expect(result.pointsEarned).toBe(10);
     });
 
     it('should use current user ID from decorator', async () => {
-      const customUser = { id: 456, email: 'test@example.com', role: 'student' };
+      const customUser = {
+        id: 456,
+        email: 'test@example.com',
+        role: 'student',
+      };
       const questionId = 1;
       const submitDto: SubmitAnswerDto = {
         attemptId: 1,
@@ -201,7 +217,11 @@ describe('ProgressController', () => {
 
       await controller.submitAnswer(customUser, questionId, submitDto);
 
-      expect(service.submitAnswer).toHaveBeenCalledWith(456, questionId, submitDto);
+      expect(service.submitAnswer).toHaveBeenCalledWith(
+        456,
+        questionId,
+        submitDto,
+      );
     });
 
     it('should handle integer questionId parameter', async () => {
@@ -217,9 +237,17 @@ describe('ProgressController', () => {
         questionId: 999,
       });
 
-      const result = await controller.submitAnswer(mockUser, questionId, submitDto);
+      const result = await controller.submitAnswer(
+        mockUser,
+        questionId,
+        submitDto,
+      );
 
-      expect(service.submitAnswer).toHaveBeenCalledWith(mockUser.id, 999, submitDto);
+      expect(service.submitAnswer).toHaveBeenCalledWith(
+        mockUser.id,
+        999,
+        submitDto,
+      );
       expect(result.questionId).toBe(999);
       expect(typeof result.questionId).toBe('number');
     });
@@ -239,7 +267,11 @@ describe('ProgressController', () => {
         answerText: 'My name is John',
       });
 
-      const result = await controller.submitAnswer(mockUser, questionId, submitDto);
+      const result = await controller.submitAnswer(
+        mockUser,
+        questionId,
+        submitDto,
+      );
 
       expect(result.answerText).toBe('My name is John');
     });
@@ -259,7 +291,11 @@ describe('ProgressController', () => {
         answerAudioUrl: 'https://example.com/answer.mp3',
       });
 
-      const result = await controller.submitAnswer(mockUser, questionId, submitDto);
+      const result = await controller.submitAnswer(
+        mockUser,
+        questionId,
+        submitDto,
+      );
 
       expect(result.answerAudioUrl).toBe('https://example.com/answer.mp3');
     });
@@ -278,16 +314,28 @@ describe('ProgressController', () => {
 
       mockProgressService.completeLevel.mockResolvedValue(mockCompletedAttempt);
 
-      const result = await controller.completeLevel(mockUser, levelId, completeDto);
+      const result = await controller.completeLevel(
+        mockUser,
+        levelId,
+        completeDto,
+      );
 
-      expect(service.completeLevel).toHaveBeenCalledWith(mockUser.id, levelId, completeDto);
+      expect(service.completeLevel).toHaveBeenCalledWith(
+        mockUser.id,
+        levelId,
+        completeDto,
+      );
       expect(result).toEqual(mockCompletedAttempt);
       expect(result.isCompleted).toBe(true);
       expect(result.score).toBe(85);
     });
 
     it('should use current user ID from decorator', async () => {
-      const customUser = { id: 789, email: 'test@example.com', role: 'student' };
+      const customUser = {
+        id: 789,
+        email: 'test@example.com',
+        role: 'student',
+      };
       const levelId = 1;
       const completeDto: CompleteLevelDto = {
         attemptId: 1,
@@ -301,7 +349,11 @@ describe('ProgressController', () => {
 
       await controller.completeLevel(customUser, levelId, completeDto);
 
-      expect(service.completeLevel).toHaveBeenCalledWith(789, levelId, completeDto);
+      expect(service.completeLevel).toHaveBeenCalledWith(
+        789,
+        levelId,
+        completeDto,
+      );
     });
 
     it('should handle integer levelId parameter', async () => {
@@ -319,9 +371,17 @@ describe('ProgressController', () => {
         levelId: 999,
       });
 
-      const result = await controller.completeLevel(mockUser, levelId, completeDto);
+      const result = await controller.completeLevel(
+        mockUser,
+        levelId,
+        completeDto,
+      );
 
-      expect(service.completeLevel).toHaveBeenCalledWith(mockUser.id, 999, completeDto);
+      expect(service.completeLevel).toHaveBeenCalledWith(
+        mockUser.id,
+        999,
+        completeDto,
+      );
       expect(result.levelId).toBe(999);
       expect(typeof result.levelId).toBe('number');
     });
@@ -338,7 +398,11 @@ describe('ProgressController', () => {
 
       mockProgressService.completeLevel.mockResolvedValue(mockCompletedAttempt);
 
-      const result = await controller.completeLevel(mockUser, levelId, completeDto);
+      const result = await controller.completeLevel(
+        mockUser,
+        levelId,
+        completeDto,
+      );
 
       expect(result.isPassed).toBe(true);
       expect(result.score).toBe(85);
@@ -362,7 +426,11 @@ describe('ProgressController', () => {
 
       mockProgressService.completeLevel.mockResolvedValue(failedAttempt);
 
-      const result = await controller.completeLevel(mockUser, levelId, completeDto);
+      const result = await controller.completeLevel(
+        mockUser,
+        levelId,
+        completeDto,
+      );
 
       expect(result.isPassed).toBe(false);
       expect(result.score).toBe(50);
@@ -371,7 +439,9 @@ describe('ProgressController', () => {
 
   describe('getMyProgress', () => {
     it('should get student progress summary', async () => {
-      mockProgressService.getStudentProgress.mockResolvedValue(mockStudentProgress);
+      mockProgressService.getStudentProgress.mockResolvedValue(
+        mockStudentProgress,
+      );
 
       const result = await controller.getMyProgress(mockUser);
 
@@ -383,7 +453,11 @@ describe('ProgressController', () => {
     });
 
     it('should use current user ID from decorator', async () => {
-      const customUser = { id: 555, email: 'test@example.com', role: 'student' };
+      const customUser = {
+        id: 555,
+        email: 'test@example.com',
+        role: 'student',
+      };
       mockProgressService.getStudentProgress.mockResolvedValue({
         ...mockStudentProgress,
         studentId: 555,
@@ -395,7 +469,9 @@ describe('ProgressController', () => {
     });
 
     it('should return progress with statistics', async () => {
-      mockProgressService.getStudentProgress.mockResolvedValue(mockStudentProgress);
+      mockProgressService.getStudentProgress.mockResolvedValue(
+        mockStudentProgress,
+      );
 
       const result = await controller.getMyProgress(mockUser);
 
@@ -410,19 +486,30 @@ describe('ProgressController', () => {
   describe('getChapterProgress', () => {
     it('should get chapter progress', async () => {
       const chapterId = 1;
-      mockProgressService.getChapterProgress.mockResolvedValue(mockChapterProgress);
+      mockProgressService.getChapterProgress.mockResolvedValue(
+        mockChapterProgress,
+      );
 
       const result = await controller.getChapterProgress(mockUser, chapterId);
 
-      expect(service.getChapterProgress).toHaveBeenCalledWith(mockUser.id, chapterId);
+      expect(service.getChapterProgress).toHaveBeenCalledWith(
+        mockUser.id,
+        chapterId,
+      );
       expect(result).toEqual(mockChapterProgress);
       expect(result.chapterId).toBe(1);
     });
 
     it('should use current user ID from decorator', async () => {
-      const customUser = { id: 321, email: 'test@example.com', role: 'student' };
+      const customUser = {
+        id: 321,
+        email: 'test@example.com',
+        role: 'student',
+      };
       const chapterId = 1;
-      mockProgressService.getChapterProgress.mockResolvedValue(mockChapterProgress);
+      mockProgressService.getChapterProgress.mockResolvedValue(
+        mockChapterProgress,
+      );
 
       await controller.getChapterProgress(customUser, chapterId);
 
@@ -445,7 +532,9 @@ describe('ProgressController', () => {
 
     it('should return chapter progress with details', async () => {
       const chapterId = 1;
-      mockProgressService.getChapterProgress.mockResolvedValue(mockChapterProgress);
+      mockProgressService.getChapterProgress.mockResolvedValue(
+        mockChapterProgress,
+      );
 
       const result = await controller.getChapterProgress(mockUser, chapterId);
 
@@ -468,7 +557,11 @@ describe('ProgressController', () => {
     });
 
     it('should use current user ID from decorator', async () => {
-      const customUser = { id: 654, email: 'test@example.com', role: 'student' };
+      const customUser = {
+        id: 654,
+        email: 'test@example.com',
+        role: 'student',
+      };
       const unitId = 1;
       mockProgressService.getUnitProgress.mockResolvedValue(mockUnitProgress);
 

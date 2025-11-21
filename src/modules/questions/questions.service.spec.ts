@@ -199,7 +199,9 @@ describe('QuestionsService', () => {
 
   describe('findAll', () => {
     it('should return all active questions with answer options', async () => {
-      const questions = [{ ...mockQuestion, answerOptions: [mockAnswerOption] }];
+      const questions = [
+        { ...mockQuestion, answerOptions: [mockAnswerOption] },
+      ];
 
       mockQuestionRepository.find.mockResolvedValue(questions);
 
@@ -296,7 +298,9 @@ describe('QuestionsService', () => {
 
       mockQuestionRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOne(questionId)).rejects.toThrow(NotFoundException);
+      await expect(service.findOne(questionId)).rejects.toThrow(
+        NotFoundException,
+      );
       await expect(service.findOne(questionId)).rejects.toThrow(
         `Question with ID ${questionId} not found`,
       );
@@ -337,7 +341,11 @@ describe('QuestionsService', () => {
         points: 15,
       };
 
-      const updatedQuestion = { ...mockQuestion, ...updateDto, answerOptions: [] };
+      const updatedQuestion = {
+        ...mockQuestion,
+        ...updateDto,
+        answerOptions: [],
+      };
 
       mockQuestionRepository.findOne.mockResolvedValue(mockQuestion);
       mockQuestionRepository.save.mockResolvedValue(updatedQuestion);
@@ -365,7 +373,12 @@ describe('QuestionsService', () => {
         questionText: 'Updated question',
         answerOptions: [
           { ...mockAnswerOption, optionText: 'New Option 1' },
-          { ...mockAnswerOption, id: 2, optionText: 'New Option 2', isCorrect: false },
+          {
+            ...mockAnswerOption,
+            id: 2,
+            optionText: 'New Option 2',
+            isCorrect: false,
+          },
         ],
       };
 
@@ -379,7 +392,9 @@ describe('QuestionsService', () => {
 
       const result = await service.update(questionId, updateDto);
 
-      expect(answerOptionRepository.delete).toHaveBeenCalledWith({ questionId });
+      expect(answerOptionRepository.delete).toHaveBeenCalledWith({
+        questionId,
+      });
       expect(answerOptionRepository.create).toHaveBeenCalledTimes(2);
       expect(answerOptionRepository.save).toHaveBeenCalled();
       expect(result.answerOptions).toHaveLength(2);
@@ -456,7 +471,9 @@ describe('QuestionsService', () => {
 
       const result = await service.update(questionId, updateDto);
 
-      expect(answerOptionRepository.delete).toHaveBeenCalledWith({ questionId });
+      expect(answerOptionRepository.delete).toHaveBeenCalledWith({
+        questionId,
+      });
       expect(result.answerOptions).toEqual([]);
     });
   });
@@ -478,7 +495,9 @@ describe('QuestionsService', () => {
         where: { id: questionId },
         relations: ['answerOptions'],
       });
-      expect(questionRepository.remove).toHaveBeenCalledWith(questionWithOptions);
+      expect(questionRepository.remove).toHaveBeenCalledWith(
+        questionWithOptions,
+      );
     });
 
     it('should throw NotFoundException when question not found', async () => {
@@ -486,7 +505,9 @@ describe('QuestionsService', () => {
 
       mockQuestionRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.remove(questionId)).rejects.toThrow(NotFoundException);
+      await expect(service.remove(questionId)).rejects.toThrow(
+        NotFoundException,
+      );
       expect(questionRepository.remove).not.toHaveBeenCalled();
     });
 
@@ -522,7 +543,9 @@ describe('QuestionsService', () => {
 
       await service.remove(questionId);
 
-      expect(questionRepository.remove).toHaveBeenCalledWith(questionWithOptions);
+      expect(questionRepository.remove).toHaveBeenCalledWith(
+        questionWithOptions,
+      );
     });
   });
 });

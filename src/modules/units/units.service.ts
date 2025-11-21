@@ -20,7 +20,11 @@ export class UnitsService {
     return await this.unitRepository.save(unit);
   }
 
-  async findAll(userId: number, chapterId?: number, includeLevels = false): Promise<UnitResponseDto[]> {
+  async findAll(
+    userId: number,
+    chapterId?: number,
+    includeLevels = false,
+  ): Promise<UnitResponseDto[]> {
     const query: any = {
       where: chapterId ? { chapterId, isActive: true } : { isActive: true },
       order: { orderIndex: 'ASC' },
@@ -33,12 +37,15 @@ export class UnitsService {
     const units = await this.unitRepository.find(query);
 
     // Fetch all unit progresses for this user
-    const unitIds = units.map(u => u.id);
-    const progresses = await this.progressService.getUnitsProgress(userId, unitIds);
-    const progressMap = new Map(progresses.map(p => [p.unitId, p]));
+    const unitIds = units.map((u) => u.id);
+    const progresses = await this.progressService.getUnitsProgress(
+      userId,
+      unitIds,
+    );
+    const progressMap = new Map(progresses.map((p) => [p.unitId, p]));
 
     // Map to response DTOs with progress
-    return units.map(unit => ({
+    return units.map((unit) => ({
       id: unit.id,
       title: unit.title,
       description: unit.description,
@@ -54,7 +61,11 @@ export class UnitsService {
     }));
   }
 
-  async findOne(id: number, userId: number, includeLevels = false): Promise<UnitResponseDto> {
+  async findOne(
+    id: number,
+    userId: number,
+    includeLevels = false,
+  ): Promise<UnitResponseDto> {
     const query: any = { where: { id } };
 
     if (includeLevels) {

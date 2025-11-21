@@ -1,38 +1,92 @@
-import { IsString, IsOptional, IsNumber, Min, Max } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsNumber,
+  IsInt,
+  IsNotEmpty,
+  Min,
+  Max,
+} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
- * PHASE 3 - TODO
  * DTO for creating pronunciation attempt records
+ *
+ * Architecture Note:
+ * - Speech recognition is CLIENT-SIDE (mobile app)
+ * - Backend only stores client-calculated scores
+ * - All score fields are optional (client may submit partial data)
  */
 export class CreatePronunciationAttemptDto {
-  @ApiProperty({ example: 'hello', description: 'Word being practiced' })
+  @ApiProperty({
+    description: 'Question ID being practiced',
+    example: 1,
+  })
+  @IsNotEmpty()
+  @IsInt()
+  questionId: number;
+
+  @ApiProperty({
+    description: 'Reference text that student should pronounce',
+    example: 'Hello, how are you?',
+  })
+  @IsNotEmpty()
   @IsString()
-  word: string;
+  referenceText: string;
 
   @ApiPropertyOptional({
-    example: 'https://storage.example.com/audio/123.mp3',
-    description: 'URL to recorded audio file',
+    description: 'Text recognized by client speech recognition',
+    example: 'Hello, how are you?',
   })
   @IsOptional()
   @IsString()
-  audioUrl?: string;
+  recognizedText?: string;
 
   @ApiPropertyOptional({
-    example: 'helo',
-    description: 'Transcription from speech recognition',
+    description: 'Overall pronunciation score (0-100) calculated by client',
+    example: 87.5,
+    minimum: 0,
+    maximum: 100,
   })
   @IsOptional()
-  @IsString()
-  transcription?: string;
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  pronunciationScore?: number;
 
   @ApiPropertyOptional({
-    example: 85.5,
-    description: 'Pronunciation accuracy score (0-100)',
+    description: 'Accuracy score (0-100) calculated by client',
+    example: 90.0,
+    minimum: 0,
+    maximum: 100,
   })
   @IsOptional()
   @IsNumber()
   @Min(0)
   @Max(100)
   accuracyScore?: number;
+
+  @ApiPropertyOptional({
+    description: 'Fluency score (0-100) calculated by client',
+    example: 85.0,
+    minimum: 0,
+    maximum: 100,
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  fluencyScore?: number;
+
+  @ApiPropertyOptional({
+    description: 'Completeness score (0-100) calculated by client',
+    example: 88.0,
+    minimum: 0,
+    maximum: 100,
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Max(100)
+  completenessScore?: number;
 }

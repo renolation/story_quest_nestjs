@@ -20,7 +20,10 @@ export class ChaptersService {
     return await this.chapterRepository.save(chapter);
   }
 
-  async findAll(userId: number, includeUnits = false): Promise<ChapterResponseDto[]> {
+  async findAll(
+    userId: number,
+    includeUnits = false,
+  ): Promise<ChapterResponseDto[]> {
     const query: any = {
       where: { isActive: true },
       order: { orderIndex: 'ASC' },
@@ -33,12 +36,15 @@ export class ChaptersService {
     const chapters = await this.chapterRepository.find(query);
 
     // Fetch all chapter progresses for this user
-    const chapterIds = chapters.map(c => c.id);
-    const progresses = await this.progressService.getChaptersProgress(userId, chapterIds);
-    const progressMap = new Map(progresses.map(p => [p.chapterId, p]));
+    const chapterIds = chapters.map((c) => c.id);
+    const progresses = await this.progressService.getChaptersProgress(
+      userId,
+      chapterIds,
+    );
+    const progressMap = new Map(progresses.map((p) => [p.chapterId, p]));
 
     // Map to response DTOs with progress
-    return chapters.map(chapter => ({
+    return chapters.map((chapter) => ({
       id: chapter.id,
       title: chapter.title,
       description: chapter.description,
@@ -54,7 +60,11 @@ export class ChaptersService {
     }));
   }
 
-  async findOne(id: number, userId: number, includeUnits = false): Promise<ChapterResponseDto> {
+  async findOne(
+    id: number,
+    userId: number,
+    includeUnits = false,
+  ): Promise<ChapterResponseDto> {
     const query: any = { where: { id } };
 
     if (includeUnits) {
@@ -93,7 +103,10 @@ export class ChaptersService {
     return chapter;
   }
 
-  async update(id: number, updateChapterDto: UpdateChapterDto): Promise<Chapter> {
+  async update(
+    id: number,
+    updateChapterDto: UpdateChapterDto,
+  ): Promise<Chapter> {
     const chapter = await this.findOneById(id);
     Object.assign(chapter, updateChapterDto);
     return await this.chapterRepository.save(chapter);
@@ -104,9 +117,11 @@ export class ChaptersService {
     await this.chapterRepository.remove(chapter);
   }
 
-  async reorder(reorderData: { id: number; orderIndex: number }[]): Promise<void> {
+  async reorder(
+    reorderData: { id: number; orderIndex: number }[],
+  ): Promise<void> {
     // Validate all chapter IDs exist
-    const chapterIds = reorderData.map(item => item.id);
+    const chapterIds = reorderData.map((item) => item.id);
     const chapters = await this.chapterRepository.findByIds(chapterIds);
 
     if (chapters.length !== chapterIds.length) {
@@ -114,12 +129,14 @@ export class ChaptersService {
     }
 
     // Update order indexes in a transaction
-    await this.chapterRepository.manager.transaction(async (transactionalEntityManager) => {
-      for (const item of reorderData) {
-        await transactionalEntityManager.update(Chapter, item.id, {
-          orderIndex: item.orderIndex,
-        });
-      }
-    });
+    await this.chapterRepository.manager.transaction(
+      async (transactionalEntityManager) => {
+        for (const item of reorderData) {
+          await transactionalEntityManager.update(Chapter, item.id, {
+            orderIndex: item.orderIndex,
+          });
+        }
+      },
+    );
   }
 }

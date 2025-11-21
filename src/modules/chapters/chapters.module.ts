@@ -6,10 +6,7 @@ import { Chapter } from './entities/chapter.entity';
 import { ProgressModule } from '../progress/progress.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Chapter]),
-    ProgressModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Chapter]), ProgressModule],
   controllers: [ChaptersController],
   providers: [ChaptersService],
   exports: [ChaptersService],

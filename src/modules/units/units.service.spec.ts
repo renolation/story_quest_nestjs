@@ -143,7 +143,9 @@ describe('UnitsService', () => {
       const units = [mockUnit];
 
       mockRepository.find.mockResolvedValue(units);
-      mockProgressService.getUnitsProgress.mockResolvedValue([mockUnitProgress]);
+      mockProgressService.getUnitsProgress.mockResolvedValue([
+        mockUnitProgress,
+      ]);
       mockProgressService.mapUnitProgressToDto.mockReturnValue({
         totalLevels: 10,
         completedLevels: 5,
@@ -156,7 +158,9 @@ describe('UnitsService', () => {
         where: { isActive: true },
         order: { orderIndex: 'ASC' },
       });
-      expect(progressService.getUnitsProgress).toHaveBeenCalledWith(userId, [1]);
+      expect(progressService.getUnitsProgress).toHaveBeenCalledWith(userId, [
+        1,
+      ]);
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe(1);
       expect(result[0].progress).toBeDefined();
@@ -168,7 +172,9 @@ describe('UnitsService', () => {
       const units = [mockUnit];
 
       mockRepository.find.mockResolvedValue(units);
-      mockProgressService.getUnitsProgress.mockResolvedValue([mockUnitProgress]);
+      mockProgressService.getUnitsProgress.mockResolvedValue([
+        mockUnitProgress,
+      ]);
       mockProgressService.mapUnitProgressToDto.mockReturnValue({
         totalLevels: 10,
         completedLevels: 5,
@@ -186,10 +192,14 @@ describe('UnitsService', () => {
 
     it('should return units with levels when includeLevels is true', async () => {
       const userId = 1;
-      const unitsWithLevels = [{ ...mockUnit, levels: [{ id: 1, title: 'Level 1' }] }];
+      const unitsWithLevels = [
+        { ...mockUnit, levels: [{ id: 1, title: 'Level 1' }] },
+      ];
 
       mockRepository.find.mockResolvedValue(unitsWithLevels);
-      mockProgressService.getUnitsProgress.mockResolvedValue([mockUnitProgress]);
+      mockProgressService.getUnitsProgress.mockResolvedValue([
+        mockUnitProgress,
+      ]);
       mockProgressService.mapUnitProgressToDto.mockReturnValue({
         totalLevels: 10,
         completedLevels: 5,
@@ -246,7 +256,9 @@ describe('UnitsService', () => {
         { ...mockUnitProgress, unitId: 3 },
       ]);
       mockProgressService.mapUnitProgressToDto.mockImplementation((progress) =>
-        progress ? { totalLevels: 10, completedLevels: 5, averageScore: 78.5 } : null,
+        progress
+          ? { totalLevels: 10, completedLevels: 5, averageScore: 78.5 }
+          : null,
       );
 
       const result = await service.findAll(userId, undefined, false);
@@ -273,8 +285,13 @@ describe('UnitsService', () => {
 
       const result = await service.findOne(unitId, userId, false);
 
-      expect(repository.findOne).toHaveBeenCalledWith({ where: { id: unitId } });
-      expect(progressService.getUnitProgress).toHaveBeenCalledWith(userId, unitId);
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: unitId },
+      });
+      expect(progressService.getUnitProgress).toHaveBeenCalledWith(
+        userId,
+        unitId,
+      );
       expect(result.id).toBe(1);
       expect(result.progress).toBeDefined();
     });
@@ -282,7 +299,10 @@ describe('UnitsService', () => {
     it('should return unit with levels when includeLevels is true', async () => {
       const userId = 1;
       const unitId = 1;
-      const unitWithLevels = { ...mockUnit, levels: [{ id: 1, title: 'Level 1' }] };
+      const unitWithLevels = {
+        ...mockUnit,
+        levels: [{ id: 1, title: 'Level 1' }],
+      };
 
       mockRepository.findOne.mockResolvedValue(unitWithLevels);
       mockProgressService.getUnitProgress.mockResolvedValue(mockUnitProgress);
@@ -356,7 +376,9 @@ describe('UnitsService', () => {
 
       const result = await service.findOneById(unitId);
 
-      expect(repository.findOne).toHaveBeenCalledWith({ where: { id: unitId } });
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: unitId },
+      });
       expect(result).toEqual(mockUnit);
       expect(progressService.getUnitProgress).not.toHaveBeenCalled();
     });
@@ -366,7 +388,9 @@ describe('UnitsService', () => {
 
       mockRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOneById(unitId)).rejects.toThrow(NotFoundException);
+      await expect(service.findOneById(unitId)).rejects.toThrow(
+        NotFoundException,
+      );
       await expect(service.findOneById(unitId)).rejects.toThrow(
         `Unit with ID ${unitId} not found`,
       );
@@ -399,7 +423,9 @@ describe('UnitsService', () => {
 
       const result = await service.update(unitId, updateDto);
 
-      expect(repository.findOne).toHaveBeenCalledWith({ where: { id: unitId } });
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: unitId },
+      });
       expect(repository.save).toHaveBeenCalled();
       expect(result.title).toBe('Updated Title');
       expect(result.description).toBe('Updated description');
@@ -476,7 +502,9 @@ describe('UnitsService', () => {
 
       await service.remove(unitId);
 
-      expect(repository.findOne).toHaveBeenCalledWith({ where: { id: unitId } });
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: unitId },
+      });
       expect(repository.remove).toHaveBeenCalledWith(mockUnit);
     });
 

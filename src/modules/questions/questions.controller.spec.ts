@@ -158,7 +158,9 @@ describe('QuestionsController', () => {
         points: 25,
         audioUrl: 'https://example.com/audio.mp3',
         imageUrl: 'https://example.com/image.jpg',
-        answerOptions: [{ optionText: 'Answer', isCorrect: true, orderIndex: 0 }],
+        answerOptions: [
+          { optionText: 'Answer', isCorrect: true, orderIndex: 0 },
+        ],
       };
 
       const expectedQuestion = { id: 1, ...createDto };
@@ -392,7 +394,12 @@ describe('QuestionsController', () => {
         questionText: 'Updated question',
         answerOptions: [
           { id: 3, optionText: 'New Option 1', isCorrect: true, orderIndex: 0 },
-          { id: 4, optionText: 'New Option 2', isCorrect: false, orderIndex: 1 },
+          {
+            id: 4,
+            optionText: 'New Option 2',
+            isCorrect: false,
+            orderIndex: 1,
+          },
         ],
       };
 

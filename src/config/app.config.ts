@@ -20,12 +20,11 @@ export default registerAs('app', () => ({
   apiPrefix: process.env.API_PREFIX || 'api/v1',
 
   // CORS
-  corsOrigins:
-    process.env.CORS_ORIGINS?.split(',') || [
-      'http://localhost:3000', // React dev
-      'http://localhost:5173', // Vite dev
-      'http://localhost:8080', // Flutter web (if needed)
-    ],
+  corsOrigins: process.env.CORS_ORIGINS?.split(',') || [
+    'http://localhost:3000', // React dev
+    'http://localhost:5173', // Vite dev
+    'http://localhost:8080', // Flutter web (if needed)
+  ],
 
   // Rate Limiting
   throttle: {

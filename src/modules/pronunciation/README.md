@@ -4,46 +4,39 @@
 **Status**: 🔲 TODO
 **Priority**: HIGH
 
+> **⚠️ ARCHITECTURE UPDATE (2025-11-21):**
+> Speech recognition is now handled **client-side** in the mobile app (Flutter).
+> Backend provides **reference text only** for client-side speech comparison.
+> **No server-side TTS or Speech Recognition API needed.**
+
 ## Purpose
-Enable students to practice pronunciation with real-time feedback using speech recognition.
+Provide reference text for students to practice pronunciation using client-side speech-to-text comparison.
 
 ## Features
-- [ ] Record pronunciation attempts with audio storage
-- [ ] Speech-to-text validation using Google Cloud Speech API
-- [ ] Pronunciation accuracy scoring (0-100)
+- [ ] Store reference text for pronunciation questions
+- [ ] Track pronunciation practice attempts
+- [ ] Store student scores (calculated client-side)
 - [ ] Practice history tracking
-- [ ] Audio file management (temporary storage, auto-cleanup)
 
 ## Entities
-- **PronunciationAttempt**: Stores pronunciation practice records
+- **PronunciationAttempt**: Stores pronunciation practice records with client-calculated scores
 
 ## Dependencies
 - Auth module (for user context)
-- External: Google Cloud Speech-to-Text API
-- External: AWS S3 / Cloudflare R2 for audio storage
+- Questions module (for reference text)
 
 ## Implementation Order
 1. Create entities and DTOs
-2. Implement audio upload service (S3)
-3. Integrate Google Cloud Speech-to-Text
-4. Implement pronunciation scoring algorithm
-5. Create REST endpoints
-6. Add audio cleanup cron job (delete after 24 hours)
+2. Implement pronunciation attempt tracking service
+3. Create REST endpoints for storing attempts
+4. Add endpoints for retrieving practice history
 
 ## API Endpoints
-- `POST /pronunciation/attempts` - Record pronunciation attempt
+- `POST /pronunciation/attempts` - Record pronunciation attempt (with client-calculated score)
 - `GET /pronunciation/attempts/me` - Get my practice history
 - `GET /pronunciation/attempts/:id` - Get specific attempt details
 
-## External Services Configuration
-```bash
-# .env
-GOOGLE_CLOUD_SPEECH_API_KEY=your-key
-AWS_S3_BUCKET=story-quest-audio
-```
-
 ## Testing
 - [ ] Unit tests for pronunciation service
-- [ ] Integration tests with mocked Speech API
 - [ ] E2E tests for complete flow
-- [ ] Test audio file cleanup
+- [ ] Test attempt tracking and retrieval

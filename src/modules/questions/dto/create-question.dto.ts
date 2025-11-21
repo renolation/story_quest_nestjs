@@ -1,4 +1,15 @@
-import { IsNotEmpty, IsString, IsOptional, IsInt, IsBoolean, IsEnum, MaxLength, IsArray, ValidateNested, Min } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsInt,
+  IsBoolean,
+  IsEnum,
+  MaxLength,
+  IsArray,
+  ValidateNested,
+  Min,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import { QuestionType, PlacementPosition } from '../../../common/enums';

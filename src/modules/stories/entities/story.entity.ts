@@ -41,7 +41,12 @@ export class Story {
   @Column({ name: 'total_word_count', type: 'int', nullable: true })
   totalWordCount: number;
 
-  @Column({ name: 'thumbnail_url', type: 'varchar', length: 500, nullable: true })
+  @Column({
+    name: 'thumbnail_url',
+    type: 'varchar',
+    length: 500,
+    nullable: true,
+  })
   thumbnailUrl: string;
 
   @CreateDateColumn({ name: 'created_at' })

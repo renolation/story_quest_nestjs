@@ -157,7 +157,11 @@ describe('LevelsController', () => {
 
       const result = await controller.findAll(mockUser, undefined, undefined);
 
-      expect(service.findAll).toHaveBeenCalledWith(mockUser.id, undefined, false);
+      expect(service.findAll).toHaveBeenCalledWith(
+        mockUser.id,
+        undefined,
+        false,
+      );
       expect(result).toEqual(levels);
       expect(result).toHaveLength(1);
     });
@@ -174,7 +178,11 @@ describe('LevelsController', () => {
 
       const result = await controller.findAll(mockUser, undefined, 'true');
 
-      expect(service.findAll).toHaveBeenCalledWith(mockUser.id, undefined, true);
+      expect(service.findAll).toHaveBeenCalledWith(
+        mockUser.id,
+        undefined,
+        true,
+      );
       expect(result[0].questions).toBeDefined();
       expect(result[0].questions).toHaveLength(1);
     });
@@ -185,7 +193,11 @@ describe('LevelsController', () => {
 
       const result = await controller.findAll(mockUser, undefined, 'false');
 
-      expect(service.findAll).toHaveBeenCalledWith(mockUser.id, undefined, false);
+      expect(service.findAll).toHaveBeenCalledWith(
+        mockUser.id,
+        undefined,
+        false,
+      );
       expect(result[0].questions).toBeUndefined();
     });
 
@@ -209,7 +221,11 @@ describe('LevelsController', () => {
     });
 
     it('should use current user ID from decorator', async () => {
-      const customUser = { id: 123, email: 'test@example.com', role: 'student' };
+      const customUser = {
+        id: 123,
+        email: 'test@example.com',
+        role: 'student',
+      };
       mockLevelsService.findAll.mockResolvedValue([]);
 
       await controller.findAll(customUser, undefined, undefined);
@@ -299,7 +315,11 @@ describe('LevelsController', () => {
     });
 
     it('should use current user ID from decorator', async () => {
-      const customUser = { id: 456, email: 'test@example.com', role: 'student' };
+      const customUser = {
+        id: 456,
+        email: 'test@example.com',
+        role: 'student',
+      };
       const levelId = 1;
       mockLevelsService.findOne.mockResolvedValue(mockLevelResponse);
 

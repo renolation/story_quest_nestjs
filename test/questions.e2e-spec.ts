@@ -20,7 +20,9 @@ describe('Questions (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     app.setGlobalPrefix('api/v1');
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
     await app.init();
 
     // Register and login as student
@@ -198,7 +200,9 @@ describe('Questions (e2e)', () => {
         .expect(201)
         .expect((res) => {
           expect(res.body).toHaveProperty('id');
-          expect(res.body.questionAudioUrl).toBe('https://example.com/audio.mp3');
+          expect(res.body.questionAudioUrl).toBe(
+            'https://example.com/audio.mp3',
+          );
           expect(res.body.hint).toBe('Listen carefully');
         });
     });
@@ -362,9 +366,7 @@ describe('Questions (e2e)', () => {
     });
 
     it('should fail without authentication (401)', () => {
-      return request(app.getHttpServer())
-        .get('/api/v1/questions')
-        .expect(401);
+      return request(app.getHttpServer()).get('/api/v1/questions').expect(401);
     });
   });
 

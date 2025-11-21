@@ -34,13 +34,17 @@ export class ProgressController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Start a level attempt',
-    description: 'Creates a new level attempt for the authenticated student (Student role only)',
+    description:
+      'Creates a new level attempt for the authenticated student (Student role only)',
   })
   @ApiResponse({
     status: 201,
     description: 'Level attempt started successfully',
   })
-  @ApiResponse({ status: 403, description: 'Forbidden - Only students can start levels' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Only students can start levels',
+  })
   @ApiResponse({ status: 404, description: 'Level not found' })
   startLevel(
     @CurrentUser() user: any,
@@ -55,7 +59,8 @@ export class ProgressController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Submit an answer to a question',
-    description: 'Records student answer and calculates correctness (Student role only)',
+    description:
+      'Records student answer and calculates correctness (Student role only)',
   })
   @ApiBody({ type: SubmitAnswerDto })
   @ApiResponse({
@@ -63,7 +68,10 @@ export class ProgressController {
     description: 'Answer submitted successfully',
   })
   @ApiResponse({ status: 400, description: 'Validation error' })
-  @ApiResponse({ status: 403, description: 'Forbidden - Only students can submit answers' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Only students can submit answers',
+  })
   @ApiResponse({ status: 404, description: 'Question or attempt not found' })
   submitAnswer(
     @CurrentUser() user: any,
@@ -83,7 +91,8 @@ export class ProgressController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Complete a level attempt',
-    description: 'Marks a level as completed and updates progress (Student role only)',
+    description:
+      'Marks a level as completed and updates progress (Student role only)',
   })
   @ApiBody({ type: CompleteLevelDto })
   @ApiResponse({
@@ -91,7 +100,10 @@ export class ProgressController {
     description: 'Level completed successfully',
   })
   @ApiResponse({ status: 400, description: 'Validation error' })
-  @ApiResponse({ status: 403, description: 'Forbidden - Only students can complete levels' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Only students can complete levels',
+  })
   @ApiResponse({ status: 404, description: 'Level attempt not found' })
   completeLevel(
     @CurrentUser() user: any,
@@ -109,7 +121,8 @@ export class ProgressController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Get my learning progress',
-    description: 'Retrieves overall progress summary for the authenticated student including chapters, units, and level attempts',
+    description:
+      'Retrieves overall progress summary for the authenticated student including chapters, units, and level attempts',
   })
   @ApiResponse({
     status: 200,
@@ -124,13 +137,17 @@ export class ProgressController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Get chapter progress',
-    description: 'Retrieves chapter-specific progress including completed units and average score',
+    description:
+      'Retrieves chapter-specific progress including completed units and average score',
   })
   @ApiResponse({
     status: 200,
     description: 'Chapter progress retrieved successfully',
   })
-  @ApiResponse({ status: 404, description: 'Chapter not found or no progress data' })
+  @ApiResponse({
+    status: 404,
+    description: 'Chapter not found or no progress data',
+  })
   getChapterProgress(
     @CurrentUser() user: any,
     @Param('id', ParseIntPipe) chapterId: number,
@@ -142,13 +159,17 @@ export class ProgressController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Get unit progress',
-    description: 'Retrieves unit-specific progress including completed levels and average score',
+    description:
+      'Retrieves unit-specific progress including completed levels and average score',
   })
   @ApiResponse({
     status: 200,
     description: 'Unit progress retrieved successfully',
   })
-  @ApiResponse({ status: 404, description: 'Unit not found or no progress data' })
+  @ApiResponse({
+    status: 404,
+    description: 'Unit not found or no progress data',
+  })
   getUnitProgress(
     @CurrentUser() user: any,
     @Param('id', ParseIntPipe) unitId: number,

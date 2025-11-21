@@ -2268,8 +2268,12 @@ class ProgressScreen extends ConsumerWidget {
 
 # PHASE 3: Audio & Pronunciation (Weeks 6-7)
 
+> **⚠️ ARCHITECTURE UPDATE (2025-11-21):**
+> Speech/pronunciation is now handled **client-side** in the mobile app.
+> Backend provides reference text only. No server-side TTS/Speech Recognition needed.
+
 ## 🎯 Goal
-Students can hear word pronunciations and practice speaking with feedback.
+Students can practice pronunciation using client-side speech-to-text comparison.
 
 *(Continue with detailed Phase 3 implementation...)*
 

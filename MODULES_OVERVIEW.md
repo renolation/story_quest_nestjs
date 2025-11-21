@@ -69,29 +69,21 @@ This document provides a complete overview of all backend modules organized by i
 
 ---
 
-## 🔲 PHASE 3: AUDIO & PRONUNCIATION (TODO)
+## 🔲 PHASE 3: PRONUNCIATION (TODO)
+
+> **⚠️ ARCHITECTURE UPDATE (2025-11-21):**
+> - Speech/pronunciation handled **client-side** in mobile app. Backend provides reference text only.
+> - **Vocabulary module REMOVED** - vocabulary managed within questions, not as separate module.
 
 ### 8. Pronunciation Module
 **Path**: `src/modules/pronunciation/`
 **Status**: 🔲 TODO
-**Purpose**: Speech recognition and pronunciation practice
+**Purpose**: Pronunciation practice tracking (client-side speech comparison)
 **Entities**:
 - `PronunciationAttempt` - Pronunciation practice records
 **External Services**:
-- Google Cloud Speech-to-Text API
-- AWS S3 for audio storage
+- None (client-side implementation)
 **See**: [pronunciation/README.md](./src/modules/pronunciation/README.md)
-
-### 9. Vocabulary Module
-**Path**: `src/modules/vocabulary/`
-**Status**: 🔲 TODO
-**Purpose**: Vocabulary words with TTS audio
-**Entities**:
-- `VocabularyWord` - Words with definitions and audio
-**External Services**:
-- Google Cloud Text-to-Speech API
-- AWS S3 for audio storage
-**See**: [vocabulary/README.md](./src/modules/vocabulary/README.md)
 
 ---
 
@@ -267,10 +259,10 @@ This document provides a complete overview of all backend modules organized by i
 ## 🚀 Next Steps
 
 ### Immediate Priority (Phase 3)
-1. Implement Pronunciation module
-2. Implement Vocabulary module
-3. Integrate Google Cloud Speech & TTS APIs
-4. Set up AWS S3 for audio storage
+1. Implement Pronunciation module (client-side speech comparison tracking)
+2. ~~Implement Vocabulary module~~ ❌ **REMOVED** (vocabulary managed in questions)
+3. ~~Integrate Google Cloud Speech & TTS APIs~~ ❌ **REMOVED** (client-side)
+4. ~~Set up AWS S3 for audio storage~~ ❌ **REMOVED** (client-side)
 
 ### Medium Priority (Phase 4-5)
 1. Implement Gamification module

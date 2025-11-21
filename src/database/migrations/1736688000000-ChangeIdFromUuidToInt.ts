@@ -18,10 +18,18 @@ export class ChangeIdFromUuidToInt1736688000000 implements MigrationInterface {
 
     // Step 1: Drop all tables in reverse order of dependencies
     // This ensures foreign key constraints don't block the drops
-    await queryRunner.query(`DROP TABLE IF EXISTS "student_question_answers" CASCADE`);
-    await queryRunner.query(`DROP TABLE IF EXISTS "student_level_attempts" CASCADE`);
-    await queryRunner.query(`DROP TABLE IF EXISTS "student_unit_progress" CASCADE`);
-    await queryRunner.query(`DROP TABLE IF EXISTS "student_chapter_progress" CASCADE`);
+    await queryRunner.query(
+      `DROP TABLE IF EXISTS "student_question_answers" CASCADE`,
+    );
+    await queryRunner.query(
+      `DROP TABLE IF EXISTS "student_level_attempts" CASCADE`,
+    );
+    await queryRunner.query(
+      `DROP TABLE IF EXISTS "student_unit_progress" CASCADE`,
+    );
+    await queryRunner.query(
+      `DROP TABLE IF EXISTS "student_chapter_progress" CASCADE`,
+    );
     await queryRunner.query(`DROP TABLE IF EXISTS "answer_options" CASCADE`);
     await queryRunner.query(`DROP TABLE IF EXISTS "questions" CASCADE`);
     await queryRunner.query(`DROP TABLE IF EXISTS "levels" CASCADE`);
@@ -48,8 +56,12 @@ export class ChangeIdFromUuidToInt1736688000000 implements MigrationInterface {
     `);
 
     // Create indexes for users
-    await queryRunner.query(`CREATE INDEX "idx_users_email" ON "users" ("email")`);
-    await queryRunner.query(`CREATE INDEX "idx_users_role" ON "users" ("role")`);
+    await queryRunner.query(
+      `CREATE INDEX "idx_users_email" ON "users" ("email")`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "idx_users_role" ON "users" ("role")`,
+    );
 
     // Chapters table
     await queryRunner.query(`
@@ -65,7 +77,9 @@ export class ChangeIdFromUuidToInt1736688000000 implements MigrationInterface {
       )
     `);
 
-    await queryRunner.query(`CREATE INDEX "idx_chapters_order" ON "chapters" ("order_index")`);
+    await queryRunner.query(
+      `CREATE INDEX "idx_chapters_order" ON "chapters" ("order_index")`,
+    );
 
     // Units table
     await queryRunner.query(`
@@ -84,8 +98,12 @@ export class ChangeIdFromUuidToInt1736688000000 implements MigrationInterface {
       )
     `);
 
-    await queryRunner.query(`CREATE INDEX "idx_units_chapter" ON "units" ("chapter_id")`);
-    await queryRunner.query(`CREATE INDEX "idx_units_order" ON "units" ("chapter_id", "order_index")`);
+    await queryRunner.query(
+      `CREATE INDEX "idx_units_chapter" ON "units" ("chapter_id")`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "idx_units_order" ON "units" ("chapter_id", "order_index")`,
+    );
 
     // Levels table
     await queryRunner.query(`
@@ -106,8 +124,12 @@ export class ChangeIdFromUuidToInt1736688000000 implements MigrationInterface {
       )
     `);
 
-    await queryRunner.query(`CREATE INDEX "idx_levels_unit" ON "levels" ("unit_id")`);
-    await queryRunner.query(`CREATE INDEX "idx_levels_order" ON "levels" ("unit_id", "order_index")`);
+    await queryRunner.query(
+      `CREATE INDEX "idx_levels_unit" ON "levels" ("unit_id")`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "idx_levels_order" ON "levels" ("unit_id", "order_index")`,
+    );
 
     // Questions table
     await queryRunner.query(`
@@ -132,8 +154,12 @@ export class ChangeIdFromUuidToInt1736688000000 implements MigrationInterface {
       )
     `);
 
-    await queryRunner.query(`CREATE INDEX "idx_questions_level" ON "questions" ("level_id")`);
-    await queryRunner.query(`CREATE INDEX "idx_questions_order" ON "questions" ("level_id", "order_index")`);
+    await queryRunner.query(
+      `CREATE INDEX "idx_questions_level" ON "questions" ("level_id")`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "idx_questions_order" ON "questions" ("level_id", "order_index")`,
+    );
 
     // Answer Options table
     await queryRunner.query(`
@@ -151,7 +177,9 @@ export class ChangeIdFromUuidToInt1736688000000 implements MigrationInterface {
       )
     `);
 
-    await queryRunner.query(`CREATE INDEX "idx_answer_options_question" ON "answer_options" ("question_id")`);
+    await queryRunner.query(
+      `CREATE INDEX "idx_answer_options_question" ON "answer_options" ("question_id")`,
+    );
 
     // Student Level Attempts table
     await queryRunner.query(`
@@ -173,9 +201,15 @@ export class ChangeIdFromUuidToInt1736688000000 implements MigrationInterface {
       )
     `);
 
-    await queryRunner.query(`CREATE INDEX "idx_student_level_attempts_student" ON "student_level_attempts" ("student_id")`);
-    await queryRunner.query(`CREATE INDEX "idx_student_level_attempts_level" ON "student_level_attempts" ("level_id")`);
-    await queryRunner.query(`CREATE INDEX "idx_student_level_attempts_completed" ON "student_level_attempts" ("student_id", "level_id", "is_completed")`);
+    await queryRunner.query(
+      `CREATE INDEX "idx_student_level_attempts_student" ON "student_level_attempts" ("student_id")`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "idx_student_level_attempts_level" ON "student_level_attempts" ("level_id")`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "idx_student_level_attempts_completed" ON "student_level_attempts" ("student_id", "level_id", "is_completed")`,
+    );
 
     // Student Question Answers table
     await queryRunner.query(`
@@ -202,8 +236,12 @@ export class ChangeIdFromUuidToInt1736688000000 implements MigrationInterface {
       )
     `);
 
-    await queryRunner.query(`CREATE INDEX "idx_student_question_answers_attempt" ON "student_question_answers" ("attempt_id")`);
-    await queryRunner.query(`CREATE INDEX "idx_student_question_answers_student" ON "student_question_answers" ("student_id")`);
+    await queryRunner.query(
+      `CREATE INDEX "idx_student_question_answers_attempt" ON "student_question_answers" ("attempt_id")`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "idx_student_question_answers_student" ON "student_question_answers" ("student_id")`,
+    );
 
     // Student Unit Progress table
     await queryRunner.query(`
@@ -226,8 +264,12 @@ export class ChangeIdFromUuidToInt1736688000000 implements MigrationInterface {
       )
     `);
 
-    await queryRunner.query(`CREATE INDEX "idx_student_unit_progress_student" ON "student_unit_progress" ("student_id")`);
-    await queryRunner.query(`CREATE INDEX "idx_student_unit_progress_unit" ON "student_unit_progress" ("unit_id")`);
+    await queryRunner.query(
+      `CREATE INDEX "idx_student_unit_progress_student" ON "student_unit_progress" ("student_id")`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "idx_student_unit_progress_unit" ON "student_unit_progress" ("unit_id")`,
+    );
 
     // Student Chapter Progress table
     await queryRunner.query(`
@@ -250,8 +292,12 @@ export class ChangeIdFromUuidToInt1736688000000 implements MigrationInterface {
       )
     `);
 
-    await queryRunner.query(`CREATE INDEX "idx_student_chapter_progress_student" ON "student_chapter_progress" ("student_id")`);
-    await queryRunner.query(`CREATE INDEX "idx_student_chapter_progress_chapter" ON "student_chapter_progress" ("chapter_id")`);
+    await queryRunner.query(
+      `CREATE INDEX "idx_student_chapter_progress_student" ON "student_chapter_progress" ("student_id")`,
+    );
+    await queryRunner.query(
+      `CREATE INDEX "idx_student_chapter_progress_chapter" ON "student_chapter_progress" ("chapter_id")`,
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
@@ -261,10 +307,18 @@ export class ChangeIdFromUuidToInt1736688000000 implements MigrationInterface {
      */
 
     // Drop all tables
-    await queryRunner.query(`DROP TABLE IF EXISTS "student_question_answers" CASCADE`);
-    await queryRunner.query(`DROP TABLE IF EXISTS "student_level_attempts" CASCADE`);
-    await queryRunner.query(`DROP TABLE IF EXISTS "student_unit_progress" CASCADE`);
-    await queryRunner.query(`DROP TABLE IF EXISTS "student_chapter_progress" CASCADE`);
+    await queryRunner.query(
+      `DROP TABLE IF EXISTS "student_question_answers" CASCADE`,
+    );
+    await queryRunner.query(
+      `DROP TABLE IF EXISTS "student_level_attempts" CASCADE`,
+    );
+    await queryRunner.query(
+      `DROP TABLE IF EXISTS "student_unit_progress" CASCADE`,
+    );
+    await queryRunner.query(
+      `DROP TABLE IF EXISTS "student_chapter_progress" CASCADE`,
+    );
     await queryRunner.query(`DROP TABLE IF EXISTS "answer_options" CASCADE`);
     await queryRunner.query(`DROP TABLE IF EXISTS "questions" CASCADE`);
     await queryRunner.query(`DROP TABLE IF EXISTS "levels" CASCADE`);

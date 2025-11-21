@@ -10,12 +10,13 @@ import {
 import { User } from '../../users/entities/user.entity';
 
 /**
- * PHASE 4 - STUDENT POINTS
+ * PHASE 4 - GAMIFICATION: STUDENT POINTS
  *
  * Tracks student points, streaks, and gamification metrics.
+ * One record per student with cumulative statistics.
  */
 @Entity('student_points')
-export class StudentPoints {
+export class StudentPoint {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -27,16 +28,16 @@ export class StudentPoints {
   student: User;
 
   @Column({ name: 'total_points', type: 'int', default: 0 })
-  totalPoints: number;
+  totalPoints: number; // Lifetime accumulated points
 
   @Column({ name: 'current_streak', type: 'int', default: 0 })
-  currentStreak: number;
+  currentStreak: number; // Current consecutive days of activity
 
   @Column({ name: 'longest_streak', type: 'int', default: 0 })
-  longestStreak: number;
+  longestStreak: number; // Best streak ever achieved
 
   @Column({ name: 'last_activity_date', type: 'date', nullable: true })
-  lastActivityDate: Date;
+  lastActivityDate: Date; // For streak calculation
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

@@ -6,10 +6,7 @@ import { Level } from './entities/level.entity';
 import { ProgressModule } from '../progress/progress.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Level]),
-    ProgressModule,
-  ],
+  imports: [TypeOrmModule.forFeature([Level]), ProgressModule],
   controllers: [LevelsController],
   providers: [LevelsService],
   exports: [LevelsService],

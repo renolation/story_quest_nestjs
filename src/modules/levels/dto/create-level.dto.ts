@@ -1,4 +1,13 @@
-import { IsNotEmpty, IsString, IsOptional, IsInt, IsBoolean, MaxLength, Min, Max } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsInt,
+  IsBoolean,
+  MaxLength,
+  Min,
+  Max,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateLevelDto {
@@ -21,8 +30,10 @@ export class CreateLevelDto {
   title: string;
 
   @ApiProperty({
-    description: 'Detailed description of the level content and learning objectives',
-    example: 'Practice saying hello and introducing yourself with interactive exercises',
+    description:
+      'Detailed description of the level content and learning objectives',
+    example:
+      'Practice saying hello and introducing yourself with interactive exercises',
     required: false,
   })
   @IsOptional()
@@ -65,7 +76,8 @@ export class CreateLevelDto {
   passingScore?: number;
 
   @ApiProperty({
-    description: 'Total points available for this level (sum of all question points)',
+    description:
+      'Total points available for this level (sum of all question points)',
     example: 100,
     minimum: 1,
     default: 100,

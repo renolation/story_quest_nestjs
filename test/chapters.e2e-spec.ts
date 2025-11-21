@@ -17,7 +17,9 @@ describe('Chapters (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     app.setGlobalPrefix('api/v1');
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
     await app.init();
 
     // Register student (registration returns token)
@@ -189,9 +191,7 @@ describe('Chapters (e2e)', () => {
     });
 
     it('should fail without authentication (401)', () => {
-      return request(app.getHttpServer())
-        .get('/api/v1/chapters')
-        .expect(401);
+      return request(app.getHttpServer()).get('/api/v1/chapters').expect(401);
     });
   });
 
@@ -362,9 +362,7 @@ describe('Chapters (e2e)', () => {
         .patch('/api/v1/chapters/reorder/bulk')
         .set('Authorization', `Bearer ${studentToken}`)
         .send({
-          chapters: [
-            { id: chapterId1, orderIndex: 300 },
-          ],
+          chapters: [{ id: chapterId1, orderIndex: 300 }],
         })
         .expect(403);
     });

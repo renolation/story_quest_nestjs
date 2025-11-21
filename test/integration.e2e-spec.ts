@@ -27,7 +27,9 @@ describe('Integration - Full Learning Workflow (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     app.setGlobalPrefix('api/v1');
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
     await app.init();
 
     // Register and login as teacher
@@ -203,7 +205,9 @@ describe('Integration - Full Learning Workflow (e2e)', () => {
         .expect(200);
 
       expect(Array.isArray(response.body)).toBe(true);
-      const createdChapter = response.body.find((ch: any) => ch.id === chapterId);
+      const createdChapter = response.body.find(
+        (ch: any) => ch.id === chapterId,
+      );
       expect(createdChapter).toBeDefined();
       expect(createdChapter).toHaveProperty('progress');
       expect(createdChapter.progress.completedUnits).toBe(0);
@@ -233,7 +237,9 @@ describe('Integration - Full Learning Workflow (e2e)', () => {
       expect(Array.isArray(response.body.levels)).toBe(true);
       expect(response.body.levels.length).toBeGreaterThan(0);
 
-      const createdLevel = response.body.levels.find((l: any) => l.id === levelId);
+      const createdLevel = response.body.levels.find(
+        (l: any) => l.id === levelId,
+      );
       expect(createdLevel).toBeDefined();
     });
 

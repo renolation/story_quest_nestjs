@@ -12,7 +12,14 @@ import {
   HttpStatus,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiQuery,
+  ApiBody,
+} from '@nestjs/swagger';
 import { LevelsService } from './levels.service';
 import { CreateLevelDto, UpdateLevelDto, LevelResponseDto } from './dto';
 import { CurrentUser, Roles } from '../../common/decorators';
@@ -31,7 +38,8 @@ export class LevelsController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Create a new level',
-    description: 'Create a new level within a unit with time limits and passing score (requires Teacher, Center, or Agency role)',
+    description:
+      'Create a new level within a unit with time limits and passing score (requires Teacher, Center, or Agency role)',
   })
   @ApiBody({ type: CreateLevelDto })
   @ApiResponse({
@@ -40,7 +48,10 @@ export class LevelsController {
     type: LevelResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Validation error' })
-  @ApiResponse({ status: 403, description: 'Forbidden - Insufficient permissions' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Insufficient permissions',
+  })
   @ApiResponse({ status: 404, description: 'Parent unit not found' })
   create(@Body() createLevelDto: CreateLevelDto) {
     return this.levelsService.create(createLevelDto);
@@ -49,7 +60,8 @@ export class LevelsController {
   @Get()
   @ApiOperation({
     summary: 'Get all levels with user progress',
-    description: 'Retrieves levels with the authenticated user\'s progress data. Optionally filter by unitId',
+    description:
+      "Retrieves levels with the authenticated user's progress data. Optionally filter by unitId",
   })
   @ApiResponse({
     status: 200,
@@ -73,13 +85,18 @@ export class LevelsController {
     @Query('unitId', new ParseIntPipe({ optional: true })) unitId?: number,
     @Query('includeQuestions') includeQuestions?: string,
   ): Promise<LevelResponseDto[]> {
-    return this.levelsService.findAll(user.id, unitId, includeQuestions === 'true');
+    return this.levelsService.findAll(
+      user.id,
+      unitId,
+      includeQuestions === 'true',
+    );
   }
 
   @Get(':id')
   @ApiOperation({
     summary: 'Get a level by ID with user progress',
-    description: 'Retrieves a specific level with the authenticated user\'s progress data',
+    description:
+      "Retrieves a specific level with the authenticated user's progress data",
   })
   @ApiResponse({
     status: 200,
@@ -106,7 +123,8 @@ export class LevelsController {
   @Roles(UserRole.TEACHER, UserRole.CENTER, UserRole.AGENCY)
   @ApiOperation({
     summary: 'Update a level',
-    description: 'Update level details including time limits and passing score (requires Teacher, Center, or Agency role)',
+    description:
+      'Update level details including time limits and passing score (requires Teacher, Center, or Agency role)',
   })
   @ApiBody({ type: UpdateLevelDto })
   @ApiResponse({
@@ -115,7 +133,10 @@ export class LevelsController {
     type: LevelResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Validation error' })
-  @ApiResponse({ status: 403, description: 'Forbidden - Insufficient permissions' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Insufficient permissions',
+  })
   @ApiResponse({ status: 404, description: 'Level not found' })
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -130,10 +151,14 @@ export class LevelsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: 'Delete a level',
-    description: 'Delete a level (requires Agency role only - will cascade delete all questions and answer options)',
+    description:
+      'Delete a level (requires Agency role only - will cascade delete all questions and answer options)',
   })
   @ApiResponse({ status: 204, description: 'Level deleted successfully' })
-  @ApiResponse({ status: 403, description: 'Forbidden - Only Agency can delete levels' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Only Agency can delete levels',
+  })
   @ApiResponse({ status: 404, description: 'Level not found' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.levelsService.remove(id);

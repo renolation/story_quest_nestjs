@@ -160,9 +160,10 @@ describe('LevelsService', () => {
         where: { isActive: true },
         order: { orderIndex: 'ASC' },
       });
-      expect(progressService.mapLevelsProgressToDto).toHaveBeenCalledWith(userId, [
-        { id: 1, passingScore: 70 },
-      ]);
+      expect(progressService.mapLevelsProgressToDto).toHaveBeenCalledWith(
+        userId,
+        [{ id: 1, passingScore: 70 }],
+      );
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe(1);
       expect(result[0].progress).toEqual(mockLevelProgress);
@@ -282,11 +283,15 @@ describe('LevelsService', () => {
       const levelId = 1;
 
       mockRepository.findOne.mockResolvedValue(mockLevel);
-      mockProgressService.mapLevelProgressToDto.mockResolvedValue(mockLevelProgress);
+      mockProgressService.mapLevelProgressToDto.mockResolvedValue(
+        mockLevelProgress,
+      );
 
       const result = await service.findOne(levelId, userId, false);
 
-      expect(repository.findOne).toHaveBeenCalledWith({ where: { id: levelId } });
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: levelId },
+      });
       expect(progressService.mapLevelProgressToDto).toHaveBeenCalledWith(
         userId,
         levelId,
@@ -305,7 +310,9 @@ describe('LevelsService', () => {
       };
 
       mockRepository.findOne.mockResolvedValue(levelWithQuestions);
-      mockProgressService.mapLevelProgressToDto.mockResolvedValue(mockLevelProgress);
+      mockProgressService.mapLevelProgressToDto.mockResolvedValue(
+        mockLevelProgress,
+      );
 
       const result = await service.findOne(levelId, userId, true);
 
@@ -335,7 +342,9 @@ describe('LevelsService', () => {
       const levelId = 42;
 
       mockRepository.findOne.mockResolvedValue({ ...mockLevel, id: levelId });
-      mockProgressService.mapLevelProgressToDto.mockResolvedValue(mockLevelProgress);
+      mockProgressService.mapLevelProgressToDto.mockResolvedValue(
+        mockLevelProgress,
+      );
 
       const result = await service.findOne(levelId, userId, false);
 
@@ -362,7 +371,9 @@ describe('LevelsService', () => {
       const customLevel = { ...mockLevel, passingScore: 85 };
 
       mockRepository.findOne.mockResolvedValue(customLevel);
-      mockProgressService.mapLevelProgressToDto.mockResolvedValue(mockLevelProgress);
+      mockProgressService.mapLevelProgressToDto.mockResolvedValue(
+        mockLevelProgress,
+      );
 
       await service.findOne(levelId, userId, false);
 
@@ -382,7 +393,9 @@ describe('LevelsService', () => {
 
       const result = await service.findOneById(levelId);
 
-      expect(repository.findOne).toHaveBeenCalledWith({ where: { id: levelId } });
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: levelId },
+      });
       expect(result).toEqual(mockLevel);
       expect(progressService.mapLevelProgressToDto).not.toHaveBeenCalled();
     });
@@ -392,7 +405,9 @@ describe('LevelsService', () => {
 
       mockRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOneById(levelId)).rejects.toThrow(NotFoundException);
+      await expect(service.findOneById(levelId)).rejects.toThrow(
+        NotFoundException,
+      );
       await expect(service.findOneById(levelId)).rejects.toThrow(
         `Level with ID ${levelId} not found`,
       );
@@ -425,7 +440,9 @@ describe('LevelsService', () => {
 
       const result = await service.update(levelId, updateDto);
 
-      expect(repository.findOne).toHaveBeenCalledWith({ where: { id: levelId } });
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: levelId },
+      });
       expect(repository.save).toHaveBeenCalled();
       expect(result.title).toBe('Updated Title');
       expect(result.description).toBe('Updated description');
@@ -522,7 +539,9 @@ describe('LevelsService', () => {
 
       await service.remove(levelId);
 
-      expect(repository.findOne).toHaveBeenCalledWith({ where: { id: levelId } });
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: levelId },
+      });
       expect(repository.remove).toHaveBeenCalledWith(mockLevel);
     });
 

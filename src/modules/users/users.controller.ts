@@ -65,7 +65,8 @@ export class UsersController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Update current user profile',
-    description: 'Update profile information for the currently authenticated user',
+    description:
+      'Update profile information for the currently authenticated user',
   })
   @ApiResponse({
     status: 200,
@@ -88,8 +89,12 @@ export class UsersController {
     @CurrentUser() user: any,
     @Body() updateProfileDto: UpdateProfileDto,
   ): Promise<UserResponseDto> {
-    const updatedUser = await this.usersService.update(user.id, updateProfileDto);
-    const userWithoutPassword = this.usersService.excludePasswordHash(updatedUser);
+    const updatedUser = await this.usersService.update(
+      user.id,
+      updateProfileDto,
+    );
+    const userWithoutPassword =
+      this.usersService.excludePasswordHash(updatedUser);
 
     return {
       id: userWithoutPassword.id,
@@ -147,7 +152,7 @@ export class UsersController {
     });
 
     return {
-      data: result.data.map(user => {
+      data: result.data.map((user) => {
         const userWithoutPassword = this.usersService.excludePasswordHash(user);
         return {
           id: userWithoutPassword.id,
@@ -172,7 +177,8 @@ export class UsersController {
   @Roles(UserRole.AGENCY, UserRole.CENTER, UserRole.TEACHER)
   @ApiOperation({
     summary: 'Get user by ID',
-    description: 'Retrieve a specific user by their ID (Admin and Teacher access)',
+    description:
+      'Retrieve a specific user by their ID (Admin and Teacher access)',
   })
   @ApiResponse({
     status: 200,

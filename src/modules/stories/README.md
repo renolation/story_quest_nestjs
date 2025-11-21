@@ -10,14 +10,17 @@ AI-powered story generation and reading comprehension features for personalized 
 ## Features
 - [ ] AI story generation (OpenAI/Gemini)
 - [ ] Story scene management
-- [ ] Vocabulary extraction from stories
+- [ ] Vocabulary extraction from stories (story-specific, not standalone vocabulary module)
 - [ ] Reading comprehension questions
 - [ ] Story progress tracking
-- [ ] TTS narration generation
 - [ ] Content moderation for child safety
 - [ ] Multiple genres (mystery, fairy tale, mythology, daily life)
 - [ ] Difficulty levels (easy, medium, hard)
 - [ ] Grade-level appropriate content
+
+> **⚠️ NOTES:**
+> - TTS narration handled client-side in mobile app
+> - StoryVocabulary entity is for vocabulary extracted FROM stories (not the removed standalone Vocabulary module)
 
 ## Entities
 - **Story**: AI-generated stories
@@ -30,8 +33,7 @@ AI-powered story generation and reading comprehension features for personalized 
 - Users module (for student association)
 - External: OpenAI/Gemini API
 - External: Content moderation API
-- External: Google Cloud TTS
-- External: AWS S3 for images/audio
+- External: AWS S3 for images (optional)
 
 ## Implementation Order
 1. Create entities and DTOs
@@ -40,9 +42,8 @@ AI-powered story generation and reading comprehension features for personalized 
 4. Create story generation service
 5. Implement vocabulary extraction
 6. Generate comprehension questions
-7. Add TTS narration generation
-8. Create progress tracking service
-9. Add REST endpoints
+7. Create progress tracking service
+8. Add REST endpoints
 
 ## API Endpoints
 - `POST /stories/generate` - Generate new story (student preferences)
@@ -81,5 +82,4 @@ Requirements:
 - [ ] Integration tests with mocked AI API
 - [ ] Test content moderation filtering
 - [ ] E2E tests for complete story flow
-- [ ] Test TTS generation
 - [ ] Performance tests (AI API rate limiting)

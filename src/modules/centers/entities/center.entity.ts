@@ -41,7 +41,12 @@ export class Center {
   @Column({ name: 'logo_url', type: 'varchar', length: 500, nullable: true })
   logoUrl: string;
 
-  @Column({ name: 'business_license', type: 'varchar', length: 255, nullable: true })
+  @Column({
+    name: 'business_license',
+    type: 'varchar',
+    length: 255,
+    nullable: true,
+  })
   businessLicense: string;
 
   @Column({ type: 'varchar', length: 20, default: 'active' })

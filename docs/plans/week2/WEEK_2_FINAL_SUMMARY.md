@@ -5,6 +5,11 @@
 **Status:** ✅ **100% COMPLETE**
 **Team:** NestJS Backend Development
 
+> **⚠️ ARCHITECTURE NOTE (2025-11-21):**
+> References to "Speech Services", "TTS", and "Google Cloud TTS" in this document reflect original planning.
+> **Architecture has been updated:** Speech/pronunciation is now handled **client-side** in the mobile app.
+> Backend provides reference text only. No server-side TTS/Speech Recognition needed.
+
 ---
 
 ## 📋 Executive Summary

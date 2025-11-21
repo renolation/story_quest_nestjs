@@ -57,7 +57,10 @@ export class QuestionsService {
     return question;
   }
 
-  async update(id: number, updateQuestionDto: UpdateQuestionDto): Promise<Question> {
+  async update(
+    id: number,
+    updateQuestionDto: UpdateQuestionDto,
+  ): Promise<Question> {
     const { answerOptions, ...questionData } = updateQuestionDto;
     const question = await this.findOne(id);
 

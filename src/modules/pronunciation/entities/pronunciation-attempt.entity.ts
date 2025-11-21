@@ -5,14 +5,21 @@ import {
   ManyToOne,
   JoinColumn,
   CreateDateColumn,
+  UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
+import { Question } from '../../questions/entities/question.entity';
 
 /**
- * PHASE 3 - PRONUNCIATION ATTEMPTS
+ * PRONUNCIATION ATTEMPTS
  *
- * Tracks student pronunciation practice attempts with audio recordings
- * and accuracy scores from speech recognition.
+ * Architecture: Speech recognition is CLIENT-SIDE (mobile app)
+ * Backend only stores pronunciation attempts with client-calculated scores.
+ *
+ * Tracks student pronunciation practice attempts with:
+ * - Reference text (what should be pronounced)
+ * - Recognized text (what client recognized - optional)
+ * - Client-calculated scores (pronunciation, accuracy, fluency, completeness)
  */
 @Entity('pronunciation_attempts')
 export class PronunciationAttempt {
@@ -26,14 +33,27 @@ export class PronunciationAttempt {
   @JoinColumn({ name: 'student_id' })
   student: User;
 
-  @Column({ type: 'varchar', length: 255 })
-  word: string;
+  @Column({ name: 'question_id' })
+  questionId: number;
 
-  @Column({ name: 'audio_url', type: 'varchar', length: 500, nullable: true })
-  audioUrl: string;
+  @ManyToOne(() => Question, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'question_id' })
+  question: Question;
 
-  @Column({ type: 'text', nullable: true })
-  transcription: string;
+  @Column({ name: 'reference_text', type: 'text' })
+  referenceText: string;
+
+  @Column({ name: 'recognized_text', type: 'text', nullable: true })
+  recognizedText: string;
+
+  @Column({
+    name: 'pronunciation_score',
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+    nullable: true,
+  })
+  pronunciationScore: number;
 
   @Column({
     name: 'accuracy_score',
@@ -44,6 +64,27 @@ export class PronunciationAttempt {
   })
   accuracyScore: number;
 
+  @Column({
+    name: 'fluency_score',
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+    nullable: true,
+  })
+  fluencyScore: number;
+
+  @Column({
+    name: 'completeness_score',
+    type: 'decimal',
+    precision: 5,
+    scale: 2,
+    nullable: true,
+  })
+  completenessScore: number;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
 }

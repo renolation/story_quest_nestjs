@@ -1,4 +1,12 @@
-import { IsNotEmpty, IsString, IsOptional, IsInt, IsBoolean, MaxLength, Min } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  IsOptional,
+  IsInt,
+  IsBoolean,
+  MaxLength,
+  Min,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateChapterDto {

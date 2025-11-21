@@ -125,7 +125,9 @@ describe('ChaptersService', () => {
       const chapters = [mockChapter];
 
       mockRepository.find.mockResolvedValue(chapters);
-      mockProgressService.getChaptersProgress.mockResolvedValue([mockChapterProgress]);
+      mockProgressService.getChaptersProgress.mockResolvedValue([
+        mockChapterProgress,
+      ]);
       mockProgressService.mapChapterProgressToDto.mockReturnValue({
         totalUnits: 5,
         completedUnits: 3,
@@ -138,7 +140,9 @@ describe('ChaptersService', () => {
         where: { isActive: true },
         order: { orderIndex: 'ASC' },
       });
-      expect(progressService.getChaptersProgress).toHaveBeenCalledWith(userId, [1]);
+      expect(progressService.getChaptersProgress).toHaveBeenCalledWith(userId, [
+        1,
+      ]);
       expect(result).toHaveLength(1);
       expect(result[0].id).toBe(1);
       expect(result[0].progress).toBeDefined();
@@ -146,10 +150,14 @@ describe('ChaptersService', () => {
 
     it('should return chapters with units when includeUnits is true', async () => {
       const userId = 1;
-      const chaptersWithUnits = [{ ...mockChapter, units: [{ id: 1, title: 'Unit 1' }] }];
+      const chaptersWithUnits = [
+        { ...mockChapter, units: [{ id: 1, title: 'Unit 1' }] },
+      ];
 
       mockRepository.find.mockResolvedValue(chaptersWithUnits);
-      mockProgressService.getChaptersProgress.mockResolvedValue([mockChapterProgress]);
+      mockProgressService.getChaptersProgress.mockResolvedValue([
+        mockChapterProgress,
+      ]);
       mockProgressService.mapChapterProgressToDto.mockReturnValue({
         totalUnits: 5,
         completedUnits: 3,
@@ -199,7 +207,9 @@ describe('ChaptersService', () => {
       const chapterId = 1;
 
       mockRepository.findOne.mockResolvedValue(mockChapter);
-      mockProgressService.getChapterProgress.mockResolvedValue(mockChapterProgress);
+      mockProgressService.getChapterProgress.mockResolvedValue(
+        mockChapterProgress,
+      );
       mockProgressService.mapChapterProgressToDto.mockReturnValue({
         totalUnits: 5,
         completedUnits: 3,
@@ -208,8 +218,13 @@ describe('ChaptersService', () => {
 
       const result = await service.findOne(chapterId, userId, false);
 
-      expect(repository.findOne).toHaveBeenCalledWith({ where: { id: chapterId } });
-      expect(progressService.getChapterProgress).toHaveBeenCalledWith(userId, chapterId);
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: chapterId },
+      });
+      expect(progressService.getChapterProgress).toHaveBeenCalledWith(
+        userId,
+        chapterId,
+      );
       expect(result.id).toBe(1);
       expect(result.progress).toBeDefined();
     });
@@ -217,10 +232,15 @@ describe('ChaptersService', () => {
     it('should return chapter with units when includeUnits is true', async () => {
       const userId = 1;
       const chapterId = 1;
-      const chapterWithUnits = { ...mockChapter, units: [{ id: 1, title: 'Unit 1' }] };
+      const chapterWithUnits = {
+        ...mockChapter,
+        units: [{ id: 1, title: 'Unit 1' }],
+      };
 
       mockRepository.findOne.mockResolvedValue(chapterWithUnits);
-      mockProgressService.getChapterProgress.mockResolvedValue(mockChapterProgress);
+      mockProgressService.getChapterProgress.mockResolvedValue(
+        mockChapterProgress,
+      );
       mockProgressService.mapChapterProgressToDto.mockReturnValue({
         totalUnits: 5,
         completedUnits: 3,
@@ -254,8 +274,13 @@ describe('ChaptersService', () => {
       const userId = 1;
       const chapterId = 42;
 
-      mockRepository.findOne.mockResolvedValue({ ...mockChapter, id: chapterId });
-      mockProgressService.getChapterProgress.mockResolvedValue(mockChapterProgress);
+      mockRepository.findOne.mockResolvedValue({
+        ...mockChapter,
+        id: chapterId,
+      });
+      mockProgressService.getChapterProgress.mockResolvedValue(
+        mockChapterProgress,
+      );
       mockProgressService.mapChapterProgressToDto.mockReturnValue({
         totalUnits: 5,
         completedUnits: 3,
@@ -277,7 +302,9 @@ describe('ChaptersService', () => {
 
       const result = await service.findOneById(chapterId);
 
-      expect(repository.findOne).toHaveBeenCalledWith({ where: { id: chapterId } });
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: chapterId },
+      });
       expect(result).toEqual(mockChapter);
       expect(progressService.getChapterProgress).not.toHaveBeenCalled();
     });
@@ -287,7 +314,9 @@ describe('ChaptersService', () => {
 
       mockRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.findOneById(chapterId)).rejects.toThrow(NotFoundException);
+      await expect(service.findOneById(chapterId)).rejects.toThrow(
+        NotFoundException,
+      );
       await expect(service.findOneById(chapterId)).rejects.toThrow(
         `Chapter with ID ${chapterId} not found`,
       );
@@ -309,7 +338,9 @@ describe('ChaptersService', () => {
 
       const result = await service.update(chapterId, updateDto);
 
-      expect(repository.findOne).toHaveBeenCalledWith({ where: { id: chapterId } });
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: chapterId },
+      });
       expect(repository.save).toHaveBeenCalled();
       expect(result.title).toBe('Updated Title');
       expect(result.description).toBe('Updated description');
@@ -353,7 +384,9 @@ describe('ChaptersService', () => {
 
       await service.remove(chapterId);
 
-      expect(repository.findOne).toHaveBeenCalledWith({ where: { id: chapterId } });
+      expect(repository.findOne).toHaveBeenCalledWith({
+        where: { id: chapterId },
+      });
       expect(repository.remove).toHaveBeenCalledWith(mockChapter);
     });
 
@@ -362,7 +395,9 @@ describe('ChaptersService', () => {
 
       mockRepository.findOne.mockResolvedValue(null);
 
-      await expect(service.remove(chapterId)).rejects.toThrow(NotFoundException);
+      await expect(service.remove(chapterId)).rejects.toThrow(
+        NotFoundException,
+      );
       expect(repository.remove).not.toHaveBeenCalled();
     });
   });
@@ -408,7 +443,9 @@ describe('ChaptersService', () => {
 
       mockRepository.findByIds.mockResolvedValue(chapters);
 
-      await expect(service.reorder(reorderData)).rejects.toThrow(NotFoundException);
+      await expect(service.reorder(reorderData)).rejects.toThrow(
+        NotFoundException,
+      );
       await expect(service.reorder(reorderData)).rejects.toThrow(
         'One or more chapters not found',
       );

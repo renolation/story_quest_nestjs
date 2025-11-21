@@ -46,7 +46,7 @@ export class ProgressService {
     return await this.chapterProgressRepository.findOne({
       where: {
         student: { id: studentId },
-        chapter: { id: chapterId }
+        chapter: { id: chapterId },
       },
     });
   }
@@ -80,7 +80,7 @@ export class ProgressService {
     return await this.unitProgressRepository.findOne({
       where: {
         student: { id: studentId },
-        unit: { id: unitId }
+        unit: { id: unitId },
       },
     });
   }
@@ -114,7 +114,7 @@ export class ProgressService {
     return await this.levelAttemptRepository.find({
       where: {
         student: { id: studentId },
-        level: { id: levelId }
+        level: { id: levelId },
       },
       order: { startedAt: 'DESC' },
     });
@@ -130,7 +130,7 @@ export class ProgressService {
     const attempts = await this.levelAttemptRepository.find({
       where: {
         student: { id: studentId },
-        level: { id: levelId }
+        level: { id: levelId },
       },
       order: { score: 'DESC', startedAt: 'DESC' },
       take: 1,
@@ -236,9 +236,10 @@ export class ProgressService {
     }
 
     // Get best attempt
-    const bestAttempt = attempts.reduce((best, current) =>
-      current.score > best.score ? current : best
-    , attempts[0]);
+    const bestAttempt = attempts.reduce(
+      (best, current) => (current.score > best.score ? current : best),
+      attempts[0],
+    );
 
     return {
       attemptCount: attempts.length,
@@ -257,7 +258,7 @@ export class ProgressService {
     studentId: number,
     levels: Array<{ id: number; passingScore: number }>,
   ): Promise<Map<number, LevelProgressDto>> {
-    const levelIds = levels.map(l => l.id);
+    const levelIds = levels.map((l) => l.id);
     const progressMap = await this.getLevelsProgress(studentId, levelIds);
 
     // Get all attempts to count them and find last attempt date
@@ -372,7 +373,9 @@ export class ProgressService {
     }
 
     if (attempt.student.id !== studentId) {
-      throw new NotFoundException('Level attempt does not belong to this student');
+      throw new NotFoundException(
+        'Level attempt does not belong to this student',
+      );
     }
 
     // Verify student exists
@@ -433,11 +436,15 @@ export class ProgressService {
     }
 
     if (attempt.student.id !== studentId) {
-      throw new NotFoundException('Level attempt does not belong to this student');
+      throw new NotFoundException(
+        'Level attempt does not belong to this student',
+      );
     }
 
     if (attempt.level.id !== levelId) {
-      throw new NotFoundException('Level attempt does not belong to this level');
+      throw new NotFoundException(
+        'Level attempt does not belong to this level',
+      );
     }
 
     // Update attempt with completion data

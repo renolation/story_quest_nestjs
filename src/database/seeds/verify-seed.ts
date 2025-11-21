@@ -64,14 +64,26 @@ async function verifySeeding() {
     const attemptRepo = AppDataSource.getRepository(StudentLevelAttempt);
     const answerRepo = AppDataSource.getRepository(StudentQuestionAnswer);
     const unitProgressRepo = AppDataSource.getRepository(StudentUnitProgress);
-    const chapterProgressRepo = AppDataSource.getRepository(StudentChapterProgress);
+    const chapterProgressRepo = AppDataSource.getRepository(
+      StudentChapterProgress,
+    );
 
     // Count users by role
-    const agencyCount = await userRepo.count({ where: { role: UserRole.AGENCY } });
-    const centerCount = await userRepo.count({ where: { role: UserRole.CENTER } });
-    const teacherCount = await userRepo.count({ where: { role: UserRole.TEACHER } });
-    const reviewerCount = await userRepo.count({ where: { role: UserRole.REVIEWER } });
-    const studentCount = await userRepo.count({ where: { role: UserRole.STUDENT } });
+    const agencyCount = await userRepo.count({
+      where: { role: UserRole.AGENCY },
+    });
+    const centerCount = await userRepo.count({
+      where: { role: UserRole.CENTER },
+    });
+    const teacherCount = await userRepo.count({
+      where: { role: UserRole.TEACHER },
+    });
+    const reviewerCount = await userRepo.count({
+      where: { role: UserRole.REVIEWER },
+    });
+    const studentCount = await userRepo.count({
+      where: { role: UserRole.STUDENT },
+    });
     const totalUsers = await userRepo.count();
 
     // Count content
@@ -89,7 +101,7 @@ async function verifySeeding() {
 
     // Display results
     console.log('📊 DATABASE RECORD COUNTS');
-    console.log('=' .repeat(60));
+    console.log('='.repeat(60));
     console.log('\n👥 USERS:');
     console.log(`   Agency:        ${agencyCount} / 1 expected`);
     console.log(`   Centers:       ${centerCount} / 3 expected`);
@@ -103,7 +115,9 @@ async function verifySeeding() {
     console.log(`   Units:         ${unitsCount} / 40-50 expected`);
     console.log(`   Levels:        ${levelsCount} / 120-150 expected`);
     console.log(`   Questions:     ${questionsCount} / 1000+ expected`);
-    console.log(`   Answer Opts:   ${answerOptionsCount} / ${questionsCount * 4} expected`);
+    console.log(
+      `   Answer Opts:   ${answerOptionsCount} / ${questionsCount * 4} expected`,
+    );
 
     console.log('\n📈 PROGRESS:');
     console.log(`   Level Attempts:      ${attemptsCount} / 500+ expected`);
@@ -113,39 +127,43 @@ async function verifySeeding() {
 
     // Verify data integrity
     console.log('\n🔍 DATA INTEGRITY CHECKS');
-    console.log('=' .repeat(60));
+    console.log('='.repeat(60));
 
     // Check that each question has at least one correct answer
-    const questionsWithoutCorrectAnswer = await AppDataSource
-      .createQueryBuilder()
-      .select('q.id')
-      .from(Question, 'q')
-      .leftJoin('q.answerOptions', 'ao')
-      .groupBy('q.id')
-      .having('SUM(CASE WHEN ao.is_correct = true THEN 1 ELSE 0 END) = 0')
-      .getRawMany();
+    const questionsWithoutCorrectAnswer =
+      await AppDataSource.createQueryBuilder()
+        .select('q.id')
+        .from(Question, 'q')
+        .leftJoin('q.answerOptions', 'ao')
+        .groupBy('q.id')
+        .having('SUM(CASE WHEN ao.is_correct = true THEN 1 ELSE 0 END) = 0')
+        .getRawMany();
 
     if (questionsWithoutCorrectAnswer.length === 0) {
       console.log('   ✅ All questions have at least one correct answer');
     } else {
-      console.log(`   ❌ ${questionsWithoutCorrectAnswer.length} questions without correct answer`);
+      console.log(
+        `   ❌ ${questionsWithoutCorrectAnswer.length} questions without correct answer`,
+      );
     }
 
     // Check that each question has exactly 4 answer options
-    const questionsWithWrongOptionCount = await AppDataSource
-      .createQueryBuilder()
-      .select('q.id', 'questionId')
-      .addSelect('COUNT(ao.id)', 'optionCount')
-      .from(Question, 'q')
-      .leftJoin('q.answerOptions', 'ao')
-      .groupBy('q.id')
-      .having('COUNT(ao.id) != 4')
-      .getRawMany();
+    const questionsWithWrongOptionCount =
+      await AppDataSource.createQueryBuilder()
+        .select('q.id', 'questionId')
+        .addSelect('COUNT(ao.id)', 'optionCount')
+        .from(Question, 'q')
+        .leftJoin('q.answerOptions', 'ao')
+        .groupBy('q.id')
+        .having('COUNT(ao.id) != 4')
+        .getRawMany();
 
     if (questionsWithWrongOptionCount.length === 0) {
       console.log('   ✅ All questions have exactly 4 answer options');
     } else {
-      console.log(`   ❌ ${questionsWithWrongOptionCount.length} questions without 4 options`);
+      console.log(
+        `   ❌ ${questionsWithWrongOptionCount.length} questions without 4 options`,
+      );
     }
 
     // Check foreign key relationships
@@ -167,10 +185,16 @@ async function verifySeeding() {
       .where('level.id IS NULL')
       .getCount();
 
-    if (orphanedUnits === 0 && orphanedLevels === 0 && orphanedQuestions === 0) {
+    if (
+      orphanedUnits === 0 &&
+      orphanedLevels === 0 &&
+      orphanedQuestions === 0
+    ) {
       console.log('   ✅ No orphaned records (all foreign keys valid)');
     } else {
-      console.log(`   ❌ Found orphaned records: Units(${orphanedUnits}), Levels(${orphanedLevels}), Questions(${orphanedQuestions})`);
+      console.log(
+        `   ❌ Found orphaned records: Units(${orphanedUnits}), Levels(${orphanedLevels}), Questions(${orphanedQuestions})`,
+      );
     }
 
     // Check progress data consistency
@@ -187,13 +211,20 @@ async function verifySeeding() {
 
     // List test credentials
     console.log('\n🔑 TEST CREDENTIALS');
-    console.log('=' .repeat(60));
+    console.log('='.repeat(60));
 
     const agency = await userRepo.findOne({ where: { role: UserRole.AGENCY } });
     const center = await userRepo.findOne({ where: { role: UserRole.CENTER } });
-    const teacher = await userRepo.findOne({ where: { role: UserRole.TEACHER } });
-    const reviewer = await userRepo.findOne({ where: { role: UserRole.REVIEWER } });
-    const students = await userRepo.find({ where: { role: UserRole.STUDENT }, take: 3 });
+    const teacher = await userRepo.findOne({
+      where: { role: UserRole.TEACHER },
+    });
+    const reviewer = await userRepo.findOne({
+      where: { role: UserRole.REVIEWER },
+    });
+    const students = await userRepo.find({
+      where: { role: UserRole.STUDENT },
+      take: 3,
+    });
 
     console.log(`\n   Agency Admin:`);
     console.log(`     Email:    ${agency?.email}`);
@@ -217,11 +248,12 @@ async function verifySeeding() {
 
     console.log(`\n   Students (showing first 3 of ${studentCount}):`);
     students.forEach((student, idx) => {
-      console.log(`     ${idx + 1}. ${student.email} / ${student.username} / Password123`);
+      console.log(
+        `     ${idx + 1}. ${student.email} / ${student.username} / Password123`,
+      );
     });
 
     console.log('\n✅ Verification completed!\n');
-
   } catch (error) {
     console.error('\n❌ Verification failed:', error);
     throw error;

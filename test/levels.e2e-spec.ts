@@ -19,7 +19,9 @@ describe('Levels (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     app.setGlobalPrefix('api/v1');
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
     await app.init();
 
     // Register and login as student
@@ -311,9 +313,7 @@ describe('Levels (e2e)', () => {
     });
 
     it('should fail without authentication (401)', () => {
-      return request(app.getHttpServer())
-        .get('/api/v1/levels')
-        .expect(401);
+      return request(app.getHttpServer()).get('/api/v1/levels').expect(401);
     });
   });
 

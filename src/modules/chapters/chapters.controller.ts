@@ -12,9 +12,21 @@ import {
   HttpStatus,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiQuery,
+  ApiBody,
+} from '@nestjs/swagger';
 import { ChaptersService } from './chapters.service';
-import { CreateChapterDto, UpdateChapterDto, ChapterResponseDto, ReorderChaptersDto } from './dto';
+import {
+  CreateChapterDto,
+  UpdateChapterDto,
+  ChapterResponseDto,
+  ReorderChaptersDto,
+} from './dto';
 import { CurrentUser, Roles } from '../../common/decorators';
 import { RolesGuard } from '../../common/guards';
 import { UserRole } from '../../common/enums';
@@ -31,7 +43,8 @@ export class ChaptersController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Create a new chapter',
-    description: 'Create a new chapter (requires Teacher, Center, or Agency role)',
+    description:
+      'Create a new chapter (requires Teacher, Center, or Agency role)',
   })
   @ApiBody({ type: CreateChapterDto })
   @ApiResponse({
@@ -40,8 +53,14 @@ export class ChaptersController {
     type: ChapterResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Validation error' })
-  @ApiResponse({ status: 403, description: 'Forbidden - Insufficient permissions' })
-  @ApiResponse({ status: 409, description: 'Chapter with this orderIndex already exists' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Insufficient permissions',
+  })
+  @ApiResponse({
+    status: 409,
+    description: 'Chapter with this orderIndex already exists',
+  })
   create(@Body() createChapterDto: CreateChapterDto) {
     return this.chaptersService.create(createChapterDto);
   }
@@ -49,7 +68,8 @@ export class ChaptersController {
   @Get()
   @ApiOperation({
     summary: 'Get all chapters with user progress',
-    description: 'Retrieves all active chapters with the authenticated user\'s progress data',
+    description:
+      "Retrieves all active chapters with the authenticated user's progress data",
   })
   @ApiResponse({
     status: 200,
@@ -72,7 +92,8 @@ export class ChaptersController {
   @Get(':id')
   @ApiOperation({
     summary: 'Get a chapter by ID with user progress',
-    description: 'Retrieves a specific chapter with the authenticated user\'s progress data',
+    description:
+      "Retrieves a specific chapter with the authenticated user's progress data",
   })
   @ApiResponse({
     status: 200,
@@ -99,7 +120,8 @@ export class ChaptersController {
   @Roles(UserRole.TEACHER, UserRole.CENTER, UserRole.AGENCY)
   @ApiOperation({
     summary: 'Update a chapter',
-    description: 'Update chapter details (requires Teacher, Center, or Agency role)',
+    description:
+      'Update chapter details (requires Teacher, Center, or Agency role)',
   })
   @ApiBody({ type: UpdateChapterDto })
   @ApiResponse({
@@ -108,7 +130,10 @@ export class ChaptersController {
     type: ChapterResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Validation error' })
-  @ApiResponse({ status: 403, description: 'Forbidden - Insufficient permissions' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Insufficient permissions',
+  })
   @ApiResponse({ status: 404, description: 'Chapter not found' })
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -123,10 +148,14 @@ export class ChaptersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: 'Delete a chapter',
-    description: 'Delete a chapter (requires Agency role only - will cascade delete all units, levels, questions)',
+    description:
+      'Delete a chapter (requires Agency role only - will cascade delete all units, levels, questions)',
   })
   @ApiResponse({ status: 204, description: 'Chapter deleted successfully' })
-  @ApiResponse({ status: 403, description: 'Forbidden - Only Agency can delete chapters' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Only Agency can delete chapters',
+  })
   @ApiResponse({ status: 404, description: 'Chapter not found' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.chaptersService.remove(id);
@@ -138,7 +167,8 @@ export class ChaptersController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Reorder chapters',
-    description: 'Update the order of multiple chapters at once (requires Teacher, Center, or Agency role)',
+    description:
+      'Update the order of multiple chapters at once (requires Teacher, Center, or Agency role)',
   })
   @ApiBody({ type: ReorderChaptersDto })
   @ApiResponse({
@@ -152,7 +182,10 @@ export class ChaptersController {
     },
   })
   @ApiResponse({ status: 400, description: 'Validation error' })
-  @ApiResponse({ status: 403, description: 'Forbidden - Insufficient permissions' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Insufficient permissions',
+  })
   @ApiResponse({ status: 404, description: 'One or more chapters not found' })
   async reorder(@Body() reorderDto: ReorderChaptersDto) {
     await this.chaptersService.reorder(reorderDto.chapters);

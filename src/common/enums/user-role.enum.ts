@@ -13,9 +13,9 @@
  * - STUDENT: End user - uses mobile app ONLY (not web dashboard)
  */
 export enum UserRole {
-  AGENCY = 'agency',      // Super Admin (Web Only)
-  CENTER = 'center',      // Organization Admin (Web Only)
-  TEACHER = 'teacher',    // Instructor (Web Only)
-  REVIEWER = 'reviewer',  // Content Moderator (Web Only)
-  STUDENT = 'student',    // End User (Mobile Only)
+  AGENCY = 'agency', // Super Admin (Web Only)
+  CENTER = 'center', // Organization Admin (Web Only)
+  TEACHER = 'teacher', // Instructor (Web Only)
+  REVIEWER = 'reviewer', // Content Moderator (Web Only)
+  STUDENT = 'student', // End User (Mobile Only)
 }

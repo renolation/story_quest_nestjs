@@ -8,7 +8,10 @@ export class LevelResponseDto {
   @ApiProperty({ description: 'Level title', example: 'Practice Hello' })
   title: string;
 
-  @ApiProperty({ description: 'Level description', example: 'Practice saying hello' })
+  @ApiProperty({
+    description: 'Level description',
+    example: 'Practice saying hello',
+  })
   description: string;
 
   @ApiProperty({ description: 'Parent unit ID', example: 1 })

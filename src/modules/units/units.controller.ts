@@ -12,7 +12,14 @@ import {
   HttpStatus,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery, ApiBody } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+  ApiQuery,
+  ApiBody,
+} from '@nestjs/swagger';
 import { UnitsService } from './units.service';
 import { CreateUnitDto, UpdateUnitDto, UnitResponseDto } from './dto';
 import { CurrentUser, Roles } from '../../common/decorators';
@@ -31,7 +38,8 @@ export class UnitsController {
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Create a new unit',
-    description: 'Create a new unit within a chapter (requires Teacher, Center, or Agency role)',
+    description:
+      'Create a new unit within a chapter (requires Teacher, Center, or Agency role)',
   })
   @ApiBody({ type: CreateUnitDto })
   @ApiResponse({
@@ -40,7 +48,10 @@ export class UnitsController {
     type: UnitResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Validation error' })
-  @ApiResponse({ status: 403, description: 'Forbidden - Insufficient permissions' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Insufficient permissions',
+  })
   @ApiResponse({ status: 404, description: 'Parent chapter not found' })
   create(@Body() createUnitDto: CreateUnitDto) {
     return this.unitsService.create(createUnitDto);
@@ -49,7 +60,8 @@ export class UnitsController {
   @Get()
   @ApiOperation({
     summary: 'Get all units with user progress',
-    description: 'Retrieves units with the authenticated user\'s progress data. Optionally filter by chapterId',
+    description:
+      "Retrieves units with the authenticated user's progress data. Optionally filter by chapterId",
   })
   @ApiResponse({
     status: 200,
@@ -70,16 +82,22 @@ export class UnitsController {
   })
   findAll(
     @CurrentUser() user: any,
-    @Query('chapterId', new ParseIntPipe({ optional: true })) chapterId?: number,
+    @Query('chapterId', new ParseIntPipe({ optional: true }))
+    chapterId?: number,
     @Query('includeLevels') includeLevels?: string,
   ): Promise<UnitResponseDto[]> {
-    return this.unitsService.findAll(user.id, chapterId, includeLevels === 'true');
+    return this.unitsService.findAll(
+      user.id,
+      chapterId,
+      includeLevels === 'true',
+    );
   }
 
   @Get(':id')
   @ApiOperation({
     summary: 'Get a unit by ID with user progress',
-    description: 'Retrieves a specific unit with the authenticated user\'s progress data',
+    description:
+      "Retrieves a specific unit with the authenticated user's progress data",
   })
   @ApiResponse({
     status: 200,
@@ -106,7 +124,8 @@ export class UnitsController {
   @Roles(UserRole.TEACHER, UserRole.CENTER, UserRole.AGENCY)
   @ApiOperation({
     summary: 'Update a unit',
-    description: 'Update unit details (requires Teacher, Center, or Agency role)',
+    description:
+      'Update unit details (requires Teacher, Center, or Agency role)',
   })
   @ApiBody({ type: UpdateUnitDto })
   @ApiResponse({
@@ -115,7 +134,10 @@ export class UnitsController {
     type: UnitResponseDto,
   })
   @ApiResponse({ status: 400, description: 'Validation error' })
-  @ApiResponse({ status: 403, description: 'Forbidden - Insufficient permissions' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Insufficient permissions',
+  })
   @ApiResponse({ status: 404, description: 'Unit not found' })
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -130,10 +152,14 @@ export class UnitsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: 'Delete a unit',
-    description: 'Delete a unit (requires Agency role only - will cascade delete all levels and questions)',
+    description:
+      'Delete a unit (requires Agency role only - will cascade delete all levels and questions)',
   })
   @ApiResponse({ status: 204, description: 'Unit deleted successfully' })
-  @ApiResponse({ status: 403, description: 'Forbidden - Only Agency can delete units' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - Only Agency can delete units',
+  })
   @ApiResponse({ status: 404, description: 'Unit not found' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.unitsService.remove(id);

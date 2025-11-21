@@ -21,7 +21,9 @@ describe('Progress (e2e)', () => {
 
     app = moduleFixture.createNestApplication();
     app.setGlobalPrefix('api/v1');
-    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ whitelist: true, transform: true }),
+    );
     await app.init();
 
     // Register and login as student
@@ -120,7 +122,9 @@ describe('Progress (e2e)', () => {
       });
 
     testQuestionId = question.body.id;
-    testAnswerOptionId = question.body.answerOptions.find((opt: any) => opt.isCorrect).id;
+    testAnswerOptionId = question.body.answerOptions.find(
+      (opt: any) => opt.isCorrect,
+    ).id;
   });
 
   afterAll(async () => {
@@ -497,7 +501,9 @@ describe('Progress (e2e)', () => {
         });
 
       flowQuestionId = question.body.id;
-      flowAnswerOptionId = question.body.answerOptions.find((opt: any) => opt.isCorrect).id;
+      flowAnswerOptionId = question.body.answerOptions.find(
+        (opt: any) => opt.isCorrect,
+      ).id;
     });
 
     it('should complete full learning workflow', async () => {

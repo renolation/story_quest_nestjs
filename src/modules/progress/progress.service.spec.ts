@@ -163,10 +163,18 @@ describe('ProgressService', () => {
     }).compile();
 
     service = module.get<ProgressService>(ProgressService);
-    chapterProgressRepository = module.get(getRepositoryToken(StudentChapterProgress));
-    unitProgressRepository = module.get(getRepositoryToken(StudentUnitProgress));
-    levelAttemptRepository = module.get(getRepositoryToken(StudentLevelAttempt));
-    questionAnswerRepository = module.get(getRepositoryToken(StudentQuestionAnswer));
+    chapterProgressRepository = module.get(
+      getRepositoryToken(StudentChapterProgress),
+    );
+    unitProgressRepository = module.get(
+      getRepositoryToken(StudentUnitProgress),
+    );
+    levelAttemptRepository = module.get(
+      getRepositoryToken(StudentLevelAttempt),
+    );
+    questionAnswerRepository = module.get(
+      getRepositoryToken(StudentQuestionAnswer),
+    );
     levelRepository = module.get(getRepositoryToken(Level));
     questionRepository = module.get(getRepositoryToken(Question));
     answerOptionRepository = module.get(getRepositoryToken(AnswerOption));
@@ -188,7 +196,9 @@ describe('ProgressService', () => {
       const studentId = 1;
       const chapterId = 1;
 
-      mockRepositories.chapterProgress.findOne.mockResolvedValue(mockChapterProgress);
+      mockRepositories.chapterProgress.findOne.mockResolvedValue(
+        mockChapterProgress,
+      );
 
       const result = await service.getChapterProgress(studentId, chapterId);
 
@@ -234,7 +244,9 @@ describe('ProgressService', () => {
       const studentId = 1;
       const chapterIds = [1, 2, 3];
 
-      mockRepositories.chapterProgress.find.mockResolvedValue([mockChapterProgress]);
+      mockRepositories.chapterProgress.find.mockResolvedValue([
+        mockChapterProgress,
+      ]);
 
       const result = await service.getChaptersProgress(studentId, chapterIds);
 
@@ -328,8 +340,12 @@ describe('ProgressService', () => {
 
       const result = await service.startLevel(studentId, levelId);
 
-      expect(levelRepository.findOne).toHaveBeenCalledWith({ where: { id: levelId } });
-      expect(userRepository.findOne).toHaveBeenCalledWith({ where: { id: studentId } });
+      expect(levelRepository.findOne).toHaveBeenCalledWith({
+        where: { id: levelId },
+      });
+      expect(userRepository.findOne).toHaveBeenCalledWith({
+        where: { id: studentId },
+      });
       expect(levelAttemptRepository.create).toHaveBeenCalled();
       expect(levelAttemptRepository.save).toHaveBeenCalled();
       expect(result).toEqual(mockLevelAttempt);
@@ -375,8 +391,12 @@ describe('ProgressService', () => {
 
       await service.startLevel(studentId, levelId);
 
-      expect(levelRepository.findOne).toHaveBeenCalledWith({ where: { id: 99 } });
-      expect(userRepository.findOne).toHaveBeenCalledWith({ where: { id: 42 } });
+      expect(levelRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 99 },
+      });
+      expect(userRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 42 },
+      });
     });
   });
 
@@ -408,9 +428,15 @@ describe('ProgressService', () => {
       mockRepositories.questionAnswer.create.mockReturnValue(mockAnswer);
       mockRepositories.questionAnswer.save.mockResolvedValue(mockAnswer);
 
-      const result = await service.submitAnswer(studentId, questionId, submitDto);
+      const result = await service.submitAnswer(
+        studentId,
+        questionId,
+        submitDto,
+      );
 
-      expect(questionRepository.findOne).toHaveBeenCalledWith({ where: { id: questionId } });
+      expect(questionRepository.findOne).toHaveBeenCalledWith({
+        where: { id: questionId },
+      });
       expect(levelAttemptRepository.findOne).toHaveBeenCalled();
       expect(questionAnswerRepository.create).toHaveBeenCalled();
       expect(questionAnswerRepository.save).toHaveBeenCalled();
@@ -428,12 +454,12 @@ describe('ProgressService', () => {
 
       mockRepositories.question.findOne.mockResolvedValue(null);
 
-      await expect(service.submitAnswer(studentId, questionId, submitDto)).rejects.toThrow(
-        NotFoundException,
-      );
-      await expect(service.submitAnswer(studentId, questionId, submitDto)).rejects.toThrow(
-        `Question with ID ${questionId} not found`,
-      );
+      await expect(
+        service.submitAnswer(studentId, questionId, submitDto),
+      ).rejects.toThrow(NotFoundException);
+      await expect(
+        service.submitAnswer(studentId, questionId, submitDto),
+      ).rejects.toThrow(`Question with ID ${questionId} not found`);
     });
 
     it('should throw NotFoundException when attempt not found', async () => {
@@ -448,9 +474,9 @@ describe('ProgressService', () => {
       mockRepositories.question.findOne.mockResolvedValue(mockQuestion);
       mockRepositories.levelAttempt.findOne.mockResolvedValue(null);
 
-      await expect(service.submitAnswer(studentId, questionId, submitDto)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.submitAnswer(studentId, questionId, submitDto),
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw NotFoundException when attempt does not belong to student', async () => {
@@ -465,12 +491,12 @@ describe('ProgressService', () => {
       mockRepositories.question.findOne.mockResolvedValue(mockQuestion);
       mockRepositories.levelAttempt.findOne.mockResolvedValue(mockLevelAttempt);
 
-      await expect(service.submitAnswer(studentId, questionId, submitDto)).rejects.toThrow(
-        NotFoundException,
-      );
-      await expect(service.submitAnswer(studentId, questionId, submitDto)).rejects.toThrow(
-        'Level attempt does not belong to this student',
-      );
+      await expect(
+        service.submitAnswer(studentId, questionId, submitDto),
+      ).rejects.toThrow(NotFoundException);
+      await expect(
+        service.submitAnswer(studentId, questionId, submitDto),
+      ).rejects.toThrow('Level attempt does not belong to this student');
     });
 
     it('should handle integer IDs', async () => {
@@ -487,13 +513,18 @@ describe('ProgressService', () => {
         ...mockLevelAttempt,
         student: { ...mockStudent, id: 42 },
       });
-      mockRepositories.user.findOne.mockResolvedValue({ ...mockStudent, id: 42 });
+      mockRepositories.user.findOne.mockResolvedValue({
+        ...mockStudent,
+        id: 42,
+      });
       mockRepositories.questionAnswer.create.mockReturnValue({});
       mockRepositories.questionAnswer.save.mockResolvedValue({});
 
       await service.submitAnswer(studentId, questionId, submitDto);
 
-      expect(questionRepository.findOne).toHaveBeenCalledWith({ where: { id: 99 } });
+      expect(questionRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 99 },
+      });
     });
   });
 
@@ -520,7 +551,11 @@ describe('ProgressService', () => {
       mockRepositories.levelAttempt.findOne.mockResolvedValue(mockLevelAttempt);
       mockRepositories.levelAttempt.save.mockResolvedValue(completedAttempt);
 
-      const result = await service.completeLevel(studentId, levelId, completeDto);
+      const result = await service.completeLevel(
+        studentId,
+        levelId,
+        completeDto,
+      );
 
       expect(levelAttemptRepository.findOne).toHaveBeenCalled();
       expect(levelAttemptRepository.save).toHaveBeenCalled();
@@ -542,9 +577,9 @@ describe('ProgressService', () => {
 
       mockRepositories.levelAttempt.findOne.mockResolvedValue(null);
 
-      await expect(service.completeLevel(studentId, levelId, completeDto)).rejects.toThrow(
-        NotFoundException,
-      );
+      await expect(
+        service.completeLevel(studentId, levelId, completeDto),
+      ).rejects.toThrow(NotFoundException);
     });
 
     it('should throw NotFoundException when attempt does not belong to student', async () => {
@@ -560,12 +595,12 @@ describe('ProgressService', () => {
 
       mockRepositories.levelAttempt.findOne.mockResolvedValue(mockLevelAttempt);
 
-      await expect(service.completeLevel(studentId, levelId, completeDto)).rejects.toThrow(
-        NotFoundException,
-      );
-      await expect(service.completeLevel(studentId, levelId, completeDto)).rejects.toThrow(
-        'Level attempt does not belong to this student',
-      );
+      await expect(
+        service.completeLevel(studentId, levelId, completeDto),
+      ).rejects.toThrow(NotFoundException);
+      await expect(
+        service.completeLevel(studentId, levelId, completeDto),
+      ).rejects.toThrow('Level attempt does not belong to this student');
     });
 
     it('should throw NotFoundException when attempt does not belong to level', async () => {
@@ -581,12 +616,12 @@ describe('ProgressService', () => {
 
       mockRepositories.levelAttempt.findOne.mockResolvedValue(mockLevelAttempt);
 
-      await expect(service.completeLevel(studentId, levelId, completeDto)).rejects.toThrow(
-        NotFoundException,
-      );
-      await expect(service.completeLevel(studentId, levelId, completeDto)).rejects.toThrow(
-        'Level attempt does not belong to this level',
-      );
+      await expect(
+        service.completeLevel(studentId, levelId, completeDto),
+      ).rejects.toThrow(NotFoundException);
+      await expect(
+        service.completeLevel(studentId, levelId, completeDto),
+      ).rejects.toThrow('Level attempt does not belong to this level');
     });
 
     it('should handle integer IDs', async () => {
@@ -620,13 +655,17 @@ describe('ProgressService', () => {
       const studentId = 1;
 
       mockRepositories.user.findOne.mockResolvedValue(mockStudent);
-      mockRepositories.chapterProgress.find.mockResolvedValue([mockChapterProgress]);
+      mockRepositories.chapterProgress.find.mockResolvedValue([
+        mockChapterProgress,
+      ]);
       mockRepositories.unitProgress.find.mockResolvedValue([mockUnitProgress]);
       mockRepositories.levelAttempt.find.mockResolvedValue([mockLevelAttempt]);
 
       const result = await service.getStudentProgress(studentId);
 
-      expect(userRepository.findOne).toHaveBeenCalledWith({ where: { id: studentId } });
+      expect(userRepository.findOne).toHaveBeenCalledWith({
+        where: { id: studentId },
+      });
       expect(chapterProgressRepository.find).toHaveBeenCalled();
       expect(unitProgressRepository.find).toHaveBeenCalled();
       expect(levelAttemptRepository.find).toHaveBeenCalled();
@@ -666,14 +705,19 @@ describe('ProgressService', () => {
     it('should handle integer ID', async () => {
       const studentId = 42;
 
-      mockRepositories.user.findOne.mockResolvedValue({ ...mockStudent, id: 42 });
+      mockRepositories.user.findOne.mockResolvedValue({
+        ...mockStudent,
+        id: 42,
+      });
       mockRepositories.chapterProgress.find.mockResolvedValue([]);
       mockRepositories.unitProgress.find.mockResolvedValue([]);
       mockRepositories.levelAttempt.find.mockResolvedValue([]);
 
       const result = await service.getStudentProgress(studentId);
 
-      expect(userRepository.findOne).toHaveBeenCalledWith({ where: { id: 42 } });
+      expect(userRepository.findOne).toHaveBeenCalledWith({
+        where: { id: 42 },
+      });
       expect(result.studentId).toBe(42);
     });
   });

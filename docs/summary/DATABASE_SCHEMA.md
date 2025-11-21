@@ -58,14 +58,16 @@ id SERIAL PRIMARY KEY  -- PostgreSQL auto-increment
 | `student_unit_progress` | Unit-level progress summary | Student + Unit |
 | `student_chapter_progress` | Chapter-level progress summary | Student + Chapter |
 
-### Phase 3: Audio & Pronunciation (2 tables)
+### Phase 3: Pronunciation (1 table)
 **Status**: 🔲 Placeholder
-**Purpose**: Speech practice and vocabulary audio
+**Purpose**: Pronunciation practice (client-side speech comparison)
+
+> **⚠️ NOTE:** Speech/pronunciation handled **client-side** in mobile app. Backend provides reference text only.
+> **Vocabulary module removed** - vocabulary managed within questions, not as separate entity.
 
 | Table | Purpose | Key Relationships |
 |-------|---------|-------------------|
-| `pronunciation_attempts` | Speech practice records | Student + Question |
-| `vocabulary_words` | Words with TTS audio URLs | Standalone |
+| `pronunciation_attempts` | Pronunciation practice records | Student + Question |
 
 ### Phase 4: Gamification (4 tables)
 **Status**: 🔲 Placeholder

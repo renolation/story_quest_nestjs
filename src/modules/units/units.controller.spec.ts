@@ -130,7 +130,11 @@ describe('UnitsController', () => {
 
       const result = await controller.findAll(mockUser, undefined, undefined);
 
-      expect(service.findAll).toHaveBeenCalledWith(mockUser.id, undefined, false);
+      expect(service.findAll).toHaveBeenCalledWith(
+        mockUser.id,
+        undefined,
+        false,
+      );
       expect(result).toEqual(units);
       expect(result).toHaveLength(1);
     });
@@ -147,7 +151,11 @@ describe('UnitsController', () => {
 
       const result = await controller.findAll(mockUser, undefined, 'true');
 
-      expect(service.findAll).toHaveBeenCalledWith(mockUser.id, undefined, true);
+      expect(service.findAll).toHaveBeenCalledWith(
+        mockUser.id,
+        undefined,
+        true,
+      );
       expect(result[0].levels).toBeDefined();
       expect(result[0].levels).toHaveLength(1);
     });
@@ -158,7 +166,11 @@ describe('UnitsController', () => {
 
       const result = await controller.findAll(mockUser, undefined, 'false');
 
-      expect(service.findAll).toHaveBeenCalledWith(mockUser.id, undefined, false);
+      expect(service.findAll).toHaveBeenCalledWith(
+        mockUser.id,
+        undefined,
+        false,
+      );
       expect(result[0].levels).toBeUndefined();
     });
 
@@ -169,7 +181,11 @@ describe('UnitsController', () => {
 
       const result = await controller.findAll(mockUser, chapterId, undefined);
 
-      expect(service.findAll).toHaveBeenCalledWith(mockUser.id, chapterId, false);
+      expect(service.findAll).toHaveBeenCalledWith(
+        mockUser.id,
+        chapterId,
+        false,
+      );
       expect(result).toEqual(units);
     });
 
@@ -182,7 +198,11 @@ describe('UnitsController', () => {
     });
 
     it('should use current user ID from decorator', async () => {
-      const customUser = { id: 123, email: 'test@example.com', role: 'student' };
+      const customUser = {
+        id: 123,
+        email: 'test@example.com',
+        role: 'student',
+      };
       mockUnitsService.findAll.mockResolvedValue([]);
 
       await controller.findAll(customUser, undefined, undefined);
@@ -272,7 +292,11 @@ describe('UnitsController', () => {
     });
 
     it('should use current user ID from decorator', async () => {
-      const customUser = { id: 456, email: 'test@example.com', role: 'student' };
+      const customUser = {
+        id: 456,
+        email: 'test@example.com',
+        role: 'student',
+      };
       const unitId = 1;
       mockUnitsService.findOne.mockResolvedValue(mockUnitResponse);
 

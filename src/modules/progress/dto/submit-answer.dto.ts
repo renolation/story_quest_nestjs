@@ -1,4 +1,10 @@
-import { IsInt, IsString, IsBoolean, IsOptional, IsNumber } from 'class-validator';
+import {
+  IsInt,
+  IsString,
+  IsBoolean,
+  IsOptional,
+  IsNumber,
+} from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class SubmitAnswerDto {

@@ -18,7 +18,6 @@ import { ProgressModule } from './modules/progress/progress.module';
 
 // Phase 3 Modules (Placeholder)
 import { PronunciationModule } from './modules/pronunciation/pronunciation.module';
-import { VocabularyModule } from './modules/vocabulary/vocabulary.module';
 
 // Phase 4 Modules (Placeholder)
 import { GamificationModule } from './modules/gamification/gamification.module';
@@ -62,7 +61,6 @@ import { JwtAuthGuard } from './common/guards';
 
     // Phase 3 - Placeholder
     PronunciationModule,
-    VocabularyModule,
 
     // Phase 4 - Placeholder
     GamificationModule,

@@ -8,7 +8,10 @@ export class UnitResponseDto {
   @ApiProperty({ description: 'Unit title', example: 'Greeting Friends' })
   title: string;
 
-  @ApiProperty({ description: 'Unit description', example: 'Learn how to greet friends' })
+  @ApiProperty({
+    description: 'Unit description',
+    example: 'Learn how to greet friends',
+  })
   description: string;
 
   @ApiProperty({ description: 'Parent chapter ID', example: 1 })

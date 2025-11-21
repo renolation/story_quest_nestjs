@@ -29,7 +29,7 @@ async function bootstrap() {
     .setTitle('Story Quest English Learning API')
     .setDescription(
       'API for Story Quest - An English learning app for Vietnamese students (grades 3-5). ' +
-      'Provides endpoints for managing chapters, units, levels, questions, and student progress.',
+        'Provides endpoints for managing chapters, units, levels, questions, and student progress.',
     )
     .setVersion('1.0')
     .addTag('Authentication', 'User authentication and authorization endpoints')

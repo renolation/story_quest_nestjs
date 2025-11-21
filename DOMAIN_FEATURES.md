@@ -186,10 +186,13 @@ The curriculum follows a four-level hierarchy:
 #### Talk to Speech Compare (Pronunciation)
 **Purpose**: Practice speaking and pronunciation
 
+> **⚠️ NOTE:** Client-side implementation (mobile app handles speech recognition)
+
 **Mechanics**:
-- Student hears native speaker pronunciation
-- Student records their own pronunciation
-- AI compares and scores similarity
+- Student sees reference text from backend
+- Student records pronunciation in mobile app
+- Mobile app compares speech-to-text with reference
+- Score calculated client-side and sent to backend
 - Visual waveform feedback
 - Confidence threshold scoring
 - Allows multiple attempts
@@ -1360,7 +1363,7 @@ Options: Blue, Green, Red, Yellow
 - High contrast mode
 - Colorblind-friendly palettes
 - Screen reader support (ARIA labels)
-- Text-to-speech for all content
+- Text-to-speech for all content (client-side)
 - Dyslexia-friendly font option
 
 ---

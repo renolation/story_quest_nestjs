@@ -11,9 +11,10 @@ import { User } from '../../users/entities/user.entity';
 import { Achievement } from './achievement.entity';
 
 /**
- * PHASE 4 - STUDENT ACHIEVEMENTS
+ * PHASE 4 - GAMIFICATION: STUDENT ACHIEVEMENTS
  *
- * Tracks individual student progress toward achievements.
+ * Tracks which achievements students have unlocked.
+ * Links students to their earned achievements with unlock timestamp.
  */
 @Entity('student_achievements')
 @Index(['studentId', 'achievementId'], { unique: true })
@@ -35,14 +36,12 @@ export class StudentAchievement {
   @JoinColumn({ name: 'achievement_id' })
   achievement: Achievement;
 
-  @Column({ type: 'int', default: 0 })
-  progress: number;
-
-  @Column({ name: 'is_unlocked', type: 'boolean', default: false })
-  isUnlocked: boolean;
-
-  @Column({ name: 'unlocked_at', type: 'timestamp', nullable: true })
-  unlockedAt: Date;
+  @Column({
+    name: 'unlocked_at',
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  unlockedAt: Date; // When the student earned this achievement
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

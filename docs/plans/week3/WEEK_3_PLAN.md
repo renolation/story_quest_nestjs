@@ -5,6 +5,20 @@
 **Focus**: Phase 3-4 Features + Performance + Production Readiness
 **Goal**: Implement pronunciation, vocabulary, gamification modules + Redis caching + performance optimization
 
+> **⚠️ ARCHITECTURE UPDATE (2025-11-21):**
+>
+> **Speech/Pronunciation Implementation Changed:**
+> - ❌ ~~Server-side TTS (Google Cloud TTS)~~ - **REMOVED**
+> - ❌ ~~Server-side Speech Recognition API~~ - **REMOVED**
+> - ✅ **Client-side speech-to-text comparison** - Mobile app handles speech recognition
+> - ✅ **Backend provides reference text only** - For client-side comparison
+>
+> **What this means:**
+> - Backend stores reference text for pronunciation questions
+> - Mobile app (Flutter) handles speech capture and comparison
+> - No external TTS/Speech Recognition API integration needed
+> - Pronunciation module simplified to text delivery only
+
 ---
 
 ## 🎯 Week 3 Overview
@@ -20,8 +34,8 @@ Building on Week 2's solid Phase 1 implementation (Auth, Content Management, Pro
 
 ### Week 3 Objectives
 By end of Week 3, you will have:
-1. **Pronunciation Module** - Speech recognition and TTS integration
-2. **Vocabulary Module** - Word lists with audio support
+1. **Pronunciation Module** - Reference text delivery for client-side speech comparison
+2. ~~**Vocabulary Module**~~ - ❌ **REMOVED** (not needed - vocabulary managed in questions)
 3. **Gamification Module** - Achievements, points, badges, leaderboards
 4. **Redis Caching** - Performance optimization for content APIs
 5. **Rate Limiting** - API protection and throttling

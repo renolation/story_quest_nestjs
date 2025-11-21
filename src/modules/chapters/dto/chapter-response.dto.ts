@@ -8,10 +8,16 @@ export class ChapterResponseDto {
   @ApiProperty({ description: 'Chapter title', example: 'Basic Greetings' })
   title: string;
 
-  @ApiProperty({ description: 'Chapter description', example: 'Learn basic greetings in English' })
+  @ApiProperty({
+    description: 'Chapter description',
+    example: 'Learn basic greetings in English',
+  })
   description: string;
 
-  @ApiProperty({ description: 'Chapter thumbnail URL', example: 'https://example.com/chapter.jpg' })
+  @ApiProperty({
+    description: 'Chapter thumbnail URL',
+    example: 'https://example.com/chapter.jpg',
+  })
   thumbnailUrl: string;
 
   @ApiProperty({ description: 'Chapter order index', example: 1 })

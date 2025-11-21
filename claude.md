@@ -53,7 +53,7 @@ The backend provides secure API endpoints and manages:
 - **Content Delivery**: Chapters, Units, Levels, Questions with progress syncing
 - **Progress Tracking**: Real-time monitoring of learning achievements
 - **AI Integration**: Story generation using OpenAI/Gemini APIs with content moderation
-- **Speech Services**: Text-to-Speech and pronunciation validation
+- **Speech Comparison**: Client-side speech-to-text comparison for pronunciation practice
 - **Gamification**: Points, badges, streaks, leaderboards
 - **Offline Support**: Cached content for low-connectivity areas
 
@@ -145,7 +145,6 @@ The backend provides secure API endpoints and manages:
 ### External Services
 - **OpenAI API / Gemini API**: AI story generation
 - **AWS S3 / Cloudflare R2**: File storage (audio, images)
-- **Google Cloud TTS**: Text-to-speech generation
 - **Firebase Cloud Messaging**: Push notifications
 - **Sentry**: Error monitoring and logging
 - **Stripe / In-App Purchase**: Payment processing (premium features)

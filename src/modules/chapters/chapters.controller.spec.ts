@@ -151,7 +151,11 @@ describe('ChaptersController', () => {
     });
 
     it('should use current user ID from decorator', async () => {
-      const customUser = { id: 123, email: 'test@example.com', role: 'student' };
+      const customUser = {
+        id: 123,
+        email: 'test@example.com',
+        role: 'student',
+      };
       mockChaptersService.findAll.mockResolvedValue([]);
 
       await controller.findAll(customUser, undefined);
@@ -167,7 +171,11 @@ describe('ChaptersController', () => {
 
       const result = await controller.findOne(mockUser, chapterId, undefined);
 
-      expect(service.findOne).toHaveBeenCalledWith(chapterId, mockUser.id, false);
+      expect(service.findOne).toHaveBeenCalledWith(
+        chapterId,
+        mockUser.id,
+        false,
+      );
       expect(result).toEqual(mockChapterResponse);
       expect(result.id).toBe(1);
       expect(typeof result.id).toBe('number');
@@ -184,7 +192,11 @@ describe('ChaptersController', () => {
 
       const result = await controller.findOne(mockUser, chapterId, 'true');
 
-      expect(service.findOne).toHaveBeenCalledWith(chapterId, mockUser.id, true);
+      expect(service.findOne).toHaveBeenCalledWith(
+        chapterId,
+        mockUser.id,
+        true,
+      );
       expect(result.units).toBeDefined();
     });
 
@@ -196,7 +208,11 @@ describe('ChaptersController', () => {
 
       const result = await controller.findOne(mockUser, chapterId, undefined);
 
-      expect(service.findOne).toHaveBeenCalledWith(chapterId, mockUser.id, false);
+      expect(service.findOne).toHaveBeenCalledWith(
+        chapterId,
+        mockUser.id,
+        false,
+      );
       expect(result.id).toBe(999);
       expect(typeof result.id).toBe('number');
     });

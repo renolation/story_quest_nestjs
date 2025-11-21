@@ -44,6 +44,9 @@ export class AuthResponseDto {
   @ApiProperty({ example: 'bearer' })
   token_type: string;
 
-  @ApiProperty({ example: 900, description: 'Token expiration time in seconds' })
+  @ApiProperty({
+    example: 900,
+    description: 'Token expiration time in seconds',
+  })
   expires_in: number;
 }

@@ -35,9 +35,7 @@ export class UsersService {
       // Check if email already exists
       const existingEmail = await this.findByEmail(createUserDto.email);
       if (existingEmail) {
-        this.logger.warn(
-          `Email already registered: ${createUserDto.email}`,
-        );
+        this.logger.warn(`Email already registered: ${createUserDto.email}`);
         throw new ConflictException('Email already registered');
       }
 
@@ -46,9 +44,7 @@ export class UsersService {
         createUserDto.username,
       );
       if (existingUsername) {
-        this.logger.warn(
-          `Username already taken: ${createUserDto.username}`,
-        );
+        this.logger.warn(`Username already taken: ${createUserDto.username}`);
         throw new ConflictException('Username already taken');
       }
 
@@ -87,10 +83,7 @@ export class UsersService {
       }
 
       // Log and throw internal server error for other cases
-      this.logger.error(
-        `Failed to create user: ${error.message}`,
-        error.stack,
-      );
+      this.logger.error(`Failed to create user: ${error.message}`, error.stack);
       throw new InternalServerErrorException('Failed to create user');
     }
   }
@@ -305,9 +298,7 @@ export class UsersService {
       user.passwordHash,
     );
     if (!isPasswordValid) {
-      this.logger.warn(
-        `Invalid current password for user: ${userId}`,
-      );
+      this.logger.warn(`Invalid current password for user: ${userId}`);
       throw new UnauthorizedException('Current password is incorrect');
     }
 

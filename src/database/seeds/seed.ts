@@ -98,7 +98,6 @@ class DatabaseSeeder {
 
       console.log('\n🔑 Test Credentials:');
       console.log('   Super Admin: admin@storyquest.com / Password123');
-
     } catch (error) {
       console.error('\n❌ Seeding failed:', error);
       throw error;
@@ -122,7 +121,11 @@ class DatabaseSeeder {
 
     for (const table of tables) {
       try {
-        await this.dataSource.getRepository(table).createQueryBuilder().delete().execute();
+        await this.dataSource
+          .getRepository(table)
+          .createQueryBuilder()
+          .delete()
+          .execute();
       } catch (error) {
         // Ignore errors for non-existent tables
         if (!error.message.includes('does not exist')) {
@@ -160,8 +163,14 @@ class DatabaseSeeder {
 
     // Only 2 chapters
     const chapterData = [
-      { title: 'Greetings & Introductions', description: 'Learn basic greetings and how to introduce yourself' },
-      { title: 'Numbers & Counting', description: 'Count from 1 to 100 and learn basic math vocabulary' },
+      {
+        title: 'Greetings & Introductions',
+        description: 'Learn basic greetings and how to introduce yourself',
+      },
+      {
+        title: 'Numbers & Counting',
+        description: 'Count from 1 to 100 and learn basic math vocabulary',
+      },
     ];
 
     for (let i = 0; i < chapterData.length; i++) {
@@ -233,7 +242,12 @@ class DatabaseSeeder {
     const questionRepository = this.dataSource.getRepository(Question);
     const answerOptionRepository = this.dataSource.getRepository(AnswerOption);
 
-    const questionTypes = ['select_right_answer', 'fill_in_blank', 'sort_words', 'talk_to_speech_compare'];
+    const questionTypes = [
+      'select_right_answer',
+      'fill_in_blank',
+      'sort_words',
+      'talk_to_speech_compare',
+    ];
 
     for (const level of this.levels) {
       const questionsPerLevel = 4; // 4 questions per level
@@ -247,7 +261,10 @@ class DatabaseSeeder {
           questionType: questionType as any,
           questionText: faker.lorem.sentence(),
           questionAudioUrl: `https://storage.example.com/audio/question_${faker.string.uuid()}.mp3`,
-          questionImageUrl: Math.random() > 0.5 ? `https://storage.example.com/images/question_${faker.string.uuid()}.jpg` : undefined,
+          questionImageUrl:
+            Math.random() > 0.5
+              ? `https://storage.example.com/images/question_${faker.string.uuid()}.jpg`
+              : undefined,
           points: 10,
           orderIndex: i + 1,
         });
@@ -268,7 +285,9 @@ class DatabaseSeeder {
       }
     }
 
-    console.log(`   ✓ Created ${this.questions.length} questions (4 per level) with ${this.questions.length * 4} answer options`);
+    console.log(
+      `   ✓ Created ${this.questions.length} questions (4 per level) with ${this.questions.length * 4} answer options`,
+    );
   }
 
   private async seedProgress() {
@@ -288,7 +307,6 @@ async function main() {
 
     const seeder = new DatabaseSeeder(AppDataSource);
     await seeder.run();
-
   } catch (error) {
     console.error('❌ Fatal error:', error);
     process.exit(1);
