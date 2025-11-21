@@ -1,0 +1,581 @@
+### Story Quest API - Comprehensive Chapters & Units Testing (Day 2)
+### This file tests all enhanced endpoints with role-based access control
+### Prerequisites: Run auth.http first to get tokens for all roles
+
+@baseUrl = http://localhost:3000/api/v1
+@contentType = application/json
+
+### TOKENS - Update these after logging in with auth.http
+@agencyToken = your_agency_token_here
+@centerToken = your_center_token_here
+@teacherToken = your_teacher_token_here
+@studentToken = your_student_token_here
+
+### Test IDs (update after creating resources)
+@chapterId1 = 1
+@chapterId2 = 2
+@chapterId3 = 3
+@unitId1 = 1
+@unitId2 = 2
+@unitId3 = 3
+
+################################################################################
+# CHAPTERS API - COMPREHENSIVE TESTING (18 test cases)
+################################################################################
+
+### ============================================================================
+### C1. GET ALL CHAPTERS (Student view with progress)
+### Role: STUDENT | Expected: 200 OK
+### ============================================================================
+GET {{baseUrl}}/chapters
+Authorization: Bearer {{studentToken}}
+
+### ============================================================================
+### C2. GET ALL CHAPTERS WITH UNITS (include nested units)
+### Role: STUDENT | Expected: 200 OK with nested units
+### ============================================================================
+GET {{baseUrl}}/chapters?includeUnits=true
+Authorization: Bearer {{studentToken}}
+
+### ============================================================================
+### C3. GET SINGLE CHAPTER BY ID
+### Role: STUDENT | Expected: 200 OK
+### ============================================================================
+GET {{baseUrl}}/chapters/{{chapterId1}}
+Authorization: Bearer {{studentToken}}
+
+### ============================================================================
+### C4. GET SINGLE CHAPTER WITH UNITS
+### Role: STUDENT | Expected: 200 OK with nested units
+### ============================================================================
+GET {{baseUrl}}/chapters/{{chapterId1}}?includeUnits=true
+Authorization: Bearer {{studentToken}}
+
+### ============================================================================
+### C5. CREATE CHAPTER - TEACHER ROLE
+### Role: TEACHER | Expected: 201 Created
+### ============================================================================
+POST {{baseUrl}}/chapters
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Greetings & Introductions",
+  "description": "Learn basic greetings and how to introduce yourself in English",
+  "thumbnailUrl": "https://storage.example.com/chapters/greetings.jpg",
+  "orderIndex": 0,
+  "isActive": true
+}
+
+### ============================================================================
+### C6. CREATE CHAPTER - CENTER ROLE
+### Role: CENTER | Expected: 201 Created
+### ============================================================================
+POST {{baseUrl}}/chapters
+Authorization: Bearer {{centerToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Family & Friends",
+  "description": "Learn vocabulary related to family members and friends",
+  "thumbnailUrl": "https://storage.example.com/chapters/family.jpg",
+  "orderIndex": 1,
+  "isActive": true
+}
+
+### ============================================================================
+### C7. CREATE CHAPTER - AGENCY ROLE
+### Role: AGENCY | Expected: 201 Created
+### ============================================================================
+POST {{baseUrl}}/chapters
+Authorization: Bearer {{agencyToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Food & Drinks",
+  "description": "Learn common food and drink vocabulary",
+  "thumbnailUrl": "https://storage.example.com/chapters/food.jpg",
+  "orderIndex": 2,
+  "isActive": true
+}
+
+### ============================================================================
+### C8. CREATE CHAPTER - VALIDATION ERROR (missing required fields)
+### Role: TEACHER | Expected: 400 Bad Request
+### ============================================================================
+POST {{baseUrl}}/chapters
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "description": "Missing title and orderIndex - should fail"
+}
+
+### ============================================================================
+### C9. CREATE CHAPTER - UNAUTHORIZED (Student role)
+### Role: STUDENT | Expected: 403 Forbidden
+### ============================================================================
+POST {{baseUrl}}/chapters
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Should Fail - Student Cannot Create",
+  "orderIndex": 10
+}
+
+### ============================================================================
+### C10. UPDATE CHAPTER - TEACHER ROLE
+### Role: TEACHER | Expected: 200 OK
+### ============================================================================
+PATCH {{baseUrl}}/chapters/{{chapterId1}}
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Greetings & Introductions - Updated by Teacher",
+  "description": "Enhanced description for greetings chapter"
+}
+
+### ============================================================================
+### C11. UPDATE CHAPTER - CENTER ROLE
+### Role: CENTER | Expected: 200 OK
+### ============================================================================
+PATCH {{baseUrl}}/chapters/{{chapterId1}}
+Authorization: Bearer {{centerToken}}
+Content-Type: {{contentType}}
+
+{
+  "isActive": false
+}
+
+### ============================================================================
+### C12. UPDATE CHAPTER - AGENCY ROLE
+### Role: AGENCY | Expected: 200 OK
+### ============================================================================
+PATCH {{baseUrl}}/chapters/{{chapterId2}}
+Authorization: Bearer {{agencyToken}}
+Content-Type: {{contentType}}
+
+{
+  "orderIndex": 5
+}
+
+### ============================================================================
+### C13. UPDATE CHAPTER - NOT FOUND
+### Role: TEACHER | Expected: 404 Not Found
+### ============================================================================
+PATCH {{baseUrl}}/chapters/99999
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Non-existent Chapter"
+}
+
+### ============================================================================
+### C14. BULK REORDER CHAPTERS - SUCCESS
+### Role: TEACHER | Expected: 200 OK with success message
+### ============================================================================
+PATCH {{baseUrl}}/chapters/reorder/bulk
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "chapters": [
+    { "id": 1, "orderIndex": 2 },
+    { "id": 2, "orderIndex": 0 },
+    { "id": 3, "orderIndex": 1 }
+  ]
+}
+
+### ============================================================================
+### C15. BULK REORDER - VALIDATION ERROR (negative orderIndex)
+### Role: TEACHER | Expected: 400 Bad Request
+### ============================================================================
+PATCH {{baseUrl}}/chapters/reorder/bulk
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "chapters": [
+    { "id": 1, "orderIndex": -1 }
+  ]
+}
+
+### ============================================================================
+### C16. BULK REORDER - NOT FOUND
+### Role: TEACHER | Expected: 404 Not Found
+### ============================================================================
+PATCH {{baseUrl}}/chapters/reorder/bulk
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "chapters": [
+    { "id": 99999, "orderIndex": 0 }
+  ]
+}
+
+### ============================================================================
+### C17. DELETE CHAPTER - AGENCY ROLE (only allowed role)
+### Role: AGENCY | Expected: 204 No Content
+### ============================================================================
+DELETE {{baseUrl}}/chapters/{{chapterId3}}
+Authorization: Bearer {{agencyToken}}
+
+### ============================================================================
+### C18. DELETE CHAPTER - FORBIDDEN (Teacher role)
+### Role: TEACHER | Expected: 403 Forbidden
+### ============================================================================
+DELETE {{baseUrl}}/chapters/{{chapterId1}}
+Authorization: Bearer {{teacherToken}}
+
+################################################################################
+# UNITS API - COMPREHENSIVE TESTING (18 test cases)
+################################################################################
+
+### ============================================================================
+### U1. GET ALL UNITS (all units across chapters)
+### Role: STUDENT | Expected: 200 OK
+### ============================================================================
+GET {{baseUrl}}/units
+Authorization: Bearer {{studentToken}}
+
+### ============================================================================
+### U2. GET UNITS BY CHAPTER ID (filter by chapter)
+### Role: STUDENT | Expected: 200 OK
+### ============================================================================
+GET {{baseUrl}}/units?chapterId={{chapterId1}}
+Authorization: Bearer {{studentToken}}
+
+### ============================================================================
+### U3. GET UNITS WITH LEVELS (include nested levels)
+### Role: STUDENT | Expected: 200 OK
+### ============================================================================
+GET {{baseUrl}}/units?chapterId={{chapterId1}}&includeLevels=true
+Authorization: Bearer {{studentToken}}
+
+### ============================================================================
+### U4. GET SINGLE UNIT BY ID
+### Role: STUDENT | Expected: 200 OK
+### ============================================================================
+GET {{baseUrl}}/units/{{unitId1}}
+Authorization: Bearer {{studentToken}}
+
+### ============================================================================
+### U5. GET SINGLE UNIT WITH LEVELS
+### Role: STUDENT | Expected: 200 OK
+### ============================================================================
+GET {{baseUrl}}/units/{{unitId1}}?includeLevels=true
+Authorization: Bearer {{studentToken}}
+
+### ============================================================================
+### U6. CREATE UNIT - TEACHER ROLE
+### Role: TEACHER | Expected: 201 Created
+### ============================================================================
+POST {{baseUrl}}/units
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "chapterId": {{chapterId1}},
+  "title": "Greeting Friends",
+  "description": "Learn how to greet friends in casual situations",
+  "thumbnailUrl": "https://storage.example.com/units/greeting-friends.jpg",
+  "orderIndex": 0,
+  "isActive": true
+}
+
+### ============================================================================
+### U7. CREATE UNIT - CENTER ROLE
+### Role: CENTER | Expected: 201 Created
+### ============================================================================
+POST {{baseUrl}}/units
+Authorization: Bearer {{centerToken}}
+Content-Type: {{contentType}}
+
+{
+  "chapterId": {{chapterId1}},
+  "title": "Formal Greetings",
+  "description": "Learn formal greetings for professional settings",
+  "thumbnailUrl": "https://storage.example.com/units/formal-greetings.jpg",
+  "orderIndex": 1,
+  "isActive": true
+}
+
+### ============================================================================
+### U8. CREATE UNIT - AGENCY ROLE
+### Role: AGENCY | Expected: 201 Created
+### ============================================================================
+POST {{baseUrl}}/units
+Authorization: Bearer {{agencyToken}}
+Content-Type: {{contentType}}
+
+{
+  "chapterId": {{chapterId1}},
+  "title": "Saying Goodbye",
+  "description": "Learn different ways to say goodbye",
+  "thumbnailUrl": "https://storage.example.com/units/goodbye.jpg",
+  "orderIndex": 2,
+  "isActive": true
+}
+
+### ============================================================================
+### U9. CREATE UNIT - VALIDATION ERROR (negative orderIndex)
+### Role: TEACHER | Expected: 400 Bad Request
+### ============================================================================
+POST {{baseUrl}}/units
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "chapterId": {{chapterId1}},
+  "title": "Invalid Unit",
+  "description": "This has invalid orderIndex",
+  "orderIndex": -1
+}
+
+### ============================================================================
+### U10. CREATE UNIT - INVALID CHAPTER ID
+### Role: TEACHER | Expected: 404 Not Found
+### ============================================================================
+POST {{baseUrl}}/units
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "chapterId": 99999,
+  "title": "Unit with Invalid Chapter",
+  "description": "Parent chapter doesn't exist",
+  "orderIndex": 0
+}
+
+### ============================================================================
+### U11. CREATE UNIT - UNAUTHORIZED (Student role)
+### Role: STUDENT | Expected: 403 Forbidden
+### ============================================================================
+POST {{baseUrl}}/units
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "chapterId": {{chapterId1}},
+  "title": "Should Fail - Student Cannot Create",
+  "orderIndex": 10
+}
+
+### ============================================================================
+### U12. UPDATE UNIT - TEACHER ROLE
+### Role: TEACHER | Expected: 200 OK
+### ============================================================================
+PATCH {{baseUrl}}/units/{{unitId1}}
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Greeting Friends - Updated by Teacher",
+  "description": "Enhanced description for greeting friends unit"
+}
+
+### ============================================================================
+### U13. UPDATE UNIT - CENTER ROLE
+### Role: CENTER | Expected: 200 OK
+### ============================================================================
+PATCH {{baseUrl}}/units/{{unitId1}}
+Authorization: Bearer {{centerToken}}
+Content-Type: {{contentType}}
+
+{
+  "orderIndex": 5,
+  "isActive": true
+}
+
+### ============================================================================
+### U14. UPDATE UNIT - AGENCY ROLE
+### Role: AGENCY | Expected: 200 OK
+### ============================================================================
+PATCH {{baseUrl}}/units/{{unitId2}}
+Authorization: Bearer {{agencyToken}}
+Content-Type: {{contentType}}
+
+{
+  "thumbnailUrl": "https://storage.example.com/units/new-thumbnail.jpg"
+}
+
+### ============================================================================
+### U15. UPDATE UNIT - NOT FOUND
+### Role: TEACHER | Expected: 404 Not Found
+### ============================================================================
+PATCH {{baseUrl}}/units/99999
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Non-existent Unit"
+}
+
+### ============================================================================
+### U16. DELETE UNIT - AGENCY ROLE (only allowed role)
+### Role: AGENCY | Expected: 204 No Content
+### ============================================================================
+DELETE {{baseUrl}}/units/{{unitId3}}
+Authorization: Bearer {{agencyToken}}
+
+### ============================================================================
+### U17. DELETE UNIT - FORBIDDEN (Teacher role)
+### Role: TEACHER | Expected: 403 Forbidden
+### ============================================================================
+DELETE {{baseUrl}}/units/{{unitId1}}
+Authorization: Bearer {{teacherToken}}
+
+### ============================================================================
+### U18. DELETE UNIT - FORBIDDEN (Center role)
+### Role: CENTER | Expected: 403 Forbidden
+### ============================================================================
+DELETE {{baseUrl}}/units/{{unitId1}}
+Authorization: Bearer {{centerToken}}
+
+################################################################################
+# INTEGRATION SCENARIOS (4 test cases)
+################################################################################
+
+### ============================================================================
+### I1. CREATE CHAPTER AND UNITS WORKFLOW - Step 1: Create Chapter
+### Role: TEACHER | Expected: 201 Created
+### ============================================================================
+POST {{baseUrl}}/chapters
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Colors & Shapes",
+  "description": "Learn basic colors and shapes vocabulary",
+  "thumbnailUrl": "https://storage.example.com/chapters/colors.jpg",
+  "orderIndex": 10,
+  "isActive": true
+}
+
+### ============================================================================
+### I2. CREATE CHAPTER AND UNITS WORKFLOW - Step 2: Create First Unit
+### Role: TEACHER | Expected: 201 Created
+### NOTE: Update chapterId after Step 1
+### ============================================================================
+POST {{baseUrl}}/units
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "chapterId": 4,
+  "title": "Basic Colors",
+  "description": "Red, blue, yellow, and more!",
+  "thumbnailUrl": "https://storage.example.com/units/basic-colors.jpg",
+  "orderIndex": 0,
+  "isActive": true
+}
+
+### ============================================================================
+### I3. CREATE CHAPTER AND UNITS WORKFLOW - Step 3: Create Second Unit
+### Role: TEACHER | Expected: 201 Created
+### ============================================================================
+POST {{baseUrl}}/units
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "chapterId": 4,
+  "title": "Common Shapes",
+  "description": "Circle, square, triangle, and more!",
+  "thumbnailUrl": "https://storage.example.com/units/common-shapes.jpg",
+  "orderIndex": 1,
+  "isActive": true
+}
+
+### ============================================================================
+### I4. CREATE CHAPTER AND UNITS WORKFLOW - Step 4: Get Chapter with Units
+### Role: STUDENT | Expected: 200 OK with nested units
+### ============================================================================
+GET {{baseUrl}}/chapters/4?includeUnits=true
+Authorization: Bearer {{studentToken}}
+
+################################################################################
+# AUTHENTICATION & AUTHORIZATION TESTS (4 test cases)
+################################################################################
+
+### ============================================================================
+### A1. NO AUTHENTICATION - Chapters
+### Expected: 401 Unauthorized
+### ============================================================================
+GET {{baseUrl}}/chapters
+
+### ============================================================================
+### A2. NO AUTHENTICATION - Units
+### Expected: 401 Unauthorized
+### ============================================================================
+GET {{baseUrl}}/units
+
+### ============================================================================
+### A3. INVALID TOKEN - Chapters
+### Expected: 401 Unauthorized
+### ============================================================================
+GET {{baseUrl}}/chapters
+Authorization: Bearer invalid_token_here
+
+### ============================================================================
+### A4. INVALID TOKEN - Units
+### Expected: 401 Unauthorized
+### ============================================================================
+GET {{baseUrl}}/units
+Authorization: Bearer invalid_token_here
+
+################################################################################
+# TEST SUMMARY
+################################################################################
+
+# Total Test Cases: 44
+#
+# Chapters API: 18 tests
+#   Read operations: 4 tests (GET all, GET by ID, with/without nested units)
+#   Create operations: 5 tests (Teacher, Center, Agency, validation error, unauthorized)
+#   Update operations: 5 tests (Teacher, Center, Agency, not found)
+#   Reorder operations: 3 tests (success, validation error, not found)
+#   Delete operations: 1 test (Agency only, forbidden for others)
+#
+# Units API: 18 tests
+#   Read operations: 5 tests (GET all, filter by chapter, with levels, GET by ID)
+#   Create operations: 6 tests (Teacher, Center, Agency, validation errors, unauthorized)
+#   Update operations: 4 tests (Teacher, Center, Agency, not found)
+#   Delete operations: 3 tests (Agency only, forbidden for Teacher and Center)
+#
+# Integration Tests: 4 tests
+#   Full workflow: Create chapter ’ Create units ’ Get chapter with units
+#
+# Auth Tests: 4 tests
+#   No auth, Invalid token for both Chapters and Units
+#
+################################################################################
+# TESTING INSTRUCTIONS
+################################################################################
+
+# 1. Start NestJS server: npm run start:dev
+# 2. Login with all 4 roles using api-tests/auth.http:
+#    - Agency (super admin)
+#    - Center (organization admin)
+#    - Teacher (instructor)
+#    - Student (learner - mobile only)
+# 3. Copy tokens to @variables section at top
+# 4. Run tests sequentially to verify:
+#     Role-based access control works correctly
+#     Validation catches errors
+#     Progress tracking integrates properly
+#     Cascade operations work (delete chapter deletes units)
+# 5. Check Swagger docs: http://localhost:3000/api/docs
+#
+# Expected Results:
+# - Students can only READ chapters/units
+# - Teachers can CREATE and UPDATE
+# - Centers can CREATE and UPDATE
+# - Only AGENCY can DELETE
+# - All validation errors return 400
+# - Authorization errors return 403
+# - Not found errors return 404

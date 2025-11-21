@@ -103,4 +103,23 @@ export class ChaptersService {
     const chapter = await this.findOneById(id);
     await this.chapterRepository.remove(chapter);
   }
+
+  async reorder(reorderData: { id: number; orderIndex: number }[]): Promise<void> {
+    // Validate all chapter IDs exist
+    const chapterIds = reorderData.map(item => item.id);
+    const chapters = await this.chapterRepository.findByIds(chapterIds);
+
+    if (chapters.length !== chapterIds.length) {
+      throw new NotFoundException('One or more chapters not found');
+    }
+
+    // Update order indexes in a transaction
+    await this.chapterRepository.manager.transaction(async (transactionalEntityManager) => {
+      for (const item of reorderData) {
+        await transactionalEntityManager.update(Chapter, item.id, {
+          orderIndex: item.orderIndex,
+        });
+      }
+    });
+  }
 }
