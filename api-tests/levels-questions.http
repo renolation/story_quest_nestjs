@@ -1,0 +1,728 @@
+### Story Quest API - Comprehensive Levels & Questions Testing (Day 3)
+### This file tests all enhanced endpoints with role-based access control
+### Prerequisites: Run auth.http first to get tokens for all roles
+
+@baseUrl = http://localhost:3000/api/v1
+@contentType = application/json
+
+### TOKENS - Update these after logging in with auth.http
+@agencyToken = your_agency_token_here
+@centerToken = your_center_token_here
+@teacherToken = your_teacher_token_here
+@studentToken = your_student_token_here
+
+### Test IDs (update after creating resources)
+@unitId1 = 1
+@levelId1 = 1
+@levelId2 = 2
+@levelId3 = 3
+@questionId1 = 1
+@questionId2 = 2
+@questionId3 = 3
+
+################################################################################
+# LEVELS API - COMPREHENSIVE TESTING (18 test cases)
+################################################################################
+
+### ============================================================================
+### L1. GET ALL LEVELS (Student view with progress)
+### Role: STUDENT | Expected: 200 OK
+### ============================================================================
+GET {{baseUrl}}/levels
+Authorization: Bearer {{studentToken}}
+
+### ============================================================================
+### L2. GET LEVELS BY UNIT ID (filter by unit)
+### Role: STUDENT | Expected: 200 OK
+### ============================================================================
+GET {{baseUrl}}/levels?unitId={{unitId1}}
+Authorization: Bearer {{studentToken}}
+
+### ============================================================================
+### L3. GET LEVELS WITH QUESTIONS (include nested questions)
+### Role: STUDENT | Expected: 200 OK
+### ============================================================================
+GET {{baseUrl}}/levels?unitId={{unitId1}}&includeQuestions=true
+Authorization: Bearer {{studentToken}}
+
+### ============================================================================
+### L4. GET SINGLE LEVEL BY ID
+### Role: STUDENT | Expected: 200 OK
+### ============================================================================
+GET {{baseUrl}}/levels/{{levelId1}}
+Authorization: Bearer {{studentToken}}
+
+### ============================================================================
+### L5. GET SINGLE LEVEL WITH QUESTIONS
+### Role: STUDENT | Expected: 200 OK
+### ============================================================================
+GET {{baseUrl}}/levels/{{levelId1}}?includeQuestions=true
+Authorization: Bearer {{studentToken}}
+
+### ============================================================================
+### L6. CREATE LEVEL - TEACHER ROLE
+### Role: TEACHER | Expected: 201 Created
+### ============================================================================
+POST {{baseUrl}}/levels
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "unitId": {{unitId1}},
+  "title": "Practice Hello - Easy",
+  "description": "Practice saying hello in different situations",
+  "orderIndex": 0,
+  "timeLimitSeconds": 300,
+  "passingScore": 70,
+  "totalPoints": 100,
+  "isActive": true
+}
+
+### ============================================================================
+### L7. CREATE LEVEL - CENTER ROLE
+### Role: CENTER | Expected: 201 Created
+### ============================================================================
+POST {{baseUrl}}/levels
+Authorization: Bearer {{centerToken}}
+Content-Type: {{contentType}}
+
+{
+  "unitId": {{unitId1}},
+  "title": "Practice Hello - Medium",
+  "description": "Intermediate hello practice with more contexts",
+  "orderIndex": 1,
+  "timeLimitSeconds": 450,
+  "passingScore": 75,
+  "totalPoints": 150,
+  "isActive": true
+}
+
+### ============================================================================
+### L8. CREATE LEVEL - AGENCY ROLE
+### Role: AGENCY | Expected: 201 Created
+### ============================================================================
+POST {{baseUrl}}/levels
+Authorization: Bearer {{agencyToken}}
+Content-Type: {{contentType}}
+
+{
+  "unitId": {{unitId1}},
+  "title": "Practice Hello - Hard",
+  "description": "Advanced hello practice with complex scenarios",
+  "orderIndex": 2,
+  "timeLimitSeconds": 600,
+  "passingScore": 80,
+  "totalPoints": 200,
+  "isActive": true
+}
+
+### ============================================================================
+### L9. CREATE LEVEL - VALIDATION ERROR (invalid passing score)
+### Role: TEACHER | Expected: 400 Bad Request
+### ============================================================================
+POST {{baseUrl}}/levels
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "unitId": {{unitId1}},
+  "title": "Invalid Level",
+  "orderIndex": 0,
+  "passingScore": 150,
+  "totalPoints": 100
+}
+
+### ============================================================================
+### L10. CREATE LEVEL - INVALID UNIT ID
+### Role: TEACHER | Expected: 404 Not Found
+### ============================================================================
+POST {{baseUrl}}/levels
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "unitId": 99999,
+  "title": "Level with Invalid Unit",
+  "orderIndex": 0,
+  "passingScore": 70,
+  "totalPoints": 100
+}
+
+### ============================================================================
+### L11. CREATE LEVEL - UNAUTHORIZED (Student role)
+### Role: STUDENT | Expected: 403 Forbidden
+### ============================================================================
+POST {{baseUrl}}/levels
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "unitId": {{unitId1}},
+  "title": "Should Fail - Student Cannot Create",
+  "orderIndex": 10
+}
+
+### ============================================================================
+### L12. UPDATE LEVEL - TEACHER ROLE
+### Role: TEACHER | Expected: 200 OK
+### ============================================================================
+PATCH {{baseUrl}}/levels/{{levelId1}}
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Practice Hello - Easy (Updated)",
+  "timeLimitSeconds": 350
+}
+
+### ============================================================================
+### L13. UPDATE LEVEL - CENTER ROLE
+### Role: CENTER | Expected: 200 OK
+### ============================================================================
+PATCH {{baseUrl}}/levels/{{levelId1}}
+Authorization: Bearer {{centerToken}}
+Content-Type: {{contentType}}
+
+{
+  "passingScore": 75,
+  "isActive": true
+}
+
+### ============================================================================
+### L14. UPDATE LEVEL - AGENCY ROLE
+### Role: AGENCY | Expected: 200 OK
+### ============================================================================
+PATCH {{baseUrl}}/levels/{{levelId2}}
+Authorization: Bearer {{agencyToken}}
+Content-Type: {{contentType}}
+
+{
+  "totalPoints": 180
+}
+
+### ============================================================================
+### L15. UPDATE LEVEL - NOT FOUND
+### Role: TEACHER | Expected: 404 Not Found
+### ============================================================================
+PATCH {{baseUrl}}/levels/99999
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Non-existent Level"
+}
+
+### ============================================================================
+### L16. DELETE LEVEL - AGENCY ROLE (only allowed role)
+### Role: AGENCY | Expected: 204 No Content
+### ============================================================================
+DELETE {{baseUrl}}/levels/{{levelId3}}
+Authorization: Bearer {{agencyToken}}
+
+### ============================================================================
+### L17. DELETE LEVEL - FORBIDDEN (Teacher role)
+### Role: TEACHER | Expected: 403 Forbidden
+### ============================================================================
+DELETE {{baseUrl}}/levels/{{levelId1}}
+Authorization: Bearer {{teacherToken}}
+
+### ============================================================================
+### L18. DELETE LEVEL - FORBIDDEN (Center role)
+### Role: CENTER | Expected: 403 Forbidden
+### ============================================================================
+DELETE {{baseUrl}}/levels/{{levelId1}}
+Authorization: Bearer {{centerToken}}
+
+################################################################################
+# QUESTIONS API - COMPREHENSIVE TESTING (18 test cases)
+################################################################################
+
+### ============================================================================
+### Q1. GET ALL QUESTIONS (all questions across levels)
+### Role: STUDENT | Expected: 200 OK
+### ============================================================================
+GET {{baseUrl}}/questions
+Authorization: Bearer {{studentToken}}
+
+### ============================================================================
+### Q2. GET QUESTIONS BY LEVEL ID (filter by level)
+### Role: STUDENT | Expected: 200 OK
+### ============================================================================
+GET {{baseUrl}}/questions?levelId={{levelId1}}
+Authorization: Bearer {{studentToken}}
+
+### ============================================================================
+### Q3. GET SINGLE QUESTION BY ID (with answer options)
+### Role: STUDENT | Expected: 200 OK
+### ============================================================================
+GET {{baseUrl}}/questions/{{questionId1}}
+Authorization: Bearer {{studentToken}}
+
+### ============================================================================
+### Q4. CREATE QUESTION - SELECT RIGHT ANSWER TYPE (Teacher role)
+### Role: TEACHER | Expected: 201 Created
+### ============================================================================
+POST {{baseUrl}}/questions
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "levelId": {{levelId1}},
+  "questionType": "select_right_answer",
+  "questionText": "What is the correct way to say hello?",
+  "questionAudioUrl": "https://storage.example.com/audio/q1.mp3",
+  "orderIndex": 0,
+  "points": 10,
+  "hint": "Think about friendly greetings",
+  "explanation": "Hello is the most common greeting in English",
+  "isActive": true,
+  "answerOptions": [
+    {
+      "optionText": "Hello",
+      "isCorrect": true,
+      "orderIndex": 0
+    },
+    {
+      "optionText": "Goodbye",
+      "isCorrect": false,
+      "orderIndex": 1
+    },
+    {
+      "optionText": "Thank you",
+      "isCorrect": false,
+      "orderIndex": 2
+    },
+    {
+      "optionText": "Sorry",
+      "isCorrect": false,
+      "orderIndex": 3
+    }
+  ]
+}
+
+### ============================================================================
+### Q5. CREATE QUESTION - FILL IN BLANK TYPE (Center role)
+### Role: CENTER | Expected: 201 Created
+### ============================================================================
+POST {{baseUrl}}/questions
+Authorization: Bearer {{centerToken}}
+Content-Type: {{contentType}}
+
+{
+  "levelId": {{levelId1}},
+  "questionType": "fill_in_blank",
+  "questionText": "Complete the sentence: '_____, how are you?'",
+  "questionAudioUrl": "https://storage.example.com/audio/q2.mp3",
+  "orderIndex": 1,
+  "points": 15,
+  "hint": "Fill in the greeting word",
+  "isActive": true,
+  "answerOptions": [
+    {
+      "optionText": "Hello",
+      "isCorrect": true,
+      "orderIndex": 0
+    },
+    {
+      "optionText": "Hi",
+      "isCorrect": true,
+      "orderIndex": 1
+    }
+  ]
+}
+
+### ============================================================================
+### Q6. CREATE QUESTION - SORT WORDS TYPE (Agency role)
+### Role: AGENCY | Expected: 201 Created
+### ============================================================================
+POST {{baseUrl}}/questions
+Authorization: Bearer {{agencyToken}}
+Content-Type: {{contentType}}
+
+{
+  "levelId": {{levelId1}},
+  "questionType": "sort_words",
+  "questionText": "Arrange the words to make a correct sentence",
+  "questionPlace": "top_left",
+  "answerPlace": "bottom_right",
+  "orderIndex": 2,
+  "points": 20,
+  "isActive": true,
+  "answerOptions": [
+    {
+      "optionText": "Hello",
+      "isCorrect": true,
+      "orderIndex": 0
+    },
+    {
+      "optionText": "my",
+      "isCorrect": true,
+      "orderIndex": 1
+    },
+    {
+      "optionText": "name",
+      "isCorrect": true,
+      "orderIndex": 2
+    },
+    {
+      "optionText": "is",
+      "isCorrect": true,
+      "orderIndex": 3
+    }
+  ]
+}
+
+### ============================================================================
+### Q7. CREATE QUESTION - TALK TO SPEECH TYPE (Teacher role)
+### Role: TEACHER | Expected: 201 Created
+### ============================================================================
+POST {{baseUrl}}/questions
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "levelId": {{levelId1}},
+  "questionType": "talk_to_speech_compare",
+  "questionText": "Say the following phrase correctly",
+  "questionAudioUrl": "https://storage.example.com/audio/hello-ref.mp3",
+  "orderIndex": 3,
+  "points": 25,
+  "hint": "Listen carefully and repeat",
+  "isActive": true,
+  "answerOptions": [
+    {
+      "optionText": "Hello, nice to meet you",
+      "optionAudioUrl": "https://storage.example.com/audio/hello-ref.mp3",
+      "isCorrect": true,
+      "orderIndex": 0
+    }
+  ]
+}
+
+### ============================================================================
+### Q8. CREATE QUESTION - VALIDATION ERROR (negative orderIndex)
+### Role: TEACHER | Expected: 400 Bad Request
+### ============================================================================
+POST {{baseUrl}}/questions
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "levelId": {{levelId1}},
+  "questionType": "select_right_answer",
+  "questionText": "Invalid Question",
+  "orderIndex": -1
+}
+
+### ============================================================================
+### Q9. CREATE QUESTION - INVALID LEVEL ID
+### Role: TEACHER | Expected: 404 Not Found
+### ============================================================================
+POST {{baseUrl}}/questions
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "levelId": 99999,
+  "questionType": "select_right_answer",
+  "questionText": "Question with Invalid Level",
+  "orderIndex": 0
+}
+
+### ============================================================================
+### Q10. CREATE QUESTION - UNAUTHORIZED (Student role)
+### Role: STUDENT | Expected: 403 Forbidden
+### ============================================================================
+POST {{baseUrl}}/questions
+Authorization: Bearer {{studentToken}}
+Content-Type: {{contentType}}
+
+{
+  "levelId": {{levelId1}},
+  "questionType": "select_right_answer",
+  "questionText": "Should Fail",
+  "orderIndex": 0
+}
+
+### ============================================================================
+### Q11. UPDATE QUESTION - TEACHER ROLE
+### Role: TEACHER | Expected: 200 OK
+### ============================================================================
+PATCH {{baseUrl}}/questions/{{questionId1}}
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "questionText": "What is the correct way to say hello? (Updated)",
+  "points": 12
+}
+
+### ============================================================================
+### Q12. UPDATE QUESTION WITH NEW ANSWER OPTIONS - CENTER ROLE
+### Role: CENTER | Expected: 200 OK
+### ============================================================================
+PATCH {{baseUrl}}/questions/{{questionId1}}
+Authorization: Bearer {{centerToken}}
+Content-Type: {{contentType}}
+
+{
+  "hint": "Updated hint text",
+  "answerOptions": [
+    {
+      "optionText": "Hello",
+      "isCorrect": true,
+      "orderIndex": 0
+    },
+    {
+      "optionText": "Hi",
+      "isCorrect": true,
+      "orderIndex": 1
+    },
+    {
+      "optionText": "Goodbye",
+      "isCorrect": false,
+      "orderIndex": 2
+    }
+  ]
+}
+
+### ============================================================================
+### Q13. UPDATE QUESTION - AGENCY ROLE
+### Role: AGENCY | Expected: 200 OK
+### ============================================================================
+PATCH {{baseUrl}}/questions/{{questionId2}}
+Authorization: Bearer {{agencyToken}}
+Content-Type: {{contentType}}
+
+{
+  "explanation": "This is the most common way to greet someone in English"
+}
+
+### ============================================================================
+### Q14. UPDATE QUESTION - NOT FOUND
+### Role: TEACHER | Expected: 404 Not Found
+### ============================================================================
+PATCH {{baseUrl}}/questions/99999
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "questionText": "Non-existent Question"
+}
+
+### ============================================================================
+### Q15. DELETE QUESTION - AGENCY ROLE (only allowed role)
+### Role: AGENCY | Expected: 204 No Content
+### ============================================================================
+DELETE {{baseUrl}}/questions/{{questionId3}}
+Authorization: Bearer {{agencyToken}}
+
+### ============================================================================
+### Q16. DELETE QUESTION - FORBIDDEN (Teacher role)
+### Role: TEACHER | Expected: 403 Forbidden
+### ============================================================================
+DELETE {{baseUrl}}/questions/{{questionId1}}
+Authorization: Bearer {{teacherToken}}
+
+### ============================================================================
+### Q17. DELETE QUESTION - FORBIDDEN (Center role)
+### Role: CENTER | Expected: 403 Forbidden
+### ============================================================================
+DELETE {{baseUrl}}/questions/{{questionId1}}
+Authorization: Bearer {{centerToken}}
+
+### ============================================================================
+### Q18. DELETE QUESTION - NOT FOUND
+### Role: AGENCY | Expected: 404 Not Found
+### ============================================================================
+DELETE {{baseUrl}}/questions/99999
+Authorization: Bearer {{agencyToken}}
+
+################################################################################
+# INTEGRATION TESTS - Levels & Questions Together (4 test cases)
+################################################################################
+
+### ============================================================================
+### I1. CREATE LEVEL AND QUESTIONS WORKFLOW - Step 1: Create Level
+### Role: TEACHER | Expected: 201 Created
+### ============================================================================
+POST {{baseUrl}}/levels
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "unitId": 1,
+  "title": "Colors Practice",
+  "description": "Practice identifying and naming colors",
+  "orderIndex": 10,
+  "timeLimitSeconds": 400,
+  "passingScore": 70,
+  "totalPoints": 100,
+  "isActive": true
+}
+
+### ============================================================================
+### I2. CREATE LEVEL AND QUESTIONS WORKFLOW - Step 2: Create First Question
+### Role: TEACHER | Expected: 201 Created
+### NOTE: Update levelId after Step 1
+### ============================================================================
+POST {{baseUrl}}/questions
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "levelId": 4,
+  "questionType": "select_right_answer",
+  "questionText": "What color is the sky?",
+  "questionImageUrl": "https://storage.example.com/images/sky.jpg",
+  "orderIndex": 0,
+  "points": 50,
+  "isActive": true,
+  "answerOptions": [
+    {
+      "optionText": "Blue",
+      "isCorrect": true,
+      "orderIndex": 0
+    },
+    {
+      "optionText": "Red",
+      "isCorrect": false,
+      "orderIndex": 1
+    },
+    {
+      "optionText": "Green",
+      "isCorrect": false,
+      "orderIndex": 2
+    }
+  ]
+}
+
+### ============================================================================
+### I3. CREATE LEVEL AND QUESTIONS WORKFLOW - Step 3: Create Second Question
+### Role: TEACHER | Expected: 201 Created
+### ============================================================================
+POST {{baseUrl}}/questions
+Authorization: Bearer {{teacherToken}}
+Content-Type: {{contentType}}
+
+{
+  "levelId": 4,
+  "questionType": "select_right_answer",
+  "questionText": "What color is grass?",
+  "questionImageUrl": "https://storage.example.com/images/grass.jpg",
+  "orderIndex": 1,
+  "points": 50,
+  "isActive": true,
+  "answerOptions": [
+    {
+      "optionText": "Green",
+      "isCorrect": true,
+      "orderIndex": 0
+    },
+    {
+      "optionText": "Yellow",
+      "isCorrect": false,
+      "orderIndex": 1
+    },
+    {
+      "optionText": "Brown",
+      "isCorrect": false,
+      "orderIndex": 2
+    }
+  ]
+}
+
+### ============================================================================
+### I4. CREATE LEVEL AND QUESTIONS WORKFLOW - Step 4: Get Level with Questions
+### Role: STUDENT | Expected: 200 OK with nested questions and answer options
+### ============================================================================
+GET {{baseUrl}}/levels/4?includeQuestions=true
+Authorization: Bearer {{studentToken}}
+
+################################################################################
+# AUTHENTICATION & AUTHORIZATION TESTS (4 test cases)
+################################################################################
+
+### ============================================================================
+### A1. NO AUTHENTICATION - Levels
+### Expected: 401 Unauthorized
+### ============================================================================
+GET {{baseUrl}}/levels
+
+### ============================================================================
+### A2. NO AUTHENTICATION - Questions
+### Expected: 401 Unauthorized
+### ============================================================================
+GET {{baseUrl}}/questions
+
+### ============================================================================
+### A3. INVALID TOKEN - Levels
+### Expected: 401 Unauthorized
+### ============================================================================
+GET {{baseUrl}}/levels
+Authorization: Bearer invalid_token_here
+
+### ============================================================================
+### A4. INVALID TOKEN - Questions
+### Expected: 401 Unauthorized
+### ============================================================================
+GET {{baseUrl}}/questions
+Authorization: Bearer invalid_token_here
+
+################################################################################
+# TEST SUMMARY
+################################################################################
+
+# Total Test Cases: 44
+#
+# Levels API: 18 tests
+#   Read operations: 5 tests (GET all, filter by unit, with questions, GET by ID)
+#   Create operations: 6 tests (Teacher, Center, Agency, validation errors, unauthorized)
+#   Update operations: 4 tests (Teacher, Center, Agency, not found)
+#   Delete operations: 3 tests (Agency only, forbidden for Teacher and Center)
+#
+# Questions API: 18 tests
+#   Read operations: 3 tests (GET all, filter by level, GET by ID with answers)
+#   Create operations: 7 tests (4 question types + validation/authorization errors)
+#   Update operations: 4 tests (Teacher, Center, Agency, not found)
+#   Delete operations: 4 tests (Agency only, forbidden for Teacher/Center, not found)
+#
+# Integration Tests: 4 tests
+#   Full workflow: Create level ’ Create questions ’ Get level with questions
+#
+# Auth Tests: 4 tests
+#   No auth, Invalid token for both Levels and Questions
+#
+################################################################################
+# TESTING INSTRUCTIONS
+################################################################################
+
+# 1. Start NestJS server: npm run start:dev
+# 2. Login with all 4 roles using api-tests/auth.http:
+#    - Agency (super admin)
+#    - Center (organization admin)
+#    - Teacher (instructor)
+#    - Student (learner)
+# 3. Copy tokens to @variables section at top
+# 4. Run tests sequentially to verify:
+#     Role-based access control works correctly
+#     Validation catches errors
+#     Progress tracking integrates properly (levels)
+#     Nested answer options work correctly (questions)
+#     All 4 question types can be created
+# 5. Check Swagger docs: http://localhost:3000/api/docs
+#
+# Expected Results:
+# - Students can only READ levels and questions
+# - Teachers can CREATE and UPDATE
+# - Centers can CREATE and UPDATE
+# - Only AGENCY can DELETE
+# - All validation errors return 400
+# - Authorization errors return 403
+# - Not found errors return 404
+#
+# Question Types Tested:
+# 1. select_right_answer - Multiple choice with one correct answer
+# 2. fill_in_blank - Fill in missing words
+# 3. sort_words - Arrange words in correct order
+# 4. talk_to_speech_compare - Speech recognition and comparison

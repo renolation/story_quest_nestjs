@@ -10,13 +10,14 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { LevelsService } from './levels.service';
-import { CreateLevelDto } from './dto/create-level.dto';
-import { UpdateLevelDto } from './dto/update-level.dto';
-import { LevelResponseDto } from './dto/level-response.dto';
-import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { CreateLevelDto, UpdateLevelDto, LevelResponseDto } from './dto';
+import { CurrentUser, Roles } from '../../common/decorators';
+import { RolesGuard } from '../../common/guards';
+import { UserRole } from '../../common/enums';
 
 @ApiTags('Levels')
 @ApiBearerAuth()
@@ -25,7 +26,22 @@ export class LevelsController {
   constructor(private readonly levelsService: LevelsService) {}
 
   @Post()
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.TEACHER, UserRole.CENTER, UserRole.AGENCY)
   @HttpCode(HttpStatus.CREATED)
+  @ApiOperation({
+    summary: 'Create a new level',
+    description: 'Create a new level within a unit with time limits and passing score (requires Teacher, Center, or Agency role)',
+  })
+  @ApiBody({ type: CreateLevelDto })
+  @ApiResponse({
+    status: 201,
+    description: 'Level created successfully',
+    type: LevelResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Validation error' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Insufficient permissions' })
+  @ApiResponse({ status: 404, description: 'Parent unit not found' })
   create(@Body() createLevelDto: CreateLevelDto) {
     return this.levelsService.create(createLevelDto);
   }
@@ -86,6 +102,21 @@ export class LevelsController {
   }
 
   @Patch(':id')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.TEACHER, UserRole.CENTER, UserRole.AGENCY)
+  @ApiOperation({
+    summary: 'Update a level',
+    description: 'Update level details including time limits and passing score (requires Teacher, Center, or Agency role)',
+  })
+  @ApiBody({ type: UpdateLevelDto })
+  @ApiResponse({
+    status: 200,
+    description: 'Level updated successfully',
+    type: LevelResponseDto,
+  })
+  @ApiResponse({ status: 400, description: 'Validation error' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Insufficient permissions' })
+  @ApiResponse({ status: 404, description: 'Level not found' })
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateLevelDto: UpdateLevelDto,
@@ -94,7 +125,16 @@ export class LevelsController {
   }
 
   @Delete(':id')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.AGENCY)
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiOperation({
+    summary: 'Delete a level',
+    description: 'Delete a level (requires Agency role only - will cascade delete all questions and answer options)',
+  })
+  @ApiResponse({ status: 204, description: 'Level deleted successfully' })
+  @ApiResponse({ status: 403, description: 'Forbidden - Only Agency can delete levels' })
+  @ApiResponse({ status: 404, description: 'Level not found' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.levelsService.remove(id);
   }
