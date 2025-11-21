@@ -919,10 +919,10 @@ const newChapter = await fetch(`${API_URL}/chapters`, {
 
 ## 📚 Related Documentation
 
-- [Project Structure](./PROJECT_STRUCTURE.md)
-- [API Endpoints Reference](./API_ENDPOINTS_WITH_PROGRESS.md)
-- [Authentication Guide](./AUTH_README.md)
-- [Progress Tracking](./PROGRESS_TRACKING_IMPLEMENTATION.md)
+- [Project Structure](PROJECT_STRUCTURE.md)
+- [API Endpoints Reference](API_ENDPOINTS_WITH_PROGRESS.md)
+- [Authentication Guide](AUTH_README.md)
+- [Progress Tracking](PROGRESS_TRACKING_IMPLEMENTATION.md)
 
 ---
 

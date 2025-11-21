@@ -499,9 +499,9 @@ The NestJS backend is now fully prepared for Phase 1 development:
 - **Health Check**: http://localhost:3000/api/v1/auth/health
 
 ### Documentation
-- [Database Schema](./DATABASE_SCHEMA.md)
-- [API Endpoints](./API_ENDPOINTS.md)
-- [API Testing Guide](../api-tests/README.md)
+- [Database Schema](DATABASE_SCHEMA.md)
+- [API Endpoints](API_ENDPOINTS.md)
+- [API Testing Guide](../../api-tests/README.md)
 - [CLAUDE.md](../CLAUDE.md) - Main guidelines
 
 ### Commands

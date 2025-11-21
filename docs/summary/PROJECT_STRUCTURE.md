@@ -703,10 +703,10 @@ docker-compose -f docker-compose.dev.yml up -d --build
 
 ## 🔗 Related Documentation
 
-- [API Design Guidelines](./API_DESIGN_GUIDELINES.md)
+- [API Design Guidelines](API_DESIGN_GUIDELINES.md)
 - [Main Guidelines](../CLAUDE.md)
-- [Progress Tracking](./PROGRESS_TRACKING_IMPLEMENTATION.md)
-- [Authentication](./AUTH_README.md)
+- [Progress Tracking](PROGRESS_TRACKING_IMPLEMENTATION.md)
+- [Authentication](AUTH_README.md)
 
 ---
 

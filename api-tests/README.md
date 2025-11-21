@@ -235,7 +235,7 @@ After completing API tests:
 - [API Design Guidelines](../docs/API_DESIGN_GUIDELINES.md)
 - [Authentication System](../docs/AUTH_README.md)
 - [Progress Tracking](../docs/PROGRESS_TRACKING_IMPLEMENTATION.md)
-- [Day 2 Plan](../docs/plans/DAY_2_PLAN.md)
+- [Day 2 Plan](../docs/plans/week1/DAY_2_PLAN.md)
 
 ---
 

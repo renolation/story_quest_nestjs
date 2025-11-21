@@ -1009,9 +1009,9 @@ aws s3 cp backup_*.sql s3://backups/database/
 ## 🎓 Quick Start Checklist
 
 ### For New Developers
-1. ✅ Read [Project Structure](./docs/PROJECT_STRUCTURE.md)
-2. ✅ Review [API Design Guidelines](./docs/API_DESIGN_GUIDELINES.md)
-3. ✅ Understand [Authentication System](./docs/AUTH_README.md)
+1. ✅ Read [Project Structure](docs/summary/PROJECT_STRUCTURE.md)
+2. ✅ Review [API Design Guidelines](docs/summary/API_DESIGN_GUIDELINES.md)
+3. ✅ Understand [Authentication System](docs/summary/AUTH_README.md)
 4. ✅ Study the database schema (Integer IDs, not UUIDs)
 5. ✅ Review code style conventions (ParseIntPipe, @IsInt())
 6. ✅ Set up local development environment
@@ -1039,17 +1039,16 @@ aws s3 cp backup_*.sql s3://backups/database/
 ### Related Documentation
 
 #### Backend Documentation (This Project)
-- [Project Structure](./docs/PROJECT_STRUCTURE.md) - Complete folder structure
-- [API Design Guidelines](./docs/API_DESIGN_GUIDELINES.md) - API standards
-- [Authentication](./docs/AUTH_README.md) - Auth system details
-- [Progress Tracking](./docs/PROGRESS_TRACKING_IMPLEMENTATION.md) - Progress features
-- [API Reference](./docs/API_ENDPOINTS_WITH_PROGRESS.md) - All endpoints
-- [User Management](./docs/USER_CREATION_IMPLEMENTATION.md) - User creation
-- [Password Management](./docs/CHANGE_PASSWORD_IMPLEMENTATION.md) - Password changes
-- [Database Migration](./docs/UUID_TO_INT_MIGRATION_SUMMARY.md) - INT migration
-- [Docker Setup](./docs/DOCKER.md) - Deployment guide
-- [Web Dashboard Requirements](./docs/WEB_DASHBOARD_REQUIREMENTS.md) - Complete feature specs for 4 web roles
-- [Web Dashboard Implementation Guide](./docs/WEB_DASHBOARD_IMPLEMENTATION_GUIDE.md) - Step-by-step implementation
+- [Project Structure](docs/summary/PROJECT_STRUCTURE.md) - Complete folder structure
+- [API Design Guidelines](docs/summary/API_DESIGN_GUIDELINES.md) - API standards
+- [Authentication](docs/summary/AUTH_README.md) - Auth system details
+- [Progress Tracking](docs/summary/PROGRESS_TRACKING_IMPLEMENTATION.md) - Progress features
+- [API Reference](docs/summary/API_ENDPOINTS_WITH_PROGRESS.md) - All endpoints
+- [User Management](docs/summary/USER_CREATION_IMPLEMENTATION.md) - User creation
+- [Password Management](docs/summary/CHANGE_PASSWORD_IMPLEMENTATION.md) - Password changes
+- [Docker Setup](docs/summary/DOCKER.md) - Deployment guide
+- [Web Dashboard Requirements](docs/summary/WEB_DASHBOARD_REQUIREMENTS.md) - Complete feature specs for 4 web roles
+- [Web Dashboard Implementation Guide](docs/summary/WEB_DASHBOARD_IMPLEMENTATION_GUIDE.md) - Step-by-step implementation
 
 #### Client-Specific Documentation
 - **React Web Dashboard** (`claude-react.md`): Frontend guidelines for AGENCY, CENTER, TEACHER, REVIEWER roles
