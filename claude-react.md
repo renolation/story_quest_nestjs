@@ -43,7 +43,40 @@ Story Quest Web Dashboard is a multi-role admin panel built with React + TypeScr
 └─────────────────────────────────────┘
 ```
 
-**⚠️ IMPORTANT:** Students use **MOBILE APP ONLY** (React Native/Flutter), NOT this web dashboard.
+**⚠️ IMPORTANT:** Students use **MOBILE APP ONLY** (Flutter), NOT this web dashboard.
+
+### 📦 Recently Implemented Backend Features
+
+The backend now includes the following features:
+
+**1. Pronunciation Module** (Week 3 - Student Role Only)
+- Students practice pronunciation and submit attempts with client-calculated scores
+- Backend stores pronunciation attempts and provides analytics
+- API Endpoints: `/pronunciation/attempts`, `/pronunciation/best-score/:questionId`, `/pronunciation/stats`
+
+**2. Gamification Module** (Week 3 - Student + Teacher + Agency Roles)
+- Achievement system with 20 pre-configured achievements (bronze/silver/gold/platinum tiers)
+- Points and streaks tracking with transaction audit trail
+- Multi-period leaderboards (daily, weekly, monthly, all-time)
+- API Endpoints: `/gamification/achievements/*`, `/gamification/points/*`, `/gamification/leaderboard`, `/gamification/stats/me`
+
+**3. Chapter Ownership Model** (NEW - Agency + Center Roles)
+- **Public Chapters**: Created by AGENCY, available to all students
+- **Organization-Specific Chapters**: Created by CENTER, available only to their students
+- API Endpoints:
+  - Agency: `/api/v1/agency/chapters` (CRUD for public chapters)
+  - Center: `/api/v1/center/chapters` (CRUD for org-specific chapters)
+  - Student: `/api/v1/chapters` (view public + own org chapters)
+
+**Web Dashboard Integration:**
+- Teachers can view student pronunciation practice history and stats
+- Centers and Agency can view gamification analytics (achievements, leaderboards)
+- **Centers can create custom chapters** for their organization
+- **Agency can create public chapters** for all organizations
+- Student data is **read-only** from web dashboard (students interact via mobile app)
+
+> **See REACT_INTEGRATION_GUIDE.md for complete API documentation, TypeScript types, React Query hooks, and component examples.**
+> **See docs/summary/CHAPTER_OWNERSHIP_MODEL.md for detailed chapter ownership documentation.**
 
 ---
 
@@ -2321,6 +2354,7 @@ const activeStudentsCount = students.filter(s => s.status === 'active').length;
 - **Requirements**: See `docs/WEB_DASHBOARD_REQUIREMENTS.md` for complete feature specifications
 - **Backend API**: See `CLAUDE.md` in NestJS project for API documentation
 - **API Endpoints**: See `docs/API_DESIGN_GUIDELINES.md` for RESTful conventions
+- **Backend Integration**: See `REACT_INTEGRATION_GUIDE.md` for newly implemented backend features (Pronunciation, Gamification)
 
 ---
 
