@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, ILike } from 'typeorm';
+import * as bcrypt from 'bcrypt';
 import { Center, CenterStatus } from './entities/center.entity';
 import { CreateCenterDto } from './dto/create-center.dto';
 import { UpdateCenterDto } from './dto/update-center.dto';
@@ -29,6 +30,7 @@ import { UserRole } from '../../common/enums';
  * Business logic:
  * - CRUD operations for centers
  * - Center status management (active/inactive/suspended)
+ * - Automatic user account creation for each center (role: CENTER)
  * - List branches for a center
  * - List teachers for a center
  * - Center analytics and reporting
@@ -44,54 +46,87 @@ export class CentersService {
   constructor(
     @InjectRepository(Center)
     private centerRepository: Repository<Center>,
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
   ) {}
 
   /**
-   * Create a new center
+   * Create a new center with user account
    *
-   * @param createCenterDto - Center creation data
-   * @param currentUser - Current authenticated user (optional for flexibility)
+   * This method creates:
+   * 1. A Center entity
+   * 2. A User entity with role CENTER
+   *
+   * @param createCenterDto - Center creation data (name, email, password)
+   * @param currentUser - Current authenticated user (must be AGENCY)
    * @returns Created center with relations
-   * @throws ConflictException if email already exists
-   * @throws ForbiddenException if CENTER role tries to create
+   * @throws ConflictException if email already exists (center or user)
+   * @throws ForbiddenException if not AGENCY role
    */
   async create(
     createCenterDto: CreateCenterDto,
     currentUser?: User,
   ): Promise<Center> {
-    // Validate email uniqueness
-    if (createCenterDto.email) {
-      const existingCenter = await this.centerRepository.findOne({
-        where: { email: createCenterDto.email },
-      });
-
-      if (existingCenter) {
-        throw new ConflictException(
-          `Center with email ${createCenterDto.email} already exists`,
-        );
-      }
+    // Only AGENCY can create centers
+    if (currentUser && currentUser.role !== UserRole.AGENCY) {
+      throw new ForbiddenException('Only AGENCY role can create new centers');
     }
 
-    // Role-based business logic
-    if (currentUser) {
-      // CENTER role cannot create new centers
-      if (currentUser.role === UserRole.CENTER) {
-        throw new ForbiddenException(
-          'CENTER role is not allowed to create new centers',
-        );
-      }
+    const { name, email, password, ...centerData } = createCenterDto;
 
-      // AGENCY role: set agencyId from DTO or use currentUser.id
-      if (currentUser.role === UserRole.AGENCY) {
-        // If agencyId provided in DTO, use it; otherwise use current user's ID
-        if (!createCenterDto.agencyId) {
-          createCenterDto.agencyId = currentUser.id;
-        }
-      }
+    // Validate email uniqueness (both center and user tables)
+    const existingCenter = await this.centerRepository.findOne({
+      where: { email },
+    });
+    if (existingCenter) {
+      throw new ConflictException(`Center with email ${email} already exists`);
     }
 
-    // Create and save center
-    const center = this.centerRepository.create(createCenterDto);
+    const existingUser = await this.userRepository.findOne({
+      where: { email },
+    });
+    if (existingUser) {
+      throw new ConflictException(
+        `User with email ${email} already exists`,
+      );
+    }
+
+    // Generate username from email (e.g., 'admin@abc.com' -> 'abc_center')
+    const emailPrefix = email.split('@')[0];
+    const domain = email.split('@')[1]?.split('.')[0] || 'center';
+    let username = `${domain}_${emailPrefix}`.toLowerCase().replace(/[^a-z0-9_]/g, '_');
+
+    // Ensure username uniqueness
+    const existingUsername = await this.userRepository.findOne({
+      where: { username },
+    });
+    if (existingUsername) {
+      // Add random suffix if username exists
+      username = `${username}_${Date.now()}`;
+    }
+
+    // Hash password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create user account for center
+    const centerUser = this.userRepository.create({
+      username,
+      email,
+      passwordHash: hashedPassword,
+      fullName: name,
+      role: UserRole.CENTER,
+    });
+    const savedUser = await this.userRepository.save(centerUser);
+
+    // Create center and link to user (agency)
+    const center = this.centerRepository.create({
+      name,
+      email,
+      ...centerData,
+      agencyId: savedUser.id, // Link center to its user account
+      status: CenterStatus.ACTIVE,
+    });
     const savedCenter = await this.centerRepository.save(center);
 
     // Return with relations

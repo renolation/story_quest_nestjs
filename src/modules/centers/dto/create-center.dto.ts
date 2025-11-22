@@ -3,15 +3,22 @@ import {
   IsString,
   IsOptional,
   IsEmail,
-  IsInt,
   MinLength,
   MaxLength,
   IsUrl,
   Matches,
 } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
 
+/**
+ * DTO for creating a new center with user credentials
+ *
+ * When a center is created, a corresponding user account is automatically created with:
+ * - role: CENTER
+ * - username: auto-generated from email (e.g., 'abc_center' from 'admin@abc.com')
+ * - password: provided password (hashed with bcrypt)
+ * - email: same as center email
+ */
 export class CreateCenterDto {
   @ApiProperty({
     description: 'Center name',
@@ -25,14 +32,29 @@ export class CreateCenterDto {
   @MaxLength(255, { message: 'Center name cannot exceed 255 characters' })
   name: string;
 
-  @ApiPropertyOptional({
-    description: 'Center email address (must be unique)',
-    example: 'contact@abcenglish.com',
+  @ApiProperty({
+    description:
+      'Center email address (must be unique, used for login)',
+    example: 'admin@abcenglish.com',
+    maxLength: 255,
   })
-  @IsOptional()
+  @IsNotEmpty({ message: 'Email is required' })
   @IsEmail({}, { message: 'Invalid email format' })
   @MaxLength(255, { message: 'Email cannot exceed 255 characters' })
-  email?: string;
+  email: string;
+
+  @ApiProperty({
+    description:
+      'Password for center user account (min 6 characters, will be hashed)',
+    example: 'SecurePassword123',
+    minLength: 6,
+    maxLength: 50,
+  })
+  @IsNotEmpty({ message: 'Password is required' })
+  @IsString({ message: 'Password must be a string' })
+  @MinLength(6, { message: 'Password must be at least 6 characters long' })
+  @MaxLength(50, { message: 'Password cannot exceed 50 characters' })
+  password: string;
 
   @ApiPropertyOptional({
     description: 'Center phone number (Vietnamese format)',
@@ -75,12 +97,4 @@ export class CreateCenterDto {
   @MaxLength(255, { message: 'Business license cannot exceed 255 characters' })
   businessLicense?: string;
 
-  @ApiPropertyOptional({
-    description: 'Agency ID (super admin) to associate with this center',
-    example: 1,
-  })
-  @IsOptional()
-  @IsInt({ message: 'Agency ID must be an integer' })
-  @Type(() => Number)
-  agencyId?: number;
 }
