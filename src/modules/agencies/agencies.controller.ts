@@ -62,9 +62,9 @@ export class AgenciesController {
   @Roles(UserRole.AGENCY)
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
-    summary: 'Create a new agency',
+    summary: 'Create a new agency (SUPER ADMIN ONLY)',
     description:
-      'Create a new agency (super admin organization). Only AGENCY role can create agencies.',
+      'Create a new agency (super admin organization). CRITICAL SECURITY: Only the SUPER ADMIN (isSuperAdmin = true) can create agencies. Regular AGENCY users cannot create new agencies. This ensures only one super admin controls agency creation.',
     externalDocs: {
       description: 'Web Dashboard Implementation Guide',
       url: '/docs/WEB_DASHBOARD_IMPLEMENTATION_GUIDE.md',
@@ -93,7 +93,14 @@ export class AgenciesController {
   })
   @ApiResponse({
     status: 403,
-    description: 'Forbidden - Only AGENCY role can create agencies',
+    description: 'Forbidden - Only SUPER ADMIN can create agencies. Regular AGENCY users will get: "Only the SUPER ADMIN can create new agencies. Regular agency users cannot create agencies."',
+    schema: {
+      example: {
+        statusCode: 403,
+        message: 'Only the SUPER ADMIN can create new agencies. Regular agency users cannot create agencies.',
+        error: 'Forbidden',
+      },
+    },
   })
   @ApiResponse({
     status: 409,

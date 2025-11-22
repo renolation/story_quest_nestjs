@@ -47,18 +47,26 @@ export class AgenciesService {
    * Create a new agency
    *
    * @param createAgencyDto - Agency creation data
-   * @param currentUser - Current authenticated user (must be AGENCY or system admin)
+   * @param currentUser - Current authenticated user (must be SUPER ADMIN)
    * @returns Created agency with relations
    * @throws ConflictException if email already exists
-   * @throws ForbiddenException if not AGENCY role
+   * @throws ForbiddenException if not SUPER ADMIN
    */
   async create(
     createAgencyDto: CreateAgencyDto,
     currentUser?: User,
   ): Promise<Agency> {
-    // Only AGENCY role can create agencies (or if no user provided for system init)
-    if (currentUser && currentUser.role !== UserRole.AGENCY) {
-      throw new ForbiddenException('Only AGENCY role can create new agencies');
+    // Only SUPER ADMIN can create agencies (or if no user provided for system init)
+    if (currentUser) {
+      if (currentUser.role !== UserRole.AGENCY) {
+        throw new ForbiddenException('Only AGENCY role can create new agencies');
+      }
+
+      if (!currentUser.isSuperAdmin) {
+        throw new ForbiddenException(
+          'Only the SUPER ADMIN can create new agencies. Regular agency users cannot create agencies.',
+        );
+      }
     }
 
     const { email } = createAgencyDto;
