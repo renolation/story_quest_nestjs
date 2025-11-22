@@ -10,9 +10,9 @@ class AgencyInfoDto {
   @Expose()
   id: number;
 
-  @ApiProperty({ description: 'Agency username', example: 'superadmin' })
+  @ApiProperty({ description: 'Agency name', example: 'Story Quest Global' })
   @Expose()
-  username: string;
+  name: string;
 
   @ApiProperty({ description: 'Agency email', example: 'admin@storyquest.com' })
   @Expose()

@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { User } from '../../users/entities/user.entity';
+import { Agency } from '../../agencies/entities/agency.entity';
 import { Branch } from '../../branches/entities/branch.entity';
 import { Chapter } from '../../chapters/entities/chapter.entity';
 
@@ -31,9 +31,9 @@ export class Center {
   @Column({ name: 'agency_id', nullable: true })
   agencyId: number | null;
 
-  @ManyToOne(() => User, { nullable: true, onDelete: 'SET NULL' })
+  @ManyToOne(() => Agency, (agency) => agency.centers, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'agency_id' })
-  agency: User | null;
+  agency: Agency | null;
 
   @Column({ type: 'varchar', length: 255 })
   name: string;

@@ -260,7 +260,7 @@ export class CentersService {
       agency: center.agency
         ? {
             id: center.agency.id,
-            username: center.agency.username,
+            name: center.agency.name,
             email: center.agency.email,
           }
         : null,
@@ -337,7 +337,7 @@ export class CentersService {
       agency: center.agency
         ? {
             id: center.agency.id,
-            username: center.agency.username,
+            name: center.agency.name,
             email: center.agency.email,
           }
         : null,

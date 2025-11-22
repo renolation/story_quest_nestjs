@@ -26,6 +26,7 @@ import { GamificationModule } from './modules/gamification/gamification.module';
 import { StoriesModule } from './modules/stories/stories.module';
 
 // Phase 7 Modules (Placeholder)
+import { AgenciesModule } from './modules/agencies/agencies.module';
 import { CentersModule } from './modules/centers/centers.module';
 import { BranchesModule } from './modules/branches/branches.module';
 import { GradesModule } from './modules/grades/grades.module';
@@ -69,6 +70,7 @@ import { JwtAuthGuard } from './common/guards';
     StoriesModule,
 
     // Phase 7 - Placeholder
+    AgenciesModule,
     CentersModule,
     BranchesModule,
     GradesModule,
