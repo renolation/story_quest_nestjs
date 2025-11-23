@@ -26,6 +26,7 @@ import { GamificationModule } from './modules/gamification/gamification.module';
 import { StoriesModule } from './modules/stories/stories.module';
 
 // Phase 7 Modules (Placeholder)
+import { AgenciesModule } from './modules/agencies/agencies.module';
 import { CentersModule } from './modules/centers/centers.module';
 import { BranchesModule } from './modules/branches/branches.module';
 import { GradesModule } from './modules/grades/grades.module';
@@ -34,6 +35,10 @@ import { TeacherNotesModule } from './modules/teacher-notes/teacher-notes.module
 import { GiftcodesModule } from './modules/giftcodes/giftcodes.module';
 import { CurriculumModule } from './modules/curriculum/curriculum.module';
 import { HomeworkModule } from './modules/homework/homework.module';
+import { ServicePackagesModule } from './modules/service-packages/service-packages.module';
+import { CenterSubscriptionsModule } from './modules/center-subscriptions/center-subscriptions.module';
+import { OffersModule } from './modules/offers/offers.module';
+import { TeachersModule } from './modules/teachers/teachers.module';
 
 import { JwtAuthGuard } from './common/guards';
 
@@ -69,6 +74,7 @@ import { JwtAuthGuard } from './common/guards';
     StoriesModule,
 
     // Phase 7 - Placeholder
+    AgenciesModule,
     CentersModule,
     BranchesModule,
     GradesModule,
@@ -77,6 +83,10 @@ import { JwtAuthGuard } from './common/guards';
     GiftcodesModule,
     CurriculumModule,
     HomeworkModule,
+    ServicePackagesModule,
+    CenterSubscriptionsModule,
+    OffersModule,
+    TeachersModule,
   ],
   controllers: [AppController],
   providers: [

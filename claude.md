@@ -40,10 +40,15 @@ The backend provides secure API endpoints and manages:
 
 #### **For Web Dashboard (React)**
 - **Multi-Role Authentication**: JWT with 4 web roles (Agency, Center, Teacher, Reviewer)
-- **Center & Branch Management**: Organization hierarchy and administration
+- **Center & Branch Management**: ✅ IMPLEMENTED - Organization hierarchy and administration
+  - Centers (Organizations): Create, manage, analytics
+  - Branches (Physical locations): Multi-location support
+  - Role-based access: AGENCY manages all, CENTER manages own
 - **Teacher & Class Management**: Teacher assignments, class scheduling
 - **Student Monitoring**: Read-only analytics, notes, progress tracking (no direct student creation)
-- **Content Management & Review**: Curriculum creation, approval workflows
+- **Content Management & Review**: ✅ IMPLEMENTED - Chapter ownership model
+  - Public chapters (AGENCY): Available to all students
+  - Org-specific chapters (CENTER): Custom curriculum per organization
 - **Giftcode System**: Trial codes, discounts, access management
 - **Analytics & Reporting**: Dashboards for centers, teachers, system-wide metrics
 - **Study Abroad Portal**: AI-powered recommendations and application management
@@ -285,8 +290,10 @@ id: number;  // NOT string, NOT UUID
 users (admin, teacher, student)
   ↓ (one-to-many)
 teacher_students (teacher-student relationships)
-  ↓
-chapters (order_index)
+
+centers (organization)
+  ↓ (one-to-many)
+chapters (center_id NULLABLE, is_public, order_index)
   ↓ (one-to-many)
 units (chapter_id, order_index)
   ↓ (one-to-many)
@@ -303,6 +310,18 @@ student_question_answers (attempt_id, question_id, is_correct, points_earned)
 student_unit_progress (student_id, unit_id, completed_levels, average_score)
 student_chapter_progress (student_id, chapter_id, completed_units, average_score)
 ```
+
+### Chapter Ownership Model
+**Chapters have two types:**
+1. **Public Chapters** (`center_id = NULL`, `is_public = true`):
+   - Created by AGENCY (super admin)
+   - Available to ALL students across all organizations
+   - Standard curriculum content
+
+2. **Organization-Specific Chapters** (`center_id = <center_id>`, `is_public = false`):
+   - Created by CENTER (organization admin)
+   - Available ONLY to students in that specific organization
+   - Custom curriculum for that organization
 
 ### Key Enums
 ```typescript
@@ -380,6 +399,7 @@ STUDENT (Mobile Only) - Separate hierarchy, uses Flutter app
  * AGENCY:
  *   - Full system access
  *   - Manage all centers, teachers, reviewers
+ *   - Create PUBLIC chapters (available to all organizations)
  *   - Content review oversight
  *   - Study abroad management
  *   - System-wide analytics
@@ -387,13 +407,15 @@ STUDENT (Mobile Only) - Separate hierarchy, uses Flutter app
  * CENTER:
  *   - Manage own center and branches
  *   - Manage teachers and classes
+ *   - Create ORGANIZATION-SPECIFIC chapters (only for own organization)
  *   - View student analytics (read-only)
  *   - Create and manage giftcodes
  *   - Center-specific reports
  *
  * TEACHER:
  *   - View assigned students (read-only + notes)
- *   - Create and edit curriculum content
+ *   - Create and edit curriculum content (units, levels, questions)
+ *   - Cannot create chapters (only CENTER and AGENCY can)
  *   - Manage homework assignments
  *   - Add student notes and observations
  *   - View class reports
@@ -407,6 +429,7 @@ STUDENT (Mobile Only) - Separate hierarchy, uses Flutter app
  * STUDENT:
  *   - Mobile app access ONLY (Flutter)
  *   - Cannot access web dashboard
+ *   - Access to public chapters + own organization's chapters
  *   - Own learning progress and content
  *   - Self-service profile management
  */
@@ -489,6 +512,12 @@ POST   /api/v1/agency/centers              // Create center
 PATCH  /api/v1/agency/centers/:id          // Update center
 DELETE /api/v1/agency/centers/:id          // Delete/suspend center
 
+// Public Chapter Management
+GET    /api/v1/agency/chapters             // List all chapters (public + org-specific)
+POST   /api/v1/agency/chapters             // Create PUBLIC chapter
+PATCH  /api/v1/agency/chapters/:id         // Update any chapter
+DELETE /api/v1/agency/chapters/:id         // Delete any chapter
+
 // Content Review Oversight
 GET    /api/v1/agency/content-reviews      // View all reviews
 GET    /api/v1/agency/reviewers            // Manage reviewers
@@ -508,6 +537,12 @@ GET    /api/v1/center/branches             // List own branches
 POST   /api/v1/center/branches             // Create branch
 PATCH  /api/v1/center/branches/:id         // Update branch
 DELETE /api/v1/center/branches/:id         // Delete branch
+
+// Organization-Specific Chapter Management
+GET    /api/v1/center/chapters             // List own org chapters + public chapters
+POST   /api/v1/center/chapters             // Create ORGANIZATION-SPECIFIC chapter
+PATCH  /api/v1/center/chapters/:id         // Update own org chapter
+DELETE /api/v1/center/chapters/:id         // Delete own org chapter
 
 // Teacher Management
 GET    /api/v1/center/teachers             // List teachers in center
@@ -574,7 +609,8 @@ POST   /api/v1/reviewer/chat/:id/message   // Send message
 // STUDENT ENDPOINTS (Mobile App Only - Flutter)
 // ============================================
 // Content Access (Learning Material)
-GET    /api/v1/chapters                    // List all chapters
+// Note: Students see PUBLIC chapters + their organization's chapters only
+GET    /api/v1/chapters                    // List chapters (public + own org)
 GET    /api/v1/chapters/:id                // Get chapter by ID (ID is INTEGER)
 GET    /api/v1/chapters/:id/units          // Get units in chapter
 GET    /api/v1/units/:id/levels            // Get levels in unit
