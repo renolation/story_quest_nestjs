@@ -38,6 +38,7 @@ import { HomeworkModule } from './modules/homework/homework.module';
 import { ServicePackagesModule } from './modules/service-packages/service-packages.module';
 import { CenterSubscriptionsModule } from './modules/center-subscriptions/center-subscriptions.module';
 import { OffersModule } from './modules/offers/offers.module';
+import { TeachersModule } from './modules/teachers/teachers.module';
 
 import { JwtAuthGuard } from './common/guards';
 
@@ -85,6 +86,7 @@ import { JwtAuthGuard } from './common/guards';
     ServicePackagesModule,
     CenterSubscriptionsModule,
     OffersModule,
+    TeachersModule,
   ],
   controllers: [AppController],
   providers: [

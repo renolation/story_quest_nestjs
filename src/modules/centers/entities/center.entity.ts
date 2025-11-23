@@ -28,7 +28,10 @@ export class Center {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: 'agency_id', nullable: true })
+  @Column({ name: 'user_id', type: 'int', nullable: true })
+  userId: number | null;
+
+  @Column({ name: 'agency_id', type: 'int', nullable: true })
   agencyId: number | null;
 
   @ManyToOne(() => Agency, (agency) => agency.centers, { nullable: true, onDelete: 'SET NULL' })

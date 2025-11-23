@@ -39,7 +39,7 @@ export class Class {
   name: string;
 
   @Column({ name: 'teacher_id', nullable: true })
-  teacherId: number;
+  teacherId: number | null;
 
   @ManyToOne(() => User, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'teacher_id' })
