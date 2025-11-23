@@ -417,7 +417,7 @@ export class TeachersService {
     });
 
     // For each class, get enrolled students
-    const result = [];
+    const result: { classId: number; className: string; students: User[] }[] = [];
     for (const classItem of classes) {
       const enrollments = await this.studentClassRepository.find({
         where: { classId: classItem.id },
