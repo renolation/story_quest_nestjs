@@ -4,6 +4,7 @@ import {
   IsOptional,
   IsEmail,
   IsInt,
+  IsBoolean,
   MinLength,
   MaxLength,
   Matches,
@@ -62,4 +63,13 @@ export class CreateBranchDto {
   @IsEmail({}, { message: 'Invalid email format' })
   @MaxLength(255, { message: 'Email cannot exceed 255 characters' })
   email?: string;
+
+  @ApiPropertyOptional({
+    description: 'Whether the branch is active',
+    example: true,
+    default: true,
+  })
+  @IsOptional()
+  @IsBoolean({ message: 'isActive must be a boolean' })
+  isActive?: boolean;
 }

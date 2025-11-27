@@ -256,6 +256,7 @@ export class CentersService {
       logoUrl: center.logoUrl,
       businessLicense: center.businessLicense,
       status: center.status,
+      userId: center.userId,
       agencyId: center.agencyId,
       agency: center.agency
         ? {
@@ -333,6 +334,7 @@ export class CentersService {
       logoUrl: center.logoUrl,
       businessLicense: center.businessLicense,
       status: center.status,
+      userId: center.userId,
       agencyId: center.agencyId,
       agency: center.agency
         ? {

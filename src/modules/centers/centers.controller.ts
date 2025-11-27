@@ -160,6 +160,7 @@ export class CentersController {
       logoUrl: center.logoUrl,
       businessLicense: center.businessLicense,
       status: center.status,
+      userId: center.userId,
       agencyId: center.agencyId,
       agency: center.agency
         ? {
@@ -446,6 +447,7 @@ Note: All fields are optional. Only provided fields will be updated.`,
       logoUrl: center.logoUrl,
       businessLicense: center.businessLicense,
       status: center.status,
+      userId: center.userId,
       agencyId: center.agencyId,
       agency: center.agency
         ? {

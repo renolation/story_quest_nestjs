@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { UserRole } from '../../../common/enums';
 
 export class UserResponseDto {
@@ -17,11 +17,14 @@ export class UserResponseDto {
   @ApiProperty({ enum: UserRole, example: UserRole.STUDENT })
   role: UserRole;
 
-  @ApiProperty({ example: 'https://example.com/avatar.jpg', nullable: true })
+  @ApiPropertyOptional({ example: 'https://example.com/avatar.jpg', nullable: true })
   avatarUrl: string | null;
 
   @ApiProperty({ example: true })
   isActive: boolean;
+
+  @ApiProperty({ example: false, description: 'Whether user is a super admin' })
+  isSuperAdmin: boolean;
 
   @ApiProperty({ example: '2025-01-15T10:30:00Z' })
   createdAt: Date;

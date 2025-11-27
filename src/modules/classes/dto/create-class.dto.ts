@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsOptional, IsString, MaxLength, Min } from 'class-validator';
+import { IsInt, IsNotEmpty, IsOptional, IsString, IsBoolean, MaxLength, Min } from 'class-validator';
 
 /**
  * Create Class DTO
@@ -52,4 +52,13 @@ export class CreateClassDto {
   @Min(1)
   @IsOptional()
   maxStudents?: number;
+
+  @ApiPropertyOptional({
+    description: 'Whether the class is active',
+    example: true,
+    default: true,
+  })
+  @IsBoolean()
+  @IsOptional()
+  isActive?: boolean;
 }

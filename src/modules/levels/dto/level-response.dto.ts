@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { LevelProgressDto } from '../../progress/dto/level-progress.dto';
 
 export class LevelResponseDto {
@@ -8,11 +8,11 @@ export class LevelResponseDto {
   @ApiProperty({ description: 'Level title', example: 'Practice Hello' })
   title: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Level description',
     example: 'Practice saying hello',
   })
-  description: string;
+  description: string | null;
 
   @ApiProperty({ description: 'Parent unit ID', example: 1 })
   unitId: number;
@@ -20,11 +20,14 @@ export class LevelResponseDto {
   @ApiProperty({ description: 'Level order index within unit', example: 1 })
   orderIndex: number;
 
-  @ApiProperty({ description: 'Time limit in seconds', example: 300 })
-  timeLimitSeconds: number;
+  @ApiPropertyOptional({ description: 'Time limit in seconds', example: 300 })
+  timeLimitSeconds: number | null;
 
-  @ApiProperty({ description: 'Passing score percentage (0-100)', example: 70 })
+  @ApiProperty({ description: 'Passing score percentage (0-100)', example: 70, default: 70 })
   passingScore: number;
+
+  @ApiProperty({ description: 'Total points available for this level', example: 100, default: 100 })
+  totalPoints: number;
 
   @ApiProperty({ description: 'Whether level is active', example: true })
   isActive: boolean;
@@ -35,18 +38,16 @@ export class LevelResponseDto {
   @ApiProperty({ description: 'Level last update timestamp' })
   updatedAt: Date;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Nested questions (if includeQuestions=true)',
-    required: false,
     type: 'array',
   })
   questions?: any[];
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Student progress for this level (null if no attempts yet)',
     type: LevelProgressDto,
     nullable: true,
-    required: false,
   })
   progress?: LevelProgressDto | null;
 }
