@@ -56,6 +56,7 @@ export class UsersController {
       role: userWithoutPassword.role,
       avatarUrl: userWithoutPassword.avatarUrl,
       isActive: userWithoutPassword.isActive,
+      isSuperAdmin: userWithoutPassword.isSuperAdmin,
       createdAt: userWithoutPassword.createdAt,
       updatedAt: userWithoutPassword.updatedAt,
     };
@@ -104,6 +105,7 @@ export class UsersController {
       role: userWithoutPassword.role,
       avatarUrl: userWithoutPassword.avatarUrl,
       isActive: userWithoutPassword.isActive,
+      isSuperAdmin: userWithoutPassword.isSuperAdmin,
       createdAt: userWithoutPassword.createdAt,
       updatedAt: userWithoutPassword.updatedAt,
     };
@@ -162,6 +164,7 @@ export class UsersController {
           role: userWithoutPassword.role,
           avatarUrl: userWithoutPassword.avatarUrl,
           isActive: userWithoutPassword.isActive,
+          isSuperAdmin: userWithoutPassword.isSuperAdmin,
           createdAt: userWithoutPassword.createdAt,
           updatedAt: userWithoutPassword.updatedAt,
         };
@@ -211,6 +214,7 @@ export class UsersController {
       role: userWithoutPassword.role,
       avatarUrl: userWithoutPassword.avatarUrl,
       isActive: userWithoutPassword.isActive,
+      isSuperAdmin: userWithoutPassword.isSuperAdmin,
       createdAt: userWithoutPassword.createdAt,
       updatedAt: userWithoutPassword.updatedAt,
     };

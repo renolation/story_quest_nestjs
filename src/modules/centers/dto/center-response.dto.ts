@@ -75,6 +75,13 @@ export class CenterResponseDto {
   status: CenterStatus;
 
   @ApiPropertyOptional({
+    description: 'Associated user ID (for CENTER role user)',
+    example: 5,
+  })
+  @Expose()
+  userId: number | null;
+
+  @ApiPropertyOptional({
     description: 'Associated agency ID',
     example: 1,
   })

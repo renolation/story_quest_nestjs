@@ -7,7 +7,7 @@ import {
   MaxLength,
   Min,
 } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateChapterDto {
   @ApiProperty({
@@ -20,19 +20,17 @@ export class CreateChapterDto {
   @MaxLength(255)
   title: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Chapter description',
     example: 'Learn basic greetings and how to introduce yourself',
-    required: false,
   })
   @IsOptional()
   @IsString()
   description?: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Chapter thumbnail image URL',
     example: 'https://example.com/images/chapter1.jpg',
-    required: false,
     maxLength: 500,
   })
   @IsOptional()
@@ -50,13 +48,29 @@ export class CreateChapterDto {
   @Min(0)
   orderIndex: number;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     description: 'Whether the chapter is active/visible',
     example: true,
     default: true,
-    required: false,
   })
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @ApiPropertyOptional({
+    description: 'Center ID for organization-specific chapters. Null for public chapters (AGENCY only)',
+    example: 1,
+  })
+  @IsOptional()
+  @IsInt()
+  centerId?: number | null;
+
+  @ApiPropertyOptional({
+    description: 'Whether the chapter is public (available to all students). Only AGENCY can create public chapters',
+    example: false,
+    default: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  isPublic?: boolean;
 }
